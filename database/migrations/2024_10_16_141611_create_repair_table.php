@@ -12,7 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('repair', function (Blueprint $table) {
-            $table->id();
+            $table->id('repair_id');
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('inventory_id');
+            $table->date('return_date');
+            $table->string('return_reason');
+            $table->string('return_status');
             $table->timestamps();
         });
     }
