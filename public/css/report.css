@@ -1,0 +1,108 @@
+/* Adjust layout for printing */
+@media print {
+    body {
+        font-size: 15px;
+        /* Reduce font size for better fit */
+        margin: 0;
+    }
+
+    .navbar,
+    .dropdown,
+    .tooltip-C,
+    .flex-none {
+        display: none;
+        /* Hide navbar, dropdown, and tooltips */
+    }
+
+    .wholediv {
+        width: 100%;
+        margin: 0;
+        align-items: center;
+        /* Center-align all child elements */
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 auto;
+        /* Center table */
+    }
+
+    .table th,
+    .table td {
+        padding: 5px;
+        text-align: center;
+        /* Center-align table cells */
+    }
+
+    .table th {
+        background-color: #f0f0f0;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    /* Ensure the content is responsive for portrait mode */
+    @page {
+        size: A4 portrait;
+        /* A4 size in portrait orientation */
+        margin: 10mm;
+    }
+
+    /* Hide print button and account section */
+    .tooltip-C,
+    .avatar,
+    .flex-none {
+        display: none !important;
+    }
+
+    input[type="date"] {
+        width: auto;
+        font-size: 15px;
+        display: inline-block !important;
+        /* Ensure date input is visible */
+    }
+
+    .labeltitle {
+        display: none !important;
+        /* Completely hide labels */
+    }
+
+    table {
+        width: 100% !important;
+        margin: 0 auto;
+    }
+
+    table th,
+    table td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 12px;
+    }
+
+    /* Hides elements that are not essential for the print view */
+    .minitab {
+        display: none !important;
+    }
+
+    /* Remove overflow styling for smooth printing */
+    .overflow-x-auto {
+        overflow: visible !important;
+        height: auto !important;
+    }
+
+    /* Center date inputs */
+    .date-labels {
+        display: flex;
+        justify-content: center;
+        /* Center date inputs */
+        margin-top: 200px;
+    }
+
+    .date-labels input[type="date"] {
+        margin: 0 10px;
+        /* Add margin between date inputs */
+    }
+}

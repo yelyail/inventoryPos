@@ -1,0 +1,175 @@
+/* * {
+    font-family: -apple-system;
+} */
+
+/* body {
+    background-image: url('/Images/thun.jpg') !important;
+    background-image: url('/images/try2.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+} */
+
+.navbar.bg-base-100 {
+    background-color: #222831 !important;
+    color: white;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 990;
+}
+
+.bg-base-200 {
+    background-color: white !important;
+    color: black;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+}
+
+/* .menu.bg-base-200.rounded-box {
+    width: 120px !important;
+    border-radius: 10px;
+    margin-left: 10px;
+    margin-top: 10px;
+    background-color: #222831 !important;
+    color: white;
+    height: 680px;
+
+} */
+
+.tooltip.tooltip:hover {
+    scale: 1.1;
+    transition: 600ms;
+}
+
+.tooltip.tooltip {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    margin-left: 10px;
+    margin-bottom: 25px;
+    margin-top: 26px;
+    transition: ease-in-out 0.5s !important;
+}
+
+.labeltitle {
+    font-size: 30px;
+    padding-left: 520px;
+    font-weight: bold;
+}
+
+.wholediv {
+    position: relative;
+    display: flex;
+    padding-top: 60px;
+    height: 770px;
+    /* align-items: ; */
+}
+
+.updiv {
+    position: relative;
+    display: flex;
+    height: 200px;
+}
+
+.downdiv {
+    position: relative;
+    display: flex;
+}
+
+.maindash {
+    height: 330px;
+    width: 1515px;
+    margin: 10px;
+    border-radius: 10px;
+    background-color: #fffffff3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.downdash {
+    height: 350px;
+    width: 748px;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-radius: 10px;
+    background-color: #fffffff3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-title {
+    font-size: 30px;
+    color: #222831;
+}
+
+.stat-value {
+    font-size: 100px;
+    padding: 30px;
+    padding-top: 40px;
+    color: #222831;
+}
+
+.prodsale {
+    width: 290px;
+    height: 250px;
+    padding: 10px;
+    border-radius: 50%;
+}
+
+.stat.place-items-center {
+    padding: 10px;
+}
+
+.disable {
+    pointer-events: none;
+    opacity: 0.1;
+}
+
+.sidemenu {
+    position: sticky;
+    top: 50px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.minitab {
+    position: sticky;
+    top: 60px;
+    z-index: 1000;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* .max-w-xs {
+    max-width: 100rem !important;
+    width: 900px !important;
+} */
+
+.iconmenu {
+    width: 45px;
+    height: 43px;
+}
+
+.join {
+    background-color: #fffffff3;
+    box-shadow: 0 4px 8px rgba(206, 187, 187, 0.1);
+    color: black;
+}
+
+#success-alert {
+    top: 60px;
+    /* Adjust this value based on your navbar height */
+    z-index: 50;
+    /* Keep it on top */
+}
+
+.imgava {
+    cursor: pointer;
+    border: 3px solid rgb(0, 0, 0);
+    transition: 600ms;
+}
+
+.imgava:hover {
+    transition: 600ms;
+    scale: 1.1;
+}

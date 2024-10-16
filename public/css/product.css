@@ -1,0 +1,58 @@
+table {
+    width: 1330px !important;
+}
+
+/* .modal {
+    width: auto;
+    max-width: 600px;
+    margin: auto;
+} */
+
+.modal-box {
+    position: relative;
+    align-items: center;
+    text-align: center;
+}
+
+.imgava {
+    cursor: pointer;
+    border: 3px solid rgb(0, 0, 0);
+    transition: 600ms;
+}
+
+.imgava:hover {
+    transition: 600ms;
+    scale: 1.1;
+}
+
+td {
+    font-size: 20px;
+}
+
+.trash {
+    width: 55px;
+    height: 55px;
+}
+
+.tab {
+    transition: 600ms;
+}
+
+.tab:hover {
+    scale: 1.1;
+    transition: 600ms;
+}
+
+#activeModal {
+    z-index: 1000 !important;
+}
+
+#deleteModal {
+    z-index: 1000 !important;
+}
+
+
+#modaldisposedd {
+    position: fixed;
+    z-index: 100 !important;
+}

@@ -1,0 +1,179 @@
+.boxofcontent {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 50px;
+    /* You may want to center the grid */
+    justify-content: center;
+    width: 1500px;
+}
+
+.boxes {
+    background-color: #fffffff3;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 100%;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    margin: 0 auto;
+    cursor: pointer;
+}
+
+/* .boxesinsidee {
+    background-color: #fffffff3;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 100%;
+    width: 270px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    margin: 0 auto;
+    cursor: pointer;
+} */
+
+.card.bg-base-100.w-96.shadow-xl {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 270px;
+    height: 450px;
+    /* cursor: default; */
+}
+
+.boxes:hover,
+.card.bg-base-100.w-96.shadow-xl:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.boxes img {
+    max-width: 100%;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.boxes .product-title {
+    font-size: 18px;
+    margin: 10px 0;
+    color: #333;
+}
+
+.boxes .product-price {
+    font-size: 16px;
+    color: #888;
+}
+
+.block {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.collapse.bg-base-200 {
+    background-color: transparent;
+    color: black;
+    text-align: center;
+}
+
+.collapse-title.text-sm:hover {
+    color: yellowgreen;
+}
+
+.input-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    cursor: default !important;
+}
+
+.input-item {
+    flex: 1;
+    margin-right: 1rem;
+    cursor: default !important;
+}
+
+/* Remove right margin from the last input item */
+.input-item:last-child {
+    margin-right: 0;
+}
+
+.imgava {
+    cursor: pointer;
+    border: 3px solid rgb(0, 0, 0);
+    transition: 600ms;
+}
+
+.imgava:hover {
+    transition: 600ms;
+    scale: 1.1;
+}
+
+#success-alert {
+    top: 60px;
+    /* Adjust this value based on your navbar height */
+    z-index: 50;
+    /* Keep it on top */
+}
+
+.modal-box {
+    flex-grow: 1;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 10px;
+
+}
+
+video,
+canvas {
+    transform: scaleX(-1);
+    display: block;
+    margin: 20px auto;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+}
+
+button.btn:disabled {
+    background-color: #e0e0e0 !important;
+    /* Light gray background */
+    color: #a0a0a0 !important;
+    /* Light gray text */
+    cursor: not-allowed !important;
+    /* Forbidden cursor */
+    opacity: 0.6 !important;
+    /* Fade effect */
+}
+
+button.btn {
+    transition: opacity 0.3s ease;
+    /* Smooth transition for opacity */
+}
+
+/* .badge.badge-outline {
+    font-weight: bold;
+} */
+
+#tab:hover {
+    background-color: #222831;
+    color: white;
+}
+
+.tab {
+    transition: 600ms;
+}
+
+.tab:hover {
+    scale: 1.1;
+    transition: 600ms;
+}

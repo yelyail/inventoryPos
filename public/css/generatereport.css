@@ -1,0 +1,87 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+    width: 800px;
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header img {
+    width: 120px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.header p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.report-details {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.report-details div {
+    width: 48%;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.report-details p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.report-details .right {
+    text-align: right;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.footer {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.footer div {
+    width: 32%;
+    display: inline-block;
+}
+
+.footer p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.received-by {
+    float: right;
+    text-align: center;
+}
