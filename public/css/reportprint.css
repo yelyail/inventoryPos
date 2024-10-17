@@ -9,7 +9,8 @@
     .navbar,
     .dropdown,
     .tooltip-C,
-    .flex-none {
+    .flex-none,
+    .menu-lg {
         display: none;
         /* Hide navbar, dropdown, and tooltips */
     }

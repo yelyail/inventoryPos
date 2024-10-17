@@ -25,6 +25,6 @@ export default {
     ],
 
     daisyui: {
-        themes: ["nord", "", "",],
+        themes: ["nord"],
     },
 };

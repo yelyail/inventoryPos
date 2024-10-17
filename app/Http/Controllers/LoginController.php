@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use App\Models\Account;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
@@ -12,36 +12,70 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('username', 'password');
+        $user = User::where('username', $credentials['username'])->first();
 
-        // Query the user by 'Username' column
-        $user = Account::where('Username', $credentials['username'])->first();
-
-        // Check if the user exists and use Laravel's Hash::check for password verification
-        if ($user && Hash::check($credentials['password'], $user->Password)) {
-            // Store necessary user info in session
-            Session::put('user_id', $user->User_ID);
-            Session::put('username', $user->Username);
-            Session::put('name', $user->Name);
-            Session::put('position', $user->Position);
-            Session::put('is_supervisor', $user->Position === 'Supervisor');
-
-            // Redirect based on user role
-            if ($user->Position === 'Supervisor') {
-                return redirect()->route('dashboard')->with('success', 'Welcome, ' . $user->Name . '! You have logged in successfully.');
-            } elseif ($user->Position === 'Office Staff' || $user->Position === 'Technician') {
-                return redirect()->route('staffdashboard')->with('success', 'Welcome, ' . $user->Name . '! You have logged in successfully.');
-            }
-
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            $this->showAlert('error', 'Error!', 'Username or password is incorrect. Please try again.');
+            return back();
         }
+        Session::put('user_id', $user->user_id);
+        Session::put('username', $user->username);
+        Session::put('fullname', $user->fullname);
+        Session::put('job_title', $user->job_title);
 
-        // If login fails, redirect with an error message
+        if ($user->job_title === 'supervisor') {
+            return redirect()->route('dashboard')->with('success', 'Welcome, ' . $user->fullname . '! You have logged in successfully.');
+        } elseif ($user->job_title === 'officeStaff' || $user->job_title === 'technician') {
+            return redirect()->route('staffdashboard')->with('success', 'Welcome, ' . $user->fullname . '! You have logged in successfully.');
+        }
         return redirect()->route('Login')->with('error', 'Invalid credentials, Please try again!');
     }
 
+
     public function logout()
     {
-        // Clear all session data related to the user
         Session::flush();
         return redirect()->route('Login')->with('success', 'You have logged out successfully!');
+    }
+    public function register()
+    {
+        return view('auth/register');
+    }
+
+    public function registerSave(Request $request)
+    {
+        $request->validate([
+            'fullname' => ['required', function ($attribute, $value, $fail) {
+                if (User::where('fullname', $value)->exists()) {
+                    $fail('The fullname has already been registered.');
+                }
+            }],
+            'username' => ['required', 'unique:users,username'],
+            'job_title' => ['required', 'string'],
+            'phone_number' => ['required', 'digits:10'],
+            'password' => ['required', 'min:8'],
+        ]);
+
+        try {
+            User::create([
+                'fullname' => $request->fullname,
+                'username' => $request->username,
+                'job_title' => $request->job_title,
+                'phone_number' => $request->phone_number,
+                'password' => Hash::make($request->password),
+            ]);
+            
+            $this->showAlert('success', 'Registration successful', 'Please log in.');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            $this->showAlert('error', 'Registration failed', 'Please try again.');
+            return redirect()->back();
+        }
+    }
+    public static function showAlert($icon, $title, $text) {
+        Session::flash('alertShow', true);
+        Session::flash('icon', $icon);
+        Session::flash('title', $title);
+        Session::flash('text', $text);
     }
 }
