@@ -38,6 +38,7 @@ Route::controller(supervisorController::class)->group(function() {
     Route::get('/admin/pending', 'pending')->name('pending');
     Route::get('/admin/report', 'report')->name('report');
     Route::get('/admin/pos', 'pos')->name('pos');
+    Route::get('/admin/salesReport', 'salesReport')->name('salesReport');
     
 });
 

@@ -3,135 +3,170 @@
 @section('title', 'DAVCOM Consumer Goods Trading')
 
 @section('content')
-<div class="upanddown">
-  <div class="downdiv">
-    <div class="downdash" style="overflow-x:auto !important;">
-        <div class="stat place-items-center">
-          <div class="stat-title">Low Stock Products</div>
-            <table id="dataTableLowStock" class="table table-xs">
-              <thead style="font-size: 20px !important; color: #222831; position: sticky; top: 0; background-color: white; text-align: center;">
-                <tr>
-                  <th>Category</th>
-                  <th>Brand</th>
-                  <th>Model</th>
-                  <th>Unit</th>
-                  <th>Stock</th>
-                </tr>
-              </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <div class="avatar">
-                    <img class="imgava" src="" alt="" style="width: 50px; height: 50px; border-radius: 50%;">
-                  </div>
-                </td>
-                <td style="font-size: 15px !important; text-align: center;">
-                </td>
-                <td style="font-size: 15px !important; text-align: center;">
-                </td>
-                <td style="font-size: 15px !important; text-align: center;">
-                </td>
-                <td style="font-size: 15px !important; text-align: center; color: red;">
-                  <b></b> 
-                </td>
-              </tr>
-            </tbody>
-          </table>
+<div id="main" class="main-content flex-1 bg-gray-100 mt-12 md:mt-0 md:ml-48 pb-24 md:pb-5"> 
+  <div class="flex flex-row flex-wrap flex-grow mt-2">
+    <div class="w-full md:w-1/2 xl:w-1/3 p-6">
+      <div class="bg-gray border border-gray-300 rounded-lg">
+        <div class="uppercase text-gray-800 border-b-2 border-gray-800 rounded-tl-lg rounded-tr-lg p-2">
+          <h2 class="font-bold uppercase text-gray-600">Low Stock Product</h2>
         </div>
-    </div>
-    <div class="downdash" style="overflow:auto !important;">
-      <div class="stat place-items-center">
-        <div class="stat-title">Defective Products</div>
-          <table id="dataTableDamaged" class="table table-xs">
-            <thead style="font-size: 20px !important; color: #222831; position: sticky; top: 0; background-color: white; text-align: center;">
-              <tr>
-                <th>Serial #</th>
-                <th>Category</th>
-                <th>Brand</th>
-                <th>Model</th>
-                <th>Unit</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <div class="avatar">
-                    <img class="imgava" src="" alt="" style="width: 50px; height: 50px; border-radius: 50%;">
-                  </div>
-                </td>
-                <td style="font-size: 15px !important; text-align: center;"></td>
-                <td style="font-size: 15px !important; text-align: center;">
-                </td>
-                <td style="font-size: 15px !important; text-align: center;">
-                </td>
-                <td style="font-size: 15px !important; text-align: center;">
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-    </div>
-</div>
-
-<div class="updiv">
-
-<div class="maindash" style="overflow:auto !important;">
-    <div class="stat place-items-center">
-            <div class="stat-title">Products Pending Inspection</div>
-            <table class="table table-xs">
-    <thead style="font-size: 20px !important; color: #222831; position: sticky; top: 0; background-color: white; text-align: center;">
-        <tr>
-            <th></th>
-            <th>Serial #</th>
-            <th>Category</th>
-            <th>Brand</th>
-            <th>Model</th>
-            <th>Days Since Arrived</th>
-        </tr>
-    </thead>
-    <tbody>
-       
-            <tr>
-              <td>
-                <div class="avatar">
-                  <img class="imgava" src="" alt="" style="width: 50px; height: 50px; border-radius: 50%;">
+        <div class="p-5">
+          <table class="w-full p-5 text-gray-700">
+                                <thead>
+                                <tr>
+                                    <th class="text-left text-gray-600">Serial #</th>
+                                    <th class="text-left text-gray-600">Category Name</th>
+                                    <th class="text-left text-gray-600">Brand Name</th>
+                                    <th class="text-left text-gray-600">Product Name</th>
+                                    <th class="text-left text-gray-600">Unit</th>
+                                    <th class="text-left text-gray-600">Stocks</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-              </td>
-                <td style="font-size: 15px !important; text-align: center;"></td>
-                        <td style="font-size: 15px !important; text-align: center;">
-                            
-                        </td>
-                        <td style="font-size: 15px !important; text-align: center;">
-                            
-                        </td>
-                        <td style="font-size: 15px !important; text-align: center;">
-                            
-                        </td>
-                        <td  style="font-size: 15px !important; text-align: center;"
-                            class="">
-                            <b></b>
-                        </td>
-            </tr>
-        
-    </tbody>
-</table>
+                <div class="w-full md:w-1/2 xl:w-1/3 p-6">
+                    <div class="bg-gray border border-gray-300 rounded-lg">
+                        <div class="uppercase text-gray-800 border-b-2 border-gray-800 rounded-tl-lg rounded-tr-lg p-2">
+                            <h2 class="font-bold uppercase text-gray-600">Defective Product</h2>
+                        </div>
+                        <div class="p-5">
+                            <table class="w-full p-5 text-gray-700">
+                                <thead>
+                                <tr>
+                                    <th class="text-left text-gray-600">Serial #</th>
+                                    <th class="text-left text-gray-600">Category Name</th>
+                                    <th class="text-left text-gray-600">Brand Name</th>
+                                    <th class="text-left text-gray-600">Product Name</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 xl:w-1/3 p-6">
+                    <div class="bg-gray border border-gray-300 rounded-lg">
+                        <div class="uppercase text-gray-800 border-b-2 border-gray-800 rounded-tl-lg rounded-tr-lg p-2">
+                            <h2 class="font-bold uppercase text-gray-600">Products Pending Inspection</h2>
+                        </div>
+                        <div class="p-5">
+                            <table class="w-full p-5 text-gray-700">
+                                <thead>
+                                <tr>
+                                    <th class="text-left text-gray-600">Serial #</th>
+                                    <th class="text-left text-gray-600">Category Name</th>
+                                    <th class="text-left text-gray-600">Brand Name</th>
+                                    <th class="text-left text-gray-600">Product Name</th>
+                                    <th class="text-left text-gray-600">Days Arrived</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div> <!--end of updiv--->
+</main>
 
-<dialog id="imageModal" class="modal">
-  <div class="modal-box">
-    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick="closeModalpic()">✕</button>
-    <div class="flex justify-center">
-      <img id="fullImage" src="" alt="Image" style="max-width: 80%; max-height: 80vh;"/>
-    </div>
-    <p><b>Description:</b></p>
-    <p id="imageDescription" class="mt-2"></p>
-  </div>
-</dialog>
+<script>
+    function toggleDropdown(dropdownId) {
+        document.getElementById(dropdownId).classList.toggle("hidden");
+    }
 
-</div> <!--end of upa nddown--->
-</div> <!--end of wholediv--->
+    window.onclick = function(event) {
+        if (!event.target.matches('.block')) {
+            var dropdowns = document.querySelectorAll('.absolute');
+            dropdowns.forEach(function(dropdown) {
+                dropdown.classList.add('hidden');
+            });
+        }
+    }
+    function toggleDD(myDropMenu) {
+        document.getElementById(myDropMenu).classList.toggle("invisible");
+    }
+    window.onclick = function(event) {
+        if (!event.target.matches('.drop-button')) {
+            var dropdowns = document.getElementsByClassName("dropdownlist");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (!openDropdown.classList.contains('invisible')) {
+                    openDropdown.classList.add('invisible');
+                }
+            }
+        }
+    }
+</script>
 <script src="{{ asset('js/Product.js') }}"></script>
 @if(session('success'))
     <div id="success-alert" class="fixed top-0 left-0 right-0 mx-auto w-full max-w-md p-4 bg-white text-black rounded shadow-lg transform -translate-y-full opacity-0 transition-transform duration-500 ease-in-out">

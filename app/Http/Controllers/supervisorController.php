@@ -22,8 +22,12 @@ class supervisorController extends Controller
     }
     
     public function report() {
-        $pageTitle = 'Reports';
+        $pageTitle = 'Inventory Reports';
         return view('Inventory/Report', compact('pageTitle'));
+    }
+    public function salesReport() {
+        $pageTitle = 'Sales Reports';
+        return view('Inventory/salesReport', compact('pageTitle'));
     }
     public function pending() {
         return view('Inventory/pending');
