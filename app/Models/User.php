@@ -20,6 +20,7 @@ class User extends Authenticatable
         'job_title',
         'phone_number',
         'password',
+        'archived',
     ];
 
     public $timestamp = false;

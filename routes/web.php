@@ -42,7 +42,9 @@ Route::controller(supervisorController::class)->group(function() {
     Route::get('/admin/salesReport', 'salesReport')->name('salesReport');
     
 });
-
+Route::controller(supervisorController::class)->group(function() {
+   Route::post('/admin/StoreSupply', 'storeSupplier')->name('storeSupplier');
+});
 
 // Route::get('/dashboard', function () {
 //     return view('dashboard');

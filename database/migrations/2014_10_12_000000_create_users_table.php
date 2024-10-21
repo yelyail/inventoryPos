@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('job_title')->nullable();
             $table->string('phone_number');
             $table->string('password');
+            $table->boolean('archived')->default(false);
             $table->timestamps();
         });
     }

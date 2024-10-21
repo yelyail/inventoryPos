@@ -9,7 +9,7 @@
             <div class="bg-gray border border-black-950">
                 <!-- Header Section with Search Box and Add Button -->
                 <div class="flex justify-between items-center uppercase text-gray-800 rounded-tl-lg rounded-tr-lg p-2">
-                    <h1 class="prod_title text-2xl font-bold">User Information</h1>
+                    <h1 class="prod_title text-2xl font-bold ">User Information</h1>
                 </div>
             </div>
         </div>
@@ -27,13 +27,13 @@
                     </div>
                 </div>
                 <div class="md:w-full text-right mt-3 md:mt-0">
-                    <button type="button" class="btn-add" id="plus-button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                    <button type="button" onclick="openAddUserModal()" class="btn-add" id="plus-button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                         <i class="fas fa-sharp fa-plus pr-0 md:pr-3:"></i> Add User
                     </button>
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-850">
+                <table class="min-w-full divide-y divide-gray-850 custom-table" id="userTable">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Employee Name</th>
@@ -44,47 +44,73 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr>
-                            <td class="px-4 py-2 text-sm text-gray-500">John Doe</td>
-                            <td class="px-4 py-2 text-sm text-gray-500">johndoe</td>
-                            <td class="px-4 py-2 text-sm text-gray-500">Manager</td>
-                            <td class="px-4 py-2 text-sm text-gray-500">1234567890</td>
-                            <td class="px-4 py-2 text-sm text-gray-500">
-                            <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                <i class="fas fa-sharp fa-pen-to-square pr-0 md:pr-2"></i><u>Edit</u>
-                            </button>
-                            <button type="button" class="btn-edit ml-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                <i class="fas fa-sharp fa-box-archive pr-0 md:pr-2"></i><u>Archive</u>
-                            </button>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-2 text-sm text-gray-500">John Doe</td>
-                            <td class="px-4 py-2 text-sm text-gray-500">johndoe</td>
-                            <td class="px-4 py-2 text-sm text-gray-500">Manager</td>
-                            <td class="px-4 py-2 text-sm text-gray-500">1234567890</td>
-                            <td class="px-4 py-2 text-sm text-gray-500">
-                            <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                <i class="fas fa-sharp fa-pen-to-square pr-0 md:pr-3:"></i> Edit
-                            </button>
-                        </tr>
-                         <tr>
-                            <td class="px-4 py-2 text-sm text-gray-500">John Doe</td>
-                            <td class="px-4 py-2 text-sm text-gray-500">johndoe</td>
-                            <td class="px-4 py-2 text-sm text-gray-500">Manager</td>
-                            <td class="px-4 py-2 text-sm text-gray-500">1234567890</td>
-                            <td class="px-4 py-2 text-sm text-gray-500">
-                            <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                <i class="fas fa-sharp fa-pen-to-square pr-0 md:pr-3:"></i> Edit
-                            </button>
-                        </tr>
+                        @foreach($users as $user)
+                            <tr>
+                                <td class="px-4 py-2 text-sm text-gray-700">{{ ucwords(strtolower($user->fullname)) }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">{{ ucwords(strtolower($user->username)) }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">{{ $user->job_title }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">{{ '+63 ' . substr($user->phone_number, 0, 3) . ' ' . substr($user->phone_number, 3, 3) . ' ' . substr($user->phone_number, 6) }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">
+                                    <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                        <i class="fas fa-sharp fa-pen-to-square pr-0 md:pr-2"></i><u>Edit</u>
+                                    </button>
+                                    <button type="button" class="btn-edit ml-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                        <i class="fas fa-sharp fa-box-archive pr-0 md:pr-2"></i><u>Archive</u>
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
-
-<script src="{{ asset('js/Product.js') }}"></script>
+<!-- Modal for Adding New User -->
+<div id="staticBackdropUser" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="staticBackdropUserLabel" aria-hidden="true">
+    <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
+        <div class="flex justify-between items-center p-4 border-b">
+            <h1 class="text-lg font-semibold" id="staticBackdropUserLabel">Add Employee</h1>
+            <button type="button" class="text-gray-500 hover:text-gray-700" onclick="closeUserModal()">
+                &times; <!-- Close button -->
+            </button>
+        </div>
+        <div class="p-4">
+            <form id="inventoryForm" action="{{route('registerSave') }}" method="POST">
+                @csrf
+                <div class="mb-4">
+                    <label for="fullname" class="block text-sm font-medium text-gray-700">Employee Name</label>
+                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="fullname" name="fullname" placeholder="Enter employee name" required>
+                </div>
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="username" name="username" placeholder="Enter username" required>
+                </div>
+                <div class="mb-4">
+                    <label for="job_title" class="block text-sm font-medium text-gray-700">Job Title</label>
+                    <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="job_title" name="job_title" required>
+                        <option value="" disabled selected hidden>Job Title</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="officeStaff">Office Staff</option>
+                        <option value="technician">Technician</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="phone_number" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="phone_number" name="phone_number" placeholder="Enter Phone Number" required>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="password" name="password" placeholder="********" required>
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button type="submit" class="btn bg-green-500 text-white hover:bg-green-600">Save</button>
+                    <button type="button" class="btn bg-red-500 text-white hover:bg-red-600 ml-2" onclick="closeUserModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @if(session('success'))
     <div id="success-alert" class="fixed top-0 left-0 right-0 mx-auto w-full max-w-md p-4 bg-white text-black rounded shadow-lg transform -translate-y-full opacity-0 transition-transform duration-500 ease-in-out">
         <div class="flex items-center">
@@ -94,4 +120,39 @@
     </div>
 @endif
 <script src="{{ asset('js/alert.js') }}"></script>
+<script> 
+
+    function openAddUserModal() {
+        document.getElementById('staticBackdropUser').classList.remove('hidden');
+    }
+
+    function closeUserModal() {
+        document.getElementById('staticBackdropUser').classList.add('hidden');
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('searchInput').addEventListener('keyup', filterTable);
+});
+
+function filterTable() {
+    let input = document.getElementById('searchInput');
+    let filter = input.value.toLowerCase();
+    let table = document.querySelector('.custom-table');
+    let tr = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < tr.length; i++) {
+        let td = tr[i].getElementsByTagName('td');
+        let found = false;
+
+        for (let j = 0; j < td.length; j++) {
+            if (td[j] && td[j].textContent.toLowerCase().indexOf(filter) > -1) {
+                found = true;
+                break;
+            }
+        }
+
+        tr[i].style.display = found ? '' : 'none';
+    }
+}
+</script>
+
 @endsection

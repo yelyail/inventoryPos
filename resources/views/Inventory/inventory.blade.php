@@ -11,7 +11,7 @@
           <h1 class="font-bold uppercase text-gray-600 text-3xl">Inventory</h1>
           <div class="flex space-x-2">
             <input type="text" class="border border-gray-300 rounded-md p-2" placeholder="Search...">
-            <button onclick="openAddProductModal()" class="bg-blue-500 text-white px-4 py-2 rounded-md">Add Product</button>
+            <button onclick="openAddProductModal()" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-800">Add Product</button>
           </div>
         </div>
         <div class="overflow-x-auto w-full">
@@ -130,7 +130,7 @@
                     <input type="file" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="productImage" name="productImage" accept="image/*" required>
                 </div>
                 <div class="flex justify-end mt-4">
-                    <button type="submit" class="btn bg-blue-500 text-white hover:bg-blue-600">Save</button>
+                    <button type="submit" class="btn bg-green-500 text-white hover:bg-green-600">Save</button>
                     <button type="button" class="btn bg-red-500 text-white hover:bg-red-600 ml-2" onclick="closeAddProductModal()">Cancel</button>
                 </div>
             </form>
