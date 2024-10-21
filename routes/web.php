@@ -34,10 +34,11 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 //Routes for header navigations------------------------------------------------------------------------------------------------------
 Route::controller(supervisorController::class)->group(function() {
     Route::get('/admin/dashboard', 'dashboard')->name('dashboard');
-    Route::get('/admin/adding', 'inventory')->name('inventory');
-    Route::get('/admin/pending', 'pending')->name('pending');
+    Route::get('/admin/inventory', 'inventory')->name('inventory');
+    Route::get('/admin/supplier', 'supplier')->name('supplier');
     Route::get('/admin/report', 'report')->name('report');
     Route::get('/admin/pos', 'pos')->name('pos');
+    Route::get('/admin/user', 'user')->name('user');
     Route::get('/admin/salesReport', 'salesReport')->name('salesReport');
     
 });

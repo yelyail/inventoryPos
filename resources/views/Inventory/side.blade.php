@@ -17,6 +17,7 @@
 
     @vite('resources/css/app.css')
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js" integrity="sha256-xKeoJ50pzbUGkpQxDYHD7o7hxe0LaOGeguUidbq6vis=" crossorigin="anonymous"></script>
@@ -34,7 +35,6 @@
                 </a>
             </div>
             <div class="flex flex-1 md:w-1/3 justify-center mx-auto text-white px-2">
-                <h2 class="font-bold uppercase text-white-900 text-2xl"><b>{{ $pageTitle ?? 'Dashboard' }}</b></h2>
             </div>
             <div class="flex w-full pt-2 content-center justify-between md:w-1/3 md:justify-end">
                 <ul class="list-reset flex justify-between flex-1 md:flex-none items-center">
@@ -66,26 +66,45 @@
                         <li class="mr-3 flex-1">
                             <a href="{{ route('dashboard') }}" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500">
                                 <i class="fas fa-list-check pr-0 md:pr-3"></i>
-                                <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">Dashboard</span>
+                                <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block"> Dashboard</span>
                             </a>
                         </li>
                         <li class="mr-3 flex-1">
                             <a href="{{ route('pos') }}" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-gray-500">
                                 <i class="fa fa-cart-shopping pr-0 md:pr-3"></i>
-                                <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">POS</span>
+                                <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block"> POS</span>
                             </a>
                         </li>
                         <li class="mr-3 flex-1">
                             <a href="{{ route('inventory') }}" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-purple-500">
                                 <i class="fas fa-sharp fa-boxes-stacked pr-0 md:pr-3:"></i>
-                                <span class="pb-1 md:pb-0 text-xs md:text-base text-white md:text-gray-200 block md:inline-block">Inventory</span>
+                                <span class="pb-1 md:pb-0 text-xs md:text-base text-white md:text-gray-200 block md:inline-block"> Inventory</span>
+                            </a>
+                        </li>  
+                        <li class="mr-3 flex-1">
+                            <a href="{{ route('supplier') }}" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-purple-500">
+                                <i class="fas fa-sharp fa-users pr-0 md:pr-3:"></i>
+                                <span class="pb-1 md:pb-0 text-xs md:text-base text-white md:text-gray-200 block md:inline-block"> Supplier</span>
+                            </a>
+                        </li>
+                        <li class="mr-3 flex-1">
+                            <a href="{{ route('user') }}" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-purple-500">
+                                <i class="fas fa-sharp fa-user pr-0 md:pr-3:"></i>
+                                <span class="pb-1 md:pb-0 text-xs md:text-base text-white md:text-gray-200 block md:inline-block"> User Information</span>
                             </a>
                         </li>
                         <li class="relative mr-3 flex-1">
-                            <button onclick="toggleDropdown('reportDropdown')" class="block w-full text-left py-1 md:py-3 pl-0 md:pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-red-500">
+                            <button onclick="toggleDropdown('reportDropdown')" class="block w-full text-left py-1 md:py-3 pl-0 md:pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-red-500 flex items-center">
                                 <i class="fa fa-square-poll-vertical pr-0 md:pr-3"></i>
-                                <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">Reports</span>
+                                <span class="flex items-center pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200">
+                                    Reports 
+                                    <svg class="h-5 w-5 text-gray-400 ml-12" width="10" height="10" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z"/>
+                                        <polyline points="6 9 12 15 18 9" />
+                                    </svg>
+                                </span>
                             </button>
+
                             <ul id="reportDropdown" class="absolute left-0 hidden mt-2 w-full bg-gray-800 shadow-lg">
                                 <li>
                                     <a href="{{ route('report') }}" class="block py-1 md:py-3 pl-2 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-red-500">
@@ -110,5 +129,6 @@
         </main>
     <!-- External Scripts -->
     @vite('resources/js/app.js')
+    <script src="{{ asset('js/side.js') }}"></script>
 </body>
 </html>

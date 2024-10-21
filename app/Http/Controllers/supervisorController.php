@@ -12,22 +12,25 @@ class supervisorController extends Controller
     }
     
     public function pos() {
-        $pageTitle = 'Point of Sale'; 
-        return view('Inventory/pos', compact('pageTitle'));
+        return view('Inventory/pos');
     }
     
     public function inventory() {
-        $pageTitle = 'Inventory'; 
-        return view('Inventory/inventory', compact('pageTitle'));
+        return view('Inventory/inventory');
+    }
+    
+    public function supplier() {
+        return view('Inventory/supplier');
+    }
+    public function user() {
+        return view('Inventory/usermanagement');
     }
     
     public function report() {
-        $pageTitle = 'Inventory Reports';
-        return view('Inventory/Report', compact('pageTitle'));
+        return view('Inventory/Report');
     }
     public function salesReport() {
-        $pageTitle = 'Sales Reports';
-        return view('Inventory/salesReport', compact('pageTitle'));
+        return view('Inventory/salesReport');
     }
     public function pending() {
         return view('Inventory/pending');
