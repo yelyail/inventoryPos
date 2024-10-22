@@ -1,5 +1,16 @@
 function toggleDropdown(dropdownId) {
-    document.getElementById(dropdownId).classList.toggle("hidden");
+    const dropdowns = document.querySelectorAll('ul[id^="dropdown"]');
+        
+        // Loop through dropdowns and hide them
+        dropdowns.forEach(dropdown => {
+            if (dropdown.id !== dropdownId) {
+                dropdown.classList.add('hidden'); // Hide others
+            }
+        });
+        
+        // Toggle the clicked dropdown
+        const dropdown = document.getElementById(dropdownId);
+        dropdown.classList.toggle('hidden'); // Show/hide the selected one
 }
 
 window.onclick = function(event) {

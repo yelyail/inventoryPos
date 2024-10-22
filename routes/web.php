@@ -39,11 +39,13 @@ Route::controller(supervisorController::class)->group(function() {
     Route::get('/admin/report', 'report')->name('report');
     Route::get('/admin/pos', 'pos')->name('pos');
     Route::get('/admin/user', 'user')->name('user');
+    Route::get('/admin/pending', 'pending')->name('pending');
     Route::get('/admin/salesReport', 'salesReport')->name('salesReport');
     
 });
 Route::controller(supervisorController::class)->group(function() {
    Route::post('/admin/StoreSupply', 'storeSupplier')->name('storeSupplier');
+   Route::post('/admin/storeProduct', 'storeInventory')->name('storeInventory');
 });
 
 // Route::get('/dashboard', function () {

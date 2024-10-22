@@ -65,8 +65,7 @@ class LoginController extends Controller
                 'password' => Hash::make($request->password),
             ]);
             
-            $this->showAlert('success', 'Registration successful', 'Please log in.');
-            return redirect()->back();
+            return redirect()->back()->with('success', 'Added successfully!');
         } catch (\Exception $e) {
             $this->showAlert('error', 'Registration failed', 'Please try again.');
             return redirect()->back();

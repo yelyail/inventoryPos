@@ -16,7 +16,7 @@
     <meta name="keywords" content="keywords,here">
 
     @vite('resources/css/app.css')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css"/>
@@ -107,46 +107,12 @@
                                 </li>
                             </ul>
                         </li>
-
-                        <li class="mr-3 flex-1">
-                            <a href="{{ route('supplier') }}" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-purple-500">
-                                <i class="fas fa-sharp fa-users pr-0 md:pr-3:"></i>
-                                <span class="pb-1 md:pb-0 text-xs md:text-base text-white md:text-gray-200 block md:inline-block"> Supplier</span>
+                        <li>
+                            <a href="{{ route('report') }}" class="block py-1 md:py-3 pl-2 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-red-500">
+                                <i class="fa fa-clipboard pr-0 md:pr-3"></i>
+                                <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">Inventory Reports</span>
                             </a>
                         </li>
-                        <li class="mr-3 flex-1">
-                            <a href="{{ route('user') }}" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-purple-500">
-                                <i class="fas fa-sharp fa-user pr-0 md:pr-3:"></i>
-                                <span class="pb-1 md:pb-0 text-xs md:text-base text-white md:text-gray-200 block md:inline-block"> User Information</span>
-                            </a>
-                        </li>
-                        <li class="relative mr-3 flex-1">
-                            <button onclick="toggleDropdown('reportDropdown')" class="block w-full text-left py-1 md:py-3 pl-0 md:pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-red-500 flex items-center">
-                                <i class="fa fa-square-poll-vertical pr-0 md:pr-3"></i>
-                                <span class="flex items-center pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200">
-                                    Reports 
-                                    <svg class="h-5 w-5 text-gray-400 ml-12" width="10" height="10" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z"/>
-                                        <polyline points="6 9 12 15 18 9" />
-                                    </svg>
-                                </span>
-                            </button>
-
-                            <ul id="reportDropdown" class="absolute left-0 hidden mt-2 w-full bg-gray-800 shadow-lg">
-                                <li>
-                                    <a href="{{ route('report') }}" class="block py-1 md:py-3 pl-2 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-red-500">
-                                        <i class="fa fa-clipboard pr-0 md:pr-3"></i>
-                                        <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">Inventory Reports</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('salesReport') }}" class="block py-1 md:py-3 pl-2 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-red-500">
-                                        <i class="fa fa-chart-line pr-0 md:pr-3"></i>
-                                        <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">Sales Reports</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>                        
                     </ul>
                 </div>
             </div>
@@ -158,6 +124,6 @@
     @vite('resources/js/app.js')
     <script src="{{ asset('js/side.js') }}"></script>
     <script src="{{ asset('js/alert.js') }}"></script>
-    <script src="{{asset('js/inventory.js') }}"></script>
+    <script src="{{ asset('js/search.js') }}"></script>
 </body>
 </html>

@@ -23,5 +23,5 @@ class User extends Authenticatable
         'archived',
     ];
 
-    public $timestamp = false;
+    public $timestamp = true;
 }

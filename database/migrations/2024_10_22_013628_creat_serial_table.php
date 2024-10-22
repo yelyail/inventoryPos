@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('category', function (Blueprint $table) {
-            $table->id('category_id');
-            $table->string('category_name');
-            $table->string('brand_name');
+        Schema::create('serial', function (Blueprint $table) {
+            $table->id('serial_id');
+            $table->unsignedBigInteger('product_ID');
+            $table->string('serial_number');
+            $table->foreign('product_ID')->references('product_ID')->on('product');
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('category');
+        //
     }
 };

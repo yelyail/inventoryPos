@@ -10,13 +10,17 @@ class inventory extends Model
     use HasFactory;
     protected $table = 'inventory';
     protected $primaryKey = 'inventory_id';
+
     protected $fillable = [
-        'order_id',
-        'inventory_ID',
-        'return_date',
+        'product_id',
         'date_arrived',
         'warranty_supplier',
-        'image_delivery',
+        'status',
     ];
 
+    // Relationship with Product
+    public function product()
+    {
+        return $this->belongsTo(product::class, 'product_id', 'product_id');
+    }
 }

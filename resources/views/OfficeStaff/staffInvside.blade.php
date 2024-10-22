@@ -1,376 +1,214 @@
-@if(!Session::has('user_id'))
-    <script type="text/javascript">
-        window.location = "{{ route('Login') }}"; // Redirect to login if session is not set
-    </script>
-@endif
-<!doctype html>
-<html data-theme="forest">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  @vite('resources/css/app.css')
-    <link rel="stylesheet" href="{{ asset('css/Dashboard.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/Bra-Cat.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/Invside.css') }}">
-    <link rel="icon" type="image/png" href="{{ asset('Images/davlogo2.png') }}">
-    <title>DAVCOM Consumer Goods Trading</title>
+@extends('OfficeStaff.side')
 
-</head>
-<!--NavBar Heading-->
-<body>
- <div class="navbar bg-base-100">
+@section('title', 'DAVCOM Consumer Goods Trading')
 
-<div class="dropdown">
-      <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-10 w-10"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4 6h16M4 12h16M4 18h7" />
-        </svg>
-      </div>
-      <ul
-        tabindex="0"
-        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow" style="width:300px; height: 190px; color: black; background-color: white !important;     border: 3px solid rgb(0, 0, 0);">
-        <li>
-    <a href="{{ route('staffdashboard') }}">
-      <img class="iconmenu"
-      src="/Images/dashboard.png"/>
-      Dashboard
-    </a>
-  </li>
-  <li>
-    <details open>
-      <summary>
-        <img class="iconmenu"
-      src="/Images/warehouse.png"/>
-        Inventory Management
-      </summary>
-      <ul>
-        <li>
-          <a href="{{ route('staffPending') }}">
-            Pending
-          </a>
-        </li>
-        <li>
-          <a href="{{ route('staffInvside') }}">
-            Inventory
-          </a>
-        </li>
-      </ul>
-    </details>
-  </li>
-      </ul>
-    </div>
-  <div class="flex-1">
-    <a class="btn btn-ghost text-xl"><img src="/Images/davcomlogo.png" style="width: 180px; height: 30px;" /></a>
-    <h1 class="labeltitle">Inventory</h1>
-  </div>
-  
-  <div class="flex-none gap-2">
-    <div class="dropdown dropdown-end">
-      <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-        <div class="w-10 rounded-full">
-          <img
-            alt="Tailwind CSS Navbar component"
-            src="/Images/account.png" style="filter: invert(1) !important;" />
+@section('content')
+<div id="main" class="main-content-flow flex-1 bg-white-100 mt-15 md:mt-4 md:ml-60 pb-30 md:pb-20">
+  <div class="flex flex-row flex-wrap flex-grow mt-1">
+    <div class="w-full p-2">
+      <div class="bg-gray border border-black-950">
+        <div class="flex justify-between items-center uppercase text-gray-800 rounded-tl-lg rounded-tr-lg p-2">
+          <h1 class="font-bold uppercase text-gray-600 text-3xl">Inventory</h1>
+          <div class="flex space-x-2">
+            <input type="text" class="border border-gray-300 rounded-md p-2" placeholder="Search...">
+            <button onclick="openAddProductModal()" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-800">Add Product</button>
+          </div>
+        </div>
+        <div class="overflow-x-auto w-full">
+          <table class="table w-full p-5 text-gray-700">
+            <thead class="text-1xl">
+              <tr>
+                <th class="w-40">Product Image</th>
+                <th class="w-40">Category Name</th>
+                <th class="w-40">Brand Name</th>
+                <th class="w-40">Model Name</th>
+                <th class="w-40">Supplier Name</th>
+                <th class="w-40">Current Stocks</th>
+                <th class="w-40">Price</th>
+                <th class="w-40">Updated Stocks</th>
+                <th class="w-40">Restock Date</th>
+                <th class="w-40">Date Added</th>
+                <th class="w-40">Warranty</th>
+                <th class="w-40">Unit</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr >
+                <td class="cursor-pointer hover:opacity-75" onclick="openSerialModal('Samsung Galaxy S21', ['14242', '13242', '54533'])">
+                    <img src="{{ asset('/product_images/1727898641-AK-170.jpg') }}" alt="Product Image" 
+                        class="w-30 h-20 ">
+                </td>
+                <td>Electronics</td>
+                <td>Samsung</td>
+                <td>Galaxy S21</td>
+                <td>Supplier A</td>
+                <td class='text-center'>10</td>
+                <td class='text-center'>$999</td>
+                <td class='text-center'>15</td>
+                <td>2024-10-01</td>
+                <td>2024-01-01</td>
+                <td class='text-center'>1 year</td>
+                <td class='text-center'>Unit</td>
+                <td><button class="bg-green-500 text-white px-2 py-1 rounded">Edit</button></td>
+              </tr>
+              <!-- More rows as needed -->
+            </tbody>
+          </table>
         </div>
       </div>
-      <ul
-        tabindex="0"
-        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow" style=" border: 2px solid black; background-color:whitesmoke; color:black; z-index: 1000;">
-        <h3><b>Account:  {{ Session::get('name') }} ({{ Session::get('position') }})</h3></b>
-        <!-- <li><a><img src="/Images/megaphone.png" style="width: 20px; height: 20px;" /> <b>Activity Log</b></a></li> -->
-        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-            @csrf
-        </form>
-        <li><a href="" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><img src="/Images/logout.png" style="width: 20px; height: 20px;" /><b>Log out</b></a></li>
-        <!-- <li><select>
-        <option value="light">Light Mode</option>
-        <option value="dark">Dark Mode</option>
-      </select></li> -->
-        </li>
-    </ul>
     </div>
   </div>
 </div>
 
-<div class="wholediv">
-
-<div class="upanddown">
-
-<div class="minitab">
-  <div role="tablist" class="tabs tabs-boxed">
-    <!-- <a role="tab" class="tab tab-active">Stocks</a>
-    <a href="{{ route('staffPending') }}" role="tab" class="tab" id="tab">Pending</a>
-    <a href="{{ route('Received') }}" role="tab" class="tab"  id="tab"style="visibility: hidden;">Received</a> -->
-        <a role="tab" class="tab" style="width: 85px; height:30px; margin-left:780px">
-        <div class="tooltip-C">
-        <div class="tooltipB">Returned Products</div>
-        <button class="trash" onclick="modalreturn.showModal()"><img class="" style="width:95px; height:55px;" src="/Images/return.png"/></button>
-        </div></a>
-        <a role="tab" class="tab" style="width: 85px; height:30px;">
-        <div class="tooltip-C">
-        <div class="tooltipB">Repairing Products</div>
-        <button class="trash" onclick="modalrepair.showModal()"><img class="" style="width:95px; height:55px;" src="/Images/repair.png"/></button>
-        </div></a>
-        <a class="tab" style="width: 85px; height:30px !important; ">
-        <div class="tooltip-C">
-        <div class="tooltipB">Sold Products</div>
-        <button class="trash" onclick="modalsold.showModal()"><img class="" style="width:95px; height:55px;" src="/Images/sold.png"/></button>
-        </div></a>
-  </div>
-</div>
-
-<dialog id="modalsold" class="modal">
-    <div class="modal-box" style="width: 90%; max-width: 1400px; height: 800px;">
-        <!-- Close button -->
-        <button type="button" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick="document.getElementById('modalsold').close()">✕</button>
-        
-        <!-- Title -->
-        <h2 class="text-2xl font-bold mb-4 text-center">Sold Products</h2>
-
-        <!-- Sold Items List -->
-        @foreach($soldItems as $item)
-        <div class="bg-base-100 shadow-lg rounded-lg p-4 mb-4">
-            <div class="grid grid-cols-3 items-center mt-2">
-                <div class="col-span-1">
-                    <p class="font-semibold">Invoice: <span class="font-normal">{{ $item->Invoice }}</span></p>              
-                    <p class="font-semibold">Status: <span class="font-normal text">{{ $item->status }}</span></p>
-                    <p class="font-semibold">Serial Number: <span class="font-normal">{{ $item->inventory->serial_number }}</span></p>
-                </div>
-                <div class="col-span-1">
-                    <p class="font-semibold">Model: <span class="font-normal">{{ $item->inventory->product->product_name }}</span></p>
-                    <p class="font-semibold">Date Sold: <span class="font-normal">{{ $item->date_sold }}</span></p>
-                    <p class="font-semibold" style="visibility: hidden;">.<span class="font-normal"></span></p>
-                </div>
-            </div>
+<!-- Modal for Adding New Product -->
+<div id="staticBackdrop" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
+        <div class="flex justify-between items-center p-4 border-b">
+            <h1 class="text-lg font-semibold" id="staticBackdropLabel">Add Product</h1>
+            <button type="button" class="text-gray-500 hover:text-gray-700" onclick="closeAddProductModal()">
+                &times; <!-- Close button -->
+            </button>
         </div>
-        @endforeach
-    </div>
-</dialog>
-
-
- <dialog id="modalreturn" class="modal">
-    <div class="modal-box" style="width: 90%; max-width: 1400px; height: 800px;">
-        <!-- Close button -->
-        <button type="button" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick="document.getElementById('modalreturn').close()">✕</button>
-        
-        <!-- Title -->
-        <h2 class="text-2xl font-bold mb-4 text-center">Returned Products</h2>
-        
-        @foreach ($returneditems as $rt)
-        <!-- Returned Item List -->
-       <div class="bg-base-100 shadow-lga rounded-lg p-4 mb-4">
-            <div class="grid grid-cols-3 items-center mt-2">
-                <div class="col-span-1">
-                    <p class="font-semibold">Category: <span class="font-normal">{{ $rt->product->category->Category_Name }}</span></p>              
-                    <p class="font-semibold">Brand: <span class="font-normal">{{ $rt->product->brand->Brand_Name }}</span></p>
-                    <p class="font-semibold">Model: <span class="font-normal">{{ $rt->product->product_name }}</span></p>
+        <div class="p-4">
+            <form id="inventoryForm" action="" method="POST">
+                @csrf
+                <div class="mb-4">
+                    <label for="categoryName" class="block text-sm font-medium text-gray-700">Category Name</label>
+                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="categoryName" name="categoryName" placeholder="Enter category name" required>
                 </div>
-                <div class="col-span-1">
-                    <p class="font-semibold">Serial Number: <span class="font-normal">{{ $rt->serial_number }}</span></p>
-                    <p class="font-semibold">Date Returned: <span class="font-normal">{{ $rt->date_returned }}</span></p>
-                    <p class="font-semibold" style="">Status: <span class="font-normal">{{ $rt->status }}</span></p>
+                <div class="mb-4">
+                    <label for="productName" class="block text-sm font-medium text-gray-700">Brand Name</label>
+                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="brandname" name="brandname" placeholder="Enter Brand Name" required>
                 </div>
-            </div>
-        </div>
-        @endforeach
-    </div>
-</dialog>
-
-<dialog id="modalrepair" class="modal">
-    <div class="modal-box" style="width: 90%; max-width: 1400px; height: 800px;">
-        <!-- Close button -->
-        <button type="button" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick="document.getElementById('modalrepair').close()">✕</button>
-        
-        <!-- Title -->
-        <h2 class="text-2xl font-bold mb-4 text-center">Repairing Products</h2>
-
-       @foreach ($repairitems as $rp)
-    <!-- Repair Item List -->
-    <div class="bg-base-100 shadow-lg rounded-lg p-4 mb-4">
-        <div class="grid grid-cols-3 items-center mt-2">
-            <div class="col-span-1">
-                <p class="font-semibold">Category: 
-                    <span class="font-normal">
-                        {{ $rp->inventory && $rp->inventory->product && $rp->inventory->product->category ? $rp->inventory->product->category->Category_Name : 'N/A' }}
-                    </span>
-                </p>
-                <p class="font-semibold">Brand: 
-                    <span class="font-normal">
-                        {{ $rp->inventory && $rp->inventory->product && $rp->inventory->product->brand ? $rp->inventory->product->brand->Brand_Name : 'N/A' }}
-                    </span>
-                </p>
-                <p class="font-semibold">Model: 
-                    <span class="font-normal">
-                        {{ $rp->inventory && $rp->inventory->product ? $rp->inventory->product->product_name : 'N/A' }}
-                    </span>
-                </p>
-                <p class="font-semibold">Technician: 
-                    <span class="font-normal">{{ $rp->technician ? $rp->technician->Name : 'N/A' }}</span>
-                </p>
-            </div>
-            <div class="col-span-1">
-                <p class="font-semibold">Serial Number: 
-                    <span class="font-normal">{{ $rp->inventory->serial_number ?? 'N/A' }}</span>
-                </p>
-                <p class="font-semibold">Date Repaired: 
-                    <span class="font-normal">{{ $rp->date_repaired ?? 'N/A' }}</span>
-                </p>
-                <p class="font-semibold">Status: 
-                    <span class="font-normal">{{ $rp->status ?? 'N/A' }}</span>
-                </p>
-                <p class="font-semibold" style="visibility: hidden;">.<span class="font-normal"></span></p>
-            </div>
-        </div>
-    </div>
-@endforeach
-
-
-    </div>
-</dialog>
-
-
-
-  <div class="div">
-            <div class="boxofcontent">
-                @foreach ($catinv as $cti)
-                    <div class="boxes" data-category="{{ $cti->Category_Name }}" onclick="showProductsInModal('{{ $cti->Category_Name }}')">
-                        <div class="product-category" style="font-size: 19px;">{{ $cti->Category_Name }}</div>
+                <div class="mb-4">
+                    <label for="productName" class="block text-sm font-medium text-gray-700">Model Name</label>
+                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="modelName" name="productName" placeholder="Enter Model Name" required>
+                </div>
+                <div class="mb-4">
+                    <label for="stocks" class="block text-sm font-medium text-gray-700">Stocks</label>
+                    <input type="number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="stocks" name="stocks" placeholder="Enter how many stocks" required>
+                </div>
+                <div class="mb-4">
+                    <label for="unit" class="block text-sm font-medium text-gray-700">Units</label>
+                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="unit" name="unit" placeholder="Enter Unit/s" required>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="itemPrice" class="block text-sm font-medium text-gray-700">Price</label>
+                        <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="itemPrice" name="pricePerUnit" placeholder="Enter price" required>
                     </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-
-    <dialog id="modalinside" class="modal">
-        <div class="modal-box" style="width: 1400px; height: 800px;">
-            <div class="join" style="width: 10px;">
-                <div>
-                  <input id="searchInput" class="input input-bordered join-item" placeholder="Search" onkeyup="filterProducts()"/>
+                    <div>
+                        <label for="itemDate" class="block text-sm font-medium text-gray-700">Date Added</label>
+                        <input type="date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="itemDate" name="dateAdded" required>
+                    </div>
                 </div>
-            </div>
-            <form action="">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick="document.getElementById('modalinside').close()">✕</button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="warranty" class="block text-sm font-medium text-gray-700">Warranty</label>
+                        <input type="number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="warrantyPeriod" name="warrantyPeriod" placeholder="Enter warranty period" required>
+                    </div>
+                    <div>
+                        <label for="warrantyUnit" class="block text-sm font-medium text-gray-700">Warranty Units</label>
+                        <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="warrantyUnit" name="warrantyUnit" required>
+                            <option value="" disabled selected>Warranty Units</option>
+                            <option value="days">Days</option>
+                            <option value="weeks">Weeks</option>
+                            <option value="months">Months</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="suppName" class="block text-sm font-medium text-gray-700">Supplier Name</label>
+                    <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="suppName" name="supplierName" required>
+                        <option value="" disabled selected>Supplier Name</option>
+                  
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="productImage" class="block text-sm font-medium text-gray-700">Product Image</label>
+                    <input type="file" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="productImage" name="productImage" accept="image/*" required>
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button type="submit" class="btn bg-green-500 text-white hover:bg-green-600">Save</button>
+                    <button type="button" class="btn bg-red-500 text-white hover:bg-red-600 ml-2" onclick="closeAddProductModal()">Cancel</button>
+                </div>
             </form>
-            <div class="boxofcontent" id="modalContent">
-                <!-- Products will be dynamically loaded here -->
-            </div>
         </div>
-    </dialog>
+    </div>
+</div>
 
-@if(session('success'))
-    <div id="success-alert" class="fixed top-0 left-0 right-0 mx-auto w-full max-w-md p-4 bg-white text-black rounded shadow-lg transform -translate-y-full opacity-0 transition-transform duration-500 ease-in-out">
-        <div class="flex items-center">
-        <img src="/image-Icon/check.gif" alt="" style="width:40px; margin-right: 10px;">
-            <span>{{ session('success') }}</span>
-        </div>
+<!-- Main Modal for Serial Numbers -->
+<div id="serialNumberModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="modal-box">
+    <h3 class="text-lg font-semibold mb-4">Serial Numbers for <span id="productModelName"></span></h3>
+    <ul id="serialNumberList" class="list-disc pl-5"></ul>
+    <div class="modal-action">
+      <button onclick="openAddSerialModal()" class="btn bg-green-500 text-white border-4 border-green-500 hover:bg-green-600 hover:border-green-600">Add Serial</button>
+      <button onclick="closeModal()" class="btn bg-red-500 text-white border-4 border-red-500 hover:bg-red-600 hover:border-red-600">Close</button>
     </div>
-@endif
-@if(session('error'))
-    <div id="success-alert" class="fixed top-0 left-0 right-0 mx-auto w-full max-w-md p-4 bg-white text-black rounded shadow-lg">
-        <div class="flex items-center">
-            <img src="/image-Icon/danger.gif" alt="" style="width:40px; margin-right: 10px;">
-            <span>{{ session('error') }}</span>
-        </div>
+  </div>
+</div>
+
+<!-- Modal for Adding New Serial -->
+<div id="addSerialModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="modal-box">
+    <h3 class="text-lg font-semibold mb-4">Add New Serial for <span id="addSerialProductName"></span></h3>
+    <input type="text" id="newSerialInput" class="border border-gray-300 rounded-md p-2 mb-4" placeholder="Enter new serial number">
+    <div class="modal-action">
+      <button onclick="addNewSerial()" class="btn bg-green-500 text-white border-4 border-green-500 hover:bg-green-600 hover:border-green-600">Add Serial</button>
+      <button onclick="closeAddSerialModal()" class="btn bg-red-500 text-white border-4 border-red-500 hover:bg-red-600 hover:border-red-600">Close</button>
     </div>
-    @endif
+  </div>
+</div>
+
 <script>
-function showProductsInModal(category) {
-    const modalContent = document.getElementById('modalContent');
-    modalContent.innerHTML = ''; // Clear previous content
+function openSerialModal(productModelName, serialNumbers) {
+  console.log("Modal opened for:", productModelName, "with serial numbers:", serialNumbers);
 
-    const products = @json($productinv); // Pass the products from your backend
-    let hasApprovedProducts = false; // Flag to check if any approved products (New, Defective, Repaired) are found
-    let hasPendingProducts = false; // Flag to check if any pending products are found
+    document.getElementById('productModelName').innerText = productModelName;
+    const serialNumberList = document.getElementById('serialNumberList');
+    serialNumberList.innerHTML = '';
 
-    products.forEach(product => {
-        console.log('Checking product:', product); // Log each product being checked
-
-        // Accessing properties based on expected structure
-        const productName = product.product?.product_name;
-        const description = product.product?.description;
-        const image = product.product?.Image;
-
-        if (product.product && product.product.category && product.product.category.Category_Name === category) {
-
-            // Check if product status is Pending
-            if (product.status === 'Pending') {
-                hasPendingProducts = true; // Mark that we have pending products
-            }
-
-            // Only show approved products (New, Defective, Repaired)
-            if (product.status === 'New' || product.status === 'Defective' || product.status === 'Repaired' || product.status === 'Repair Failed' || product.status === 'Returned Defective') {
-                hasApprovedProducts = true; // Set flag to true if approved products are found
-
-                const warrantyExpirationDate = new Date(product.warranty_supplier);
-                const currentDate = new Date();
-
-                // Check conditions for buttons
-                const isDamaged = product.status === 'Defective';
-                const isWarrantyExpired = currentDate > warrantyExpirationDate;
-
-                modalContent.innerHTML += `
-                <div class="card product-card bg-base-100 w-96 shadow-xl">
-                    <figure>
-                        <img src="{{ asset('product_images/') }}/${image}" alt="" />
-                    </figure>
-                    <div class="card-body items-center text-center">
-                        <h2 class="card-title">${productName}</h2>
-                        <p style="font-size:15px;">${description}</p>
-                        <div class="card-actions justify-end">
-                            <div class="badge badge-outline" style="font-size:9px;">Warranty: ${product.warranty_supplier}</div>
-                            <div class="badge badge-outline" style="font-size:9px;">Status: ${product.status}</div>
-                        </div>
-                        <div class="badge badge-outline product-serial" style="font-size:9px;">Serial: ${product.serial_number}</div>
-                        <div class="badge badge-outline product-model" style="font-size:9px;">Model: ${product.model}</div>
-                        <div class="badge badge-outline" style="font-size:9px;">Arrived: ${product.date_arrived}</div>
-                        <div class="card-actions justify-end">
-                        </div>
-                    </div>
-                </div>`;
-
-            }
-        }
+    // Populate the modal with serial numbers
+    serialNumbers.forEach(serial => {
+        const li = document.createElement('li');
+        li.textContent = serial;
+        serialNumberList.appendChild(li);
     });
-
-    // Show pending message if no approved products are found and there are pending products
-    if (!hasApprovedProducts && hasPendingProducts) {
-        modalContent.innerHTML += `<h1><b>There are products for this category, but their status is still pending.</b></h1>`;
-    }
-
-    // If no products were found for the category, display a message
-    if (!hasApprovedProducts && !hasPendingProducts) {
-        modalContent.innerHTML = `<h1><b>No products available for this category.</b></h1>`;
-    }
-
-    document.getElementById('modalinside').showModal(); // Show the modal
+    document.getElementById('serialNumberModal').classList.remove('hidden');
 }
-function filterProducts() {
-    const searchInput = document.getElementById('searchInput').value.toLowerCase();
-    const productCards = document.querySelectorAll('.product-card');
 
-    productCards.forEach(card => {
-        const serialNumber = card.querySelector('.product-serial').textContent.toLowerCase();
-        const model = card.querySelector('.product-model').textContent.toLowerCase();
+function closeModal() {
+  document.getElementById('serialNumberModal').classList.add('hidden');
+}
 
-        if (serialNumber.includes(searchInput) || model.includes(searchInput)) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
-    });
+function openAddSerialModal() {
+    document.getElementById('addSerialModal').classList.remove('hidden');
+}
+
+function closeAddSerialModal() {
+    document.getElementById('addSerialModal').classList.add('hidden');
+}
+
+function addNewSerial() {
+    const newSerial = document.getElementById('newSerialInput').value;
+    const productModelName = document.getElementById('productModelName').innerText;
+
+    if (newSerial) {
+        const li = document.createElement('li');
+        li.textContent = newSerial;
+        document.getElementById('serialNumberList').appendChild(li);
+        closeAddSerialModal(); // Close the add serial modal
+    }
+}
+function openAddProductModal() {
+    document.getElementById('staticBackdrop').classList.remove('hidden');
+}
+
+function closeAddProductModal() {
+    document.getElementById('staticBackdrop').classList.add('hidden');
 }
 </script>
 
-
-<script src="{{ asset('js/alert.js') }}"></script>
-</body>
-</html>
+@endsection

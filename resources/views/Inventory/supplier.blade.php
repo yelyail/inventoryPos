@@ -1,7 +1,18 @@
 @extends('inventory.side')
 
 @section('title', 'DAVCOM Consumer Goods Trading')
-<div id="main" class="main-content-flow flex-1 bg-white-100 mt-13 md:mt-2 md:ml-48 pb-28 md:pb-10">
+
+@section('content')
+@if(session('success'))
+    <div id="success-alert" class="fixed top-4 left-0 right-0 mx-auto w-full max-w-md p-4 bg-white text-black rounded shadow-lg transform translate-y-10 opacity-100 transition-transform duration-500 ease-in-out">
+        <div class="flex items-center">
+            <img src="/image-Icon/check.gif" alt="" style="width:40px; margin-right: 10px;">
+            <span>{{ session('success') }}</span>
+        </div>
+    </div>
+@endif
+
+<div id="main" class="main-content-flow flex-1 bg-white-100 mt-13 md:mt-2 md:ml-60 pb-28 md:pb-10">
     <div class="w-full flex flex-col flex-grow mt-1">
         <div class="w-full p-3">
             <div class="bg-gray border border-black-950">
@@ -17,7 +28,7 @@
                     <div class="relative w-full">
                         <div class="flex items-center border border-gray-300 rounded-md">
                             <span class="input-group-text p-2" id="basic-addon1">
-                                <i class="fas fa-sharp fa-magnifying-glass pr-0 md:pr-3:"></i>
+                                <i class="fas fa-sharp fa-magnifying-glass pr-0 md:pr-3"></i>
                             </span>
                             <input type="text" id="searchInput" class="form-control p-2 rounded-l-md" placeholder="Search..." aria-label="Search">
                             <button class="btn custom-btn p-2 rounded-r-md" type="button" onclick="filterTable()">Search</button>
@@ -26,7 +37,7 @@
                 </div>
                 <div class="md:w-full text-right mt-3 md:mt-0">
                     <button type="button" class="btn-add" id="plus-button" data-bs-toggle="modal" data-bs-target="#staticBackdrop" onclick="openAddSupplierModal()">
-                        <i class="fas fa-sharp fa-plus pr-0 md:pr-3:"></i> Add Supplier
+                        <i class="fas fa-sharp fa-plus pr-0 md:pr-3"></i> Add Supplier
                     </button>
                 </div>
             </div>
@@ -48,13 +59,15 @@
                                 <td class="px-4 py-2 text-sm text-gray-700">{{ '+63 ' . substr($supplier->supplier_phone, 0, 3) . ' ' . substr($supplier->supplier_phone, 3, 3) . ' ' . substr($supplier->supplier_phone, 6) }}</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">{{ $supplier->supplier_address }}</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">{{ $supplier->supplier_email }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">
-                                    <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                        <i class="fas fa-sharp fa-pen-to-square pr-0 md:pr-2"></i><u>Edit</u>
-                                    </button>
-                                    <button type="button" class="btn-edit ml-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                        <i class="fas fa-sharp fa-box-archive pr-0 md:pr-2"></i><u>Archive</u>
-                                    </button>
+                                <td class="text-center">
+                                    <div class="flex space-x-2">
+                                        <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded flex items-center">
+                                            <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
+                                        </button>
+                                        <button class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded flex items-center">
+                                            <i class="fa-solid fa-box-archive mr-2"></i>Archive
+                                        </button>   
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
@@ -82,8 +95,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="supplier_contact" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                    <input type="tel" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="supplier_contact" name="supplier_contact" pattern="\d{10}" maxlength="10" placeholder="9123456789"
-                    title="Phone number should only contain 10 digits (without country code)" required>
+                    <input type="tel" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="supplier_contact" name="supplier_contact" pattern="\d{10}" maxlength="10" placeholder="9123456789" title="Phone number should only contain 10 digits (without country code)" required>
                 </div>
                 <div class="mb-4">
                     <label for="supplier_address" class="block text-sm font-medium text-gray-700">Address</label>
@@ -101,16 +113,6 @@
         </div>
     </div>
 </div>
-@section('content')
-<script src="{{ asset('js/Product.js') }}"></script>
-@if(session('success'))
-    <div id="success-alert" class="fixed top-0 left-0 right-0 mx-auto w-full max-w-md p-4 bg-white text-black rounded shadow-lg transform -translate-y-full opacity-0 transition-transform duration-500 ease-in-out">
-        <div class="flex items-center">
-        <img src="/image-Icon/check.gif" alt="" style="width:40px; margin-right: 10px;">
-            <span>{{ session('success') }}</span>
-        </div>
-    </div>
-@endif
 <script>
     function openAddSupplierModal() {
         document.getElementById('staticBackdropSupplier').classList.remove('hidden');
@@ -140,5 +142,4 @@
         }
     }
 </script>
-<script src="{{ asset('js/alert.js') }}"></script>
 @endsection

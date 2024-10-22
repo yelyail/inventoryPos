@@ -3,7 +3,15 @@
 @section('title', 'DAVCOM Consumer Goods Trading')
 
 @section('content')
-<div id="main" class="main-content-flow flex-1 bg-white-100 mt-13 md:mt-2 md:ml-48 pb-28 md:pb-10">
+@if(session('success'))
+    <div id="success-alert" class="fixed top-4 left-0 right-0 mx-auto w-full max-w-md p-4 bg-white text-black rounded shadow-lg transform translate-y-10 opacity-100 transition-transform duration-500 ease-in-out">
+        <div class="flex items-center">
+            <img src="/image-Icon/check.gif" alt="" style="width:40px; margin-right: 10px;">
+            <span>{{ session('success') }}</span>
+        </div>
+    </div>
+@endif
+<div id="main" class="main-content-flow flex-1 bg-white-100 mt-13 md:mt-2 md:ml-60 pb-28 md:pb-10">
     <div class="w-full flex flex-col flex-grow mt-1">
         <div class="w-full p-5">
             <div class="bg-gray border border-black-950">
@@ -50,13 +58,15 @@
                                 <td class="px-4 py-2 text-sm text-gray-700">{{ ucwords(strtolower($user->username)) }}</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">{{ $user->job_title }}</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">{{ '+63 ' . substr($user->phone_number, 0, 3) . ' ' . substr($user->phone_number, 3, 3) . ' ' . substr($user->phone_number, 6) }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">
-                                    <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                        <i class="fas fa-sharp fa-pen-to-square pr-0 md:pr-2"></i><u>Edit</u>
-                                    </button>
-                                    <button type="button" class="btn-edit ml-2" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                        <i class="fas fa-sharp fa-box-archive pr-0 md:pr-2"></i><u>Archive</u>
-                                    </button>
+                                <td class="text-center">
+                                    <div class="flex space-x-2">
+                                        <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded flex items-center">
+                                            <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
+                                        </button>
+                                        <button class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded flex items-center">
+                                            <i class="fa-solid fa-box-archive mr-2"></i></i>Archive
+                                        </button>   
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
@@ -111,14 +121,6 @@
         </div>
     </div>
 </div>
-@if(session('success'))
-    <div id="success-alert" class="fixed top-0 left-0 right-0 mx-auto w-full max-w-md p-4 bg-white text-black rounded shadow-lg transform -translate-y-full opacity-0 transition-transform duration-500 ease-in-out">
-        <div class="flex items-center">
-            <img src="/image-Icon/check.gif" alt="" style="width:40px; margin-right: 10px;">
-            <span>{{ session('success') }}</span>
-        </div>
-    </div>
-@endif
 <script src="{{ asset('js/alert.js') }}"></script>
 <script> 
 
