@@ -1,29 +1,40 @@
 function openSerialModal(element) {
-    const productId = element.getAttribute('data-product-id');
     const productName = element.getAttribute('data-product-name');
-    const serialNumbers = element.getAttribute('data-serial').split(', ');
-    const serialList = document.getElementById('serialList');
+    const productId = element.getAttribute('data-product-id'); // Assuming this is where you get the product ID
+    const serialData = element.getAttribute('data-serial');
+    const createdAtData = element.getAttribute('data-created-at');
 
-    // Update modal content
-    document.getElementById('addSerialProductId').value = productId;
-    serialList.innerHTML = ''; 
-    document.getElementById('addSerialProductName').innerText = productName; 
+    document.getElementById('addSerialProductId').value = productId; // Set the hidden input value
 
-    if (serialNumbers && serialNumbers[0] !== '') { 
-        serialNumbers.forEach(serial => {
-            const listItem = document.createElement('li');
-            listItem.textContent = serial.trim();
-            serialList.appendChild(listItem);
-        });
-    } else {
-        const listItem = document.createElement('li');
-        listItem.textContent = 'No serial numbers available.';
-        serialList.appendChild(listItem);
-    }
+    const serialNumbers = serialData ? serialData.split(', ') : [];
+    const createdAtDates = createdAtData ? createdAtData.split(', ') : [];
 
-    // Show the modal
+    document.getElementById('addSerialProductName').textContent = productName;
+    const serialCreatedAtList = document.getElementById('serialCreatedAtList');
+    serialCreatedAtList.innerHTML = ''; // Clear previous content
+
+    serialNumbers.forEach((serial, index) => {
+        const createdAt = createdAtDates[index] || 'N/A';
+        const row = document.createElement('tr');
+
+        const serialCell = document.createElement('td');
+        serialCell.classList.add('border', 'border-gray-200', 'p-2');
+        serialCell.textContent = serial;
+
+        const createdAtCell = document.createElement('td');
+        createdAtCell.classList.add('border', 'border-gray-300', 'p-2');
+        createdAtCell.textContent = createdAt;
+        row.appendChild(serialCell);
+        row.appendChild(createdAtCell);
+
+        serialCreatedAtList.appendChild(row);
+    });
+
     document.getElementById('serialModal').classList.remove('hidden');
 }
+
+
+
 function closeSerialModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -57,16 +68,16 @@ const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute
 function addNewSerial(event) {
     event.preventDefault(); // Prevent the default form submission
 
-    const newSerial = document.getElementById('serial_number').value; 
-    const productId = document.getElementById('addSerialProductId').value; 
-    const serialNumberList = document.getElementById('serialList'); 
+    const newSerial = document.getElementById('serial_number').value.trim(); 
+    const productId = document.getElementById('addSerialProductId').value.trim(); 
+    const serialNumberList = document.getElementById('serialCreatedAtList'); 
 
     if (newSerial && productId) {
         fetch('/storeSerial', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken // Include the CSRF token
+                'X-CSRF-TOKEN': csrfToken 
             },
             body: JSON.stringify({
                 serial_number: newSerial,
@@ -99,8 +110,6 @@ function addNewSerial(event) {
         alert('Please enter a valid serial number and select a product.');
     }
 }
-
-
 // Product Modal Functions
 function openAddProductModal() {
     document.getElementById('staticBackdrop').classList.remove('hidden');

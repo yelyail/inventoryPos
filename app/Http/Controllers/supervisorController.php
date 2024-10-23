@@ -21,7 +21,7 @@ class supervisorController extends Controller
     }
 
     public function pos() {
-        $categories = Category::all(); 
+        $categories = category::all(); 
         
         $products = DB::table('product')
             ->select(
@@ -54,17 +54,19 @@ class supervisorController extends Controller
                 'product.typeOfUnit'
             )
             ->get();
-        foreach ($products as $product) {
-            $product->serial_numbers = DB::table('serial')
-                ->where('product_id', $product->product_id)
-                ->pluck('serial_number')
-                ->toArray();
-        }
+
+            foreach ($products as $product) {
+                $product->serial_numbers = DB::table('serial')
+                    ->select('serial_number', 'created_at')
+                    ->where('product_id', $product->product_id)
+                    ->get();
+            }
         return view('Inventory/pos', compact('categories', 'products'));
     }
 
     // adding/viewing of inventory
     public function inventory() {
+        // Fetch products and associated serial numbers (including created_at) in a single query
         $products = DB::table('product')
             ->select(
                 'product.product_id',
@@ -77,7 +79,8 @@ class supervisorController extends Controller
                 'product.added_date as date_added',
                 DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
                 'product.typeOfUnit as unit',
-                DB::raw('COUNT(serial.serial_number) as serial_count') 
+                DB::raw('COUNT(serial.serial_number) as serial_count'),
+                DB::raw('GROUP_CONCAT(serial.serial_number) as serial_numbers') // Get all serial numbers as a comma-separated string
             )
             ->join('inventory', 'product.product_id', '=', 'inventory.product_id')
             ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
@@ -97,16 +100,25 @@ class supervisorController extends Controller
             )
             ->get();
     
+        // Fetch serial numbers along with their created_at for each product
         foreach ($products as $product) {
             $product->serial_numbers = DB::table('serial')
+                ->select('serial_number', 'created_at')
                 ->where('product_id', $product->product_id)
-                ->pluck('serial_number')
+                ->get()
+                ->map(function ($serial) {
+                    return [
+                        'serial_number' => $serial->serial_number,
+                        'created_at' => $serial->created_at,
+                    ];
+                })
                 ->toArray();
         }
     
         $suppliers = supplier::all();
         return view('Inventory/inventory', compact('products', 'suppliers'));
     }
+    
     public function storeInventory(Request $request)
     {
         $request->validate([

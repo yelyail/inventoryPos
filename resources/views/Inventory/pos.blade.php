@@ -28,8 +28,7 @@
               </select>
           </div>
           <!-- end categories -->
-          <!-- products -->
-          <div class="grid grid-cols-3 gap-4 px-5 mt-5 overflow-y-auto h-3/4">
+          <div class="grid grid-cols-3 gap-4 px-5 mt-5 overflow-y-auto h-1/2">
             @foreach($products as $product)
                 <div class="relative px-3 py-3 flex flex-col border border-gray-200 rounded-md h-32">
                     <div class="flex-grow">
@@ -38,15 +37,21 @@
                     </div>
                     <img src="{{ asset("storage/{$product->product_image}") }}" class="absolute top-2 right-2 h-14 w-14 object-cover rounded-md" alt="{{ $product->model_name }}">
                     <div class="flex justify-between items-center mt-auto">
-                        <span class="font-bold text-lg text-gray-500">${{ number_format($product->unitPrice, 2) }}</span>
-                        <button class="bg-blue-500 text-white px-2 py-1 hover:bg-blue-600 rounded"><i class="fa-solid fa-plus"></i></button>
+                        <span class="font-bold text-lg text-gray-500">₱ {{ number_format($product->unitPrice, 2) }}</span>
+                        <button  id="addSerialButton" class="bg-blue-500 text-white px-2 py-1 hover:bg-blue-600 rounded" 
+                            onclick="openPosSerialModal(this)" 
+                            data-product-name="{{ $product->model_name }}" 
+                            data-product-id="{{ $product->product_id }}" 
+                            data-serial="{{ implode(', ', $product->serial_numbers->pluck('serial_number')->toArray()) }}" 
+                            data-created-at="{{ implode(', ', $product->serial_numbers->pluck('created_at')->toArray()) }}">
+                            <i class="fa-solid fa-plus"></i>  
+                        </button>
                     </div>
                 </div>
             @endforeach
-          </div>
+        </div>
           <!-- end products -->
         </div>
-        <!-- end left section -->
         <!-- right section -->
         <div class="w-full lg:w-2/5">
           <!-- header -->
@@ -70,76 +75,6 @@
                   $13.50
                 </div>
               </div>             
-              <div class="flex flex-row justify-between items-center mb-4">
-                <div class="flex flex-row items-center w-2/5">
-                  <img src="https://source.unsplash.com/sc5sTPMrVfk/600x600" class="w-10 h-10 object-cover rounded-md" alt="">
-                  <span class="ml-4 font-semibold text-sm">Grilled Corn</span>
-                </div>
-                <div class="w-32 flex justify-between">
-                  <span class="px-3 py-1 rounded-md bg-gray-300 ">-</span>
-                  <span class="font-semibold mx-4">10</span>
-                  <span class="px-3 py-1 rounded-md bg-gray-300 ">+</span>
-                </div>
-                <div class="font-semibold text-lg w-16 text-center">
-                  $3.50
-                </div>
-              </div>
-              <div class="flex flex-row justify-between items-center mb-4">
-                <div class="flex flex-row items-center w-2/5">
-                  <img src="https://source.unsplash.com/MNtag_eXMKw/600x600" class="w-10 h-10 object-cover rounded-md" alt="">
-                  <span class="ml-4 font-semibold text-sm">Grilled Corn</span>
-                </div>
-                <div class="w-32 flex justify-between">
-                  <span class="px-3 py-1 rounded-md bg-gray-300 ">-</span>
-                  <span class="font-semibold mx-4">10</span>
-                  <span class="px-3 py-1 rounded-md bg-gray-300 ">+</span>
-                </div>
-                <div class="font-semibold text-lg w-16 text-center">
-                  $3.50
-                </div>
-              </div>
-              <div class="flex flex-row justify-between items-center mb-4">
-                <div class="flex flex-row items-center w-2/5">
-                  <img src="https://source.unsplash.com/MNtag_eXMKw/600x600" class="w-10 h-10 object-cover rounded-md" alt="">
-                  <span class="ml-4 font-semibold text-sm">Grilled Corn</span>
-                </div>
-                <div class="w-32 flex justify-between">
-                  <span class="px-3 py-1 rounded-md bg-gray-300 ">-</span>
-                  <span class="font-semibold mx-4">10</span>
-                  <span class="px-3 py-1 rounded-md bg-gray-300 ">+</span>
-                </div>
-                <div class="font-semibold text-lg w-16 text-center">
-                  $3.50
-                </div>
-              </div> 
-              <div class="flex flex-row justify-between items-center mb-4">
-                <div class="flex flex-row items-center w-2/5">
-                  <img src="https://source.unsplash.com/MNtag_eXMKw/600x600" class="w-10 h-10 object-cover rounded-md" alt="">
-                  <span class="ml-4 font-semibold text-sm">Ranch Burger</span>
-                </div>
-                <div class="w-32 flex justify-between">
-                  <span class="px-3 py-1 rounded-md bg-red-300 text-white">x</span>
-                  <span class="font-semibold mx-4">1</span>
-                  <span class="px-3 py-1 rounded-md bg-gray-300 ">+</span>
-                </div>
-                <div class="font-semibold text-lg w-16 text-center">
-                  $2.50
-                </div>
-              </div> 
-              <div class="flex flex-row justify-between items-center mb-4">
-                <div class="flex flex-row items-center w-2/5">
-                  <img src="https://source.unsplash.com/4u_nRgiLW3M/600x600" class="w-10 h-10 object-cover rounded-md" alt="">
-                  <span class="ml-4 font-semibold text-sm">Ranch Burger</span>
-                </div>
-                <div class="w-32 flex justify-between">
-                  <span class="px-3 py-1 rounded-md bg-red-300 text-white">x</span>
-                  <span class="font-semibold mx-4">1</span>
-                  <span class="px-3 py-1 rounded-md bg-gray-300 ">+</span>
-                </div>
-                <div class="font-semibold text-lg w-16 text-center">
-                  $2.50
-                </div>
-              </div>            
           </div>
           <!-- end order list -->
           <!-- totalItems -->
@@ -232,91 +167,41 @@
         <!-- end right section -->
       </div>
     </div>
-<script src="{{ asset('js/Product.js') }}"></script>
-@if(session('success'))
-    <div id="success-alert" class="fixed top-0 left-0 right-0 mx-auto w-full max-w-md p-4 bg-white text-black rounded shadow-lg transform -translate-y-full opacity-0 transition-transform duration-500 ease-in-out">
-        <div class="flex items-center">
-            <img src="/image-Icon/check.gif" alt="" style="width:40px; margin-right: 10px;">
-            <span>{{ session('success') }}</span>
+<!-- Modal for Serial Numbers -->
+<div id="serialModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="serialModalLabel">
+    <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 h-1/2 overflow-y-auto">
+        <div class="flex justify-between items-center p-4 border-b">
+            <h1 class="text-lg font-semibold" id="serialModalLabel">
+                Serial Numbers for <span id="addSerialProductName"></span>
+            </h1>
+            <button type="button" class="text-gray-500 hover:text-gray-700" onclick="closeSerialModal('serialModal')" aria-label="Close modal">
+                &times;
+            </button>
+        </div>
+        <div class="p-4">
+            <div class="relative w-full mb-5">
+                <div class="flex items-center">
+                    <span class="input-group-text p-2" id="basic-addon1">
+                        <i class="fas fa-sharp fa-magnifying-glass pr-0 md:pr-3"></i>
+                    </span>
+                    <input type="text" id="searchInput" class="form-control p-2 rounded-l-md" placeholder="Search..." aria-label="Search">
+                    <button class="btn custom-btn p-2 rounded-r-md" type="button" onclick="filterPosTable()">Search</button>
+                </div>
+            </div>
+            <input type="hidden" id="addSerialProductId" value="">
+            <table class="min-w-full border-collapse border border-gray-100">
+                <thead>
+                    <tr>
+                        <th class="border border-gray-300 p-2 text-left">Serial #</th>
+                        <th class="border border-gray-300 p-2 text-left">Date Added</th>
+                        <th class="border border-gray-300 p-2 text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="serialCreatedAtList" class="divide-y divide-gray-200">
+                </tbody>
+            </table>
+            <button id="addSerialButton" class="mt-4 bg-blue-400 text-white px-4 py-2 rounded">Add Order</button> 
         </div>
     </div>
-@endif
-<script src="{{ asset('js/alert.js') }}"></script>
-<script>
-  // gcash checkbox
-  document.getElementById('gcashCheckbox').addEventListener('change', function() {
-      const gcashNameDiv = document.getElementById('gcashNameDiv');
-      const gcashAddressDiv = document.getElementById('gcashAddressDiv');
-      const gcashReferenceDiv = document.getElementById('gcashReferenceDiv');
-      const cashAmountDiv = document.getElementById('cashAmountDiv');
-      const cashAddressDiv = document.getElementById('cashAddressDiv');
-      const cashNameDiv = document.getElementById('cashNameDiv');
-      const cashCheckbox = document.getElementById('cashCheckbox');
-
-      if (this.checked) {
-          // Uncheck cash checkbox if GCash is checked
-          cashCheckbox.checked = false;
-
-          // Hide cash fields
-          cashAmountDiv.classList.add('hidden');
-          cashAddressDiv.classList.add('hidden');
-          cashNameDiv.classList.add('hidden');
-          document.getElementById('cashAmount').value = '';
-          document.getElementById('cashName').value = '';
-          document.getElementById('cashAddress').value = '';
-
-          // Show GCash fields
-          gcashNameDiv.classList.remove('hidden');
-          gcashAddressDiv.classList.remove('hidden');
-          gcashReferenceDiv.classList.remove('hidden');
-      } else {
-          // Hide GCash fields when unchecked
-          gcashNameDiv.classList.add('hidden');
-          gcashAddressDiv.classList.add('hidden');
-          gcashReferenceDiv.classList.add('hidden');
-          document.getElementById('gcashName').value = '';
-          document.getElementById('gcashAddress').value = '';
-          document.getElementById('gcashReference').value = '';
-      }
-  });
-
-  // cash checkbox
-  document.getElementById('cashCheckbox').addEventListener('change', function() {
-      const cashAmountDiv = document.getElementById('cashAmountDiv');
-      const cashAddressDiv = document.getElementById('cashAddressDiv');
-      const cashNameDiv = document.getElementById('cashNameDiv');
-      const gcashCheckbox = document.getElementById('gcashCheckbox');
-      const gcashNameDiv = document.getElementById('gcashNameDiv');
-      const gcashAddressDiv = document.getElementById('gcashAddressDiv');
-      const gcashReferenceDiv = document.getElementById('gcashReferenceDiv');
-
-      if (this.checked) {
-          // Uncheck GCash checkbox if cash is checked
-          gcashCheckbox.checked = false;
-
-          // Hide GCash fields
-          gcashNameDiv.classList.add('hidden');
-          gcashAddressDiv.classList.add('hidden');
-          gcashReferenceDiv.classList.add('hidden');
-          document.getElementById('gcashName').value = '';
-          document.getElementById('gcashAddress').value = '';
-          document.getElementById('gcashReference').value = '';
-
-          // Show cash fields
-          cashAmountDiv.classList.remove('hidden');
-          cashAddressDiv.classList.remove('hidden');
-          cashNameDiv.classList.remove('hidden');
-      } else {
-          // Hide cash fields when unchecked
-          cashAmountDiv.classList.add('hidden');
-          cashAddressDiv.classList.add('hidden');
-          cashNameDiv.classList.add('hidden');
-          document.getElementById('cashAmount').value = '';
-          document.getElementById('cashName').value = '';
-          document.getElementById('cashAddress').value = '';
-      }
-  });
-</script>
-
-
+</div>
 @endsection

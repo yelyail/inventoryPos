@@ -43,11 +43,12 @@
               </tr>
             </thead>
             <tbody>
-                @foreach($products as $product)
+            @foreach($products as $product)
                 <tr class="cursor-pointer hover:opacity-80" 
                     data-product-id="{{ $product->product_id }}" 
                     data-product-name="{{ $product->model_name }}" 
-                    data-serial="{{ isset($product->serial_numbers) ? implode(', ', $product->serial_numbers) : '' }}" 
+                    data-serial="{{ isset($product->serial_numbers) ? implode(', ', array_column($product->serial_numbers, 'serial_number')) : '' }}" 
+                    data-created-at="{{ isset($product->serial_numbers) ? implode(', ', array_column($product->serial_numbers, 'created_at')) : '' }}" 
                     onclick="openSerialModal(this)">
                         <td>
                             <img src="{{ asset("storage/{$product->product_image}") }}" 
@@ -164,7 +165,7 @@
     </div>
 </div>
 
-<!-- Modal for Serial Numbers -->=
+<!-- Modal for Serial Numbers -->
 <div id="serialModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="serialModalLabel">
     <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
         <div class="flex justify-between items-center p-4 border-b">
@@ -174,14 +175,23 @@
             </button>
         </div>
         <div class="p-4">
-            <ul id="serialList" class="mt-2 list-disc list-inside"></ul>
+            <table class="min-w-full border-collapse border border-gray-100">
+                <thead>
+                    <tr>
+                        <th class="border border-gray-300 p-2 text-left">Serial #</th>
+                        <th class="border border-gray-300 p-2 text-left">Date Added</th>
+                    </tr>
+                </thead>
+                <tbody id="serialCreatedAtList" class="divide-y divide-gray-200">
+                </tbody>
+            </table>
+
             <div class="mt-4 flex justify-end">
                 <button class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700" onclick="openAddSerialModal()">Add New Serial</button>
             </div>
         </div>
     </div>
 </div>
-
 <!-- Modal for Adding New Serial Number -->
 <div id="addSerialModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="addSerialModalLabel">
     <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
