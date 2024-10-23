@@ -3,11 +3,6 @@
 @section('title', 'DAVCOM Consumer Goods Trading')
 
 @section('content')
-@if (session('success'))
-    <div class="bg-green-500 text-white p-4 rounded-lg">
-        {{ session('success') }}
-    </div>
-@endif
 
 <div id="main" class="main-content-flow flex-1 bg-white-100 mt-15 md:mt-4 md:ml-60 pb-30 md:pb-20">
   <div class="flex flex-row flex-wrap flex-grow mt-1">

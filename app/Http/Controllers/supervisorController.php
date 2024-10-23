@@ -19,9 +19,50 @@ class supervisorController extends Controller
         $pageTitle = 'Dashboard'; 
         return view('Inventory/dashboard', compact('pageTitle'));
     }
+
     public function pos() {
-        return view('Inventory/pos');
+        $categories = Category::all(); 
+        
+        $products = DB::table('product')
+            ->select(
+                'product.product_id',
+                'product.product_image',
+                'category.category_name',
+                'category.brand_name',
+                'product.product_name as model_name',
+                'supplier.supplier_name',
+                'product.unitPrice',
+                'product.added_date as date_added',
+                DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
+                'product.typeOfUnit as unit',
+                DB::raw('COUNT(serial.serial_number) as serial_count') 
+            )
+            ->join('inventory', 'product.product_id', '=', 'inventory.product_id')
+            ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
+            ->join('category', 'product.category_Id', '=', 'category.category_id')
+            ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
+            ->where('inventory.status', '=', 'approve')
+            ->groupBy(
+                'product.product_id',
+                'product.product_image',
+                'category.category_name',
+                'category.brand_name',
+                'product.product_name',
+                'supplier.supplier_name',
+                'product.unitPrice',
+                'product.added_date',
+                'product.typeOfUnit'
+            )
+            ->get();
+        foreach ($products as $product) {
+            $product->serial_numbers = DB::table('serial')
+                ->where('product_id', $product->product_id)
+                ->pluck('serial_number')
+                ->toArray();
+        }
+        return view('Inventory/pos', compact('categories', 'products'));
     }
+
     // adding/viewing of inventory
     public function inventory() {
         $products = DB::table('product')
