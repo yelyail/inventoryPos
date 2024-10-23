@@ -77,7 +77,7 @@
     </div>
 </div>
 <!-- Modal for Adding New User -->
-<div id="staticBackdropUser" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="staticBackdropUserLabel" aria-hidden="true">
+<div id="staticBackdropUser" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="staticBackdropUserLabel">
     <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
         <div class="flex justify-between items-center p-4 border-b">
             <h1 class="text-lg font-semibold" id="staticBackdropUserLabel">Add Employee</h1>
@@ -121,7 +121,6 @@
         </div>
     </div>
 </div>
-<script src="{{ asset('js/alert.js') }}"></script>
 <script> 
 
     function openAddUserModal() {
@@ -134,27 +133,6 @@
     document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('searchInput').addEventListener('keyup', filterTable);
 });
-
-function filterTable() {
-    let input = document.getElementById('searchInput');
-    let filter = input.value.toLowerCase();
-    let table = document.querySelector('.custom-table');
-    let tr = table.getElementsByTagName('tr');
-
-    for (let i = 1; i < tr.length; i++) {
-        let td = tr[i].getElementsByTagName('td');
-        let found = false;
-
-        for (let j = 0; j < td.length; j++) {
-            if (td[j] && td[j].textContent.toLowerCase().indexOf(filter) > -1) {
-                found = true;
-                break;
-            }
-        }
-
-        tr[i].style.display = found ? '' : 'none';
-    }
-}
 </script>
 
 @endsection

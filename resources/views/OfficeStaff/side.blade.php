@@ -10,6 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>DAVCOM Consumer Goods Trading</title>
     <meta name="author" content="name">
     <meta name="description" content="description here">
@@ -71,48 +72,24 @@
                 <div class="md:mt-12 md:w-48 md:fixed md:left-0 md:top-0 content-center md:content-start text-left justify-between">
                     <ul class="list-reset flex flex-row md:flex-col pt-3 md:py-3 px-1 md:px-2 text-center md:text-left">
                         <li class="mr-3 flex-1">
-                            <a href="{{ route('dashboard') }}" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500">
+                            <a href="{{ route('staffDashboard') }}" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500">
                                 <i class="fas fa-list-check pr-0 md:pr-3"></i>
                                 <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block"> Dashboard</span>
                             </a>
                         </li>
                         <li class="mr-3 flex-1">
-                            <a href="{{ route('pos') }}" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-gray-500">
+                            <a href="{{ route('staffPos') }}" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-gray-500">
                                 <i class="fa fa-cart-shopping pr-0 md:pr-3"></i>
                                 <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block"> POS</span>
                             </a>
                         </li>
-                        <li class="relative mr-3 flex-1">
-                            <button onclick="toggleDropdown('inventoryDropdown')" class="block w-full text-left py-1 md:py-3 pl-0 md:pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-purple-500 flex items-center">
-                                <i class="fas fa-sharp fa-boxes-stacked pr-0 md:pr-3"></i>
-                                <span class="flex items-center pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200">
-                                    Inventory
-                                    <svg class="h-5 w-5 text-gray-400 ml-12" width="10" height="10" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z"/>
-                                        <polyline points="6 9 12 15 18 9" />
-                                    </svg>
-                                </span>
-                            </button>
-                            <!-- Dropdown menu -->
-                            <ul id="inventoryDropdown" class="absolute left-0 hidden mt-2 w-full bg-gray-800 shadow-lg">
-                                <li>
-                                    <a href="{{ route('pending') }}" class="block py-1 md:py-3 pl-2 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-purple-500">
-                                        <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">Pending Products</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('inventory') }}" class="block py-1 md:py-3 pl-2 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-purple-500">
-                                        <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">Approved Products</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li>
-                            <a href="{{ route('report') }}" class="block py-1 md:py-3 pl-2 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-red-500">
-                                <i class="fa fa-clipboard pr-0 md:pr-3"></i>
-                                <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block">Inventory Reports</span>
+                        <li class="mr-3 flex-1">
+                            <a href="{{ route('staffPending') }}" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-gray-500">
+                                <i class="fa fa-cart-shopping pr-0 md:pr-3"></i>
+                                <span class="pb-1 md:pb-0 text-xs md:text-base text-gray-400 md:text-gray-200 block md:inline-block"> Inventory</span>
                             </a>
                         </li>
+                        
                     </ul>
                 </div>
             </div>
@@ -124,6 +101,7 @@
     @vite('resources/js/app.js')
     <script src="{{ asset('js/side.js') }}"></script>
     <script src="{{ asset('js/alert.js') }}"></script>
+    <script src="{{asset('js/inventory.js') }}"></script>
     <script src="{{ asset('js/search.js') }}"></script>
 </body>
 </html>

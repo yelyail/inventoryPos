@@ -46,8 +46,21 @@ Route::controller(supervisorController::class)->group(function() {
 Route::controller(supervisorController::class)->group(function() {
    Route::post('/admin/StoreSupply', 'storeSupplier')->name('storeSupplier');
    Route::post('/admin/storeProduct', 'storeInventory')->name('storeInventory');
+   Route::patch('/admin/approve/{id}', 'approve')->name('approve');
 });
-
+Route::post('/storeSerial', [supervisorController::class, 'storeSerial'])->name('storeSerial');
+// for the user
+Route::controller(supervisorController::class)->group(function() {
+    Route::get('staff/dashboard', 'staffDashboard')->name('staffDashboard');
+    Route::get('staff/inventory', 'staffInventory')->name('staffInventory');
+    Route::get('staff/pending', 'staffPending')->name('staffPending');
+    Route::get('staff/pos', 'staffPos')->name('staffPos');
+});
+Route::controller(supervisorController::class)->group(function() {
+    Route::post('staff/storeSerial', 'staffStoreSerial')->name('staffStoreSerial');
+    Route::post('staff/staffStorePending', 'staffStorePending')->name('staffStorePending');
+    Route::patch('staff/approve/{id}', 'staffApprove')->name('staffApprove');
+});
 // Route::get('/dashboard', function () {
 //     return view('dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');

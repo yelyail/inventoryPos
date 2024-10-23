@@ -26,7 +26,7 @@ class LoginController extends Controller
         if ($user->job_title === 'supervisor') {
             return redirect()->route('dashboard')->with('success', 'Welcome, ' . $user->fullname . '! You have logged in successfully.');
         } elseif ($user->job_title === 'officeStaff' || $user->job_title === 'technician') {
-            return redirect()->route('staffdashboard')->with('success', 'Welcome, ' . $user->fullname . '! You have logged in successfully.');
+            return redirect()->route('staffDashboard')->with('success', 'Welcome, ' . $user->fullname . '! You have logged in successfully.');
         }
         return redirect()->route('Login')->with('error', 'Invalid credentials, Please try again!');
     }
