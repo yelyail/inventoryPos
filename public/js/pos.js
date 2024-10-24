@@ -138,35 +138,66 @@ function closeSerialModal(modalId) {
 }
 
 // calculating
-let subtotal = 0; // Initialize subtotal globally
+const productMap = {};
+let subtotal = 0;
 
 function addToOrderSummary(productName, serialValue, productId, productImage, productPrice) {
     const orderList = document.querySelector('.px-5.py-4.mt-5.overflow-y-auto.h-64');
-
-    const orderItem = document.createElement('div');
-    orderItem.className = 'flex flex-row justify-between items-center mb-4 order-item';
-    
     const priceNumber = parseFloat(productPrice.replace(/[^0-9.-]+/g, ""));
-    subtotal += priceNumber; 
     
-    orderItem.innerHTML = `
-        <div class="flex flex-row items-center w-1/4">
-            <img src="${productImage}" class="w-10 h-10" alt="${productId}">
-            <span class="ml-4 font-semibold text-sm">${productName}</span>
-        </div>
-        <div class="w-32 flex justify-between">
-            <span class="px-2 py-1 font-normal item-serial">${serialValue}</span>
-        </div>
-        <div class="w-32 flex justify-between">
-            <span class="px-3 py-1 font-semibold item-price">₱ ${priceNumber.toFixed(2)}</span>
-        </div>
-        <div class="font-normal text-lg w-1/4 text-center">${productPrice}</div>
-    `;
+    const serialArray = serialValue ? serialValue.split(',').map(serial => serial.trim()) : [];
+    const quantity = serialArray.length;
 
-    orderList.appendChild(orderItem); 
+    if (productMap[productId]) {
+        productMap[productId].quantity += quantity;
+        productMap[productId].serialArray.push(...serialArray);
+    } else {
+        productMap[productId] = {
+            productImage,
+            productName,
+            productPrice,
+            priceNumber,
+            quantity,
+            serialArray
+        };
+    }
+
+    orderList.innerHTML = ''; 
+
+    subtotal = 0;
+    for (const product of Object.values(productMap)) {
+        const orderItem = document.createElement('div');
+        orderItem.className = 'flex flex-row justify-between items-center mb-4 order-item';
+        
+        // Calculate total price for the item
+        const totalPrice = (product.priceNumber * product.quantity).toFixed(2);
+        
+        subtotal += parseFloat(totalPrice.replace(/[^0-9.-]+/g, ""));
+
+        orderItem.innerHTML = `
+            <div class="flex flex-row items-center w-1/4">
+                <img src="${product.productImage}" class="w-10 h-10" alt="${productId}">
+                <span class="ml-4 font-semibold text-sm">${product.productName}</span>
+            </div>
+            <div class="w-32 flex justify-between">
+                <span class="px-2 py-1 font-semibold item-quantity">Qty: ${product.quantity}</span>
+            </div>
+            <div class="w-32 flex justify-between">
+                <span class="px-2 py-1 font-semibold item-price"> ${formatCurrency(product.priceNumber)}</span>
+            </div>
+            <div class="w-32 flex justify-between">
+                <span class="px-2 py-1 font-semibold item-total">${formatCurrency(totalPrice)}</span> <!-- Display total price -->
+            </div>
+        `;
+
+        orderList.appendChild(orderItem); 
+    }
+
     updateDiscount();
     updateSummary(); 
 }
+
+// Format currency function
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-PH', {
         style: 'currency',
@@ -175,19 +206,19 @@ const formatCurrency = (value) => {
         maximumFractionDigits: 2
     }).format(value);
 };
+
 function updateDiscount() {
     const discountSelect = document.getElementById('discountSelect');
     const discountRate = parseFloat(discountSelect.value);
     const discountAmount = subtotal * discountRate;
 
-    document.getElementById('discountDisplay').textContent =formatCurrency(discountAmount); 
+    document.getElementById('discountDisplay').textContent = formatCurrency(discountAmount);
     updateSummary();
 }
 
 function updateSummary() {
     const discount = parseFloat(document.getElementById('discountDisplay').textContent.replace(/[^0-9.-]+/g, "")) || 0; 
     let vatTax = 0; 
-
     if (discount === 0) { 
         const vatRate = 0.12; 
         vatTax = subtotal * vatRate; 
@@ -198,14 +229,12 @@ function updateSummary() {
     const vatTaxDisplay = document.getElementById('vatTaxDisplay');
 
     const total = subtotal - discount + vatTax; 
-    
-    
-    
+
     subtotalDisplay.textContent = formatCurrency(subtotal); 
     vatTaxDisplay.textContent = formatCurrency(vatTax); 
     totalDisplay.textContent = formatCurrency(total); 
-    
 }
+
 
 document.getElementById('category').addEventListener('change', function() {
     const selectedCategory = this.value;
@@ -278,11 +307,3 @@ document.getElementById('category').addEventListener('change', function() {
 //         console.error('Error:', error);
 //     });
 // });
-    
-
-
-
-
-
-
-
