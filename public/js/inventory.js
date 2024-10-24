@@ -32,9 +32,6 @@ function openSerialModal(element) {
 
     document.getElementById('serialModal').classList.remove('hidden');
 }
-
-
-
 function closeSerialModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -43,7 +40,6 @@ function closeSerialModal(modalId) {
         console.error(`Modal with ID ${modalId} not found`);
     }
 }
-
 function openAddSerialModal() {
     const modal = document.getElementById('addSerialModal');
     if (modal) {
@@ -52,7 +48,6 @@ function openAddSerialModal() {
         console.error("Add Serial Modal not found");
     }
 }
-
 function closeAddSerialModal() {
     const modal = document.getElementById('addSerialModal');
     if (modal) {
@@ -61,7 +56,6 @@ function closeAddSerialModal() {
         console.error("Add Serial Modal not found");
     }
 }
-
 
 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
@@ -142,4 +136,90 @@ function approveProduct(productId, button) {
         });
     }
 }
+function userArchive(user_id, button) {
+    if (confirm("Are you sure you want to archive this user?")) {
+        fetch(`/admin/userarchive/${user_id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload(); 
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
+}
+function supplierArchive(supplier_ID, button) {
+    if (confirm("Are you sure you want to archive this supplier?")) {
+        fetch(`/admin/supplierArchive/${supplier_ID}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload(); 
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
+}
+function inventoryArchive(product_id, button) {
+    if (confirm("Are you sure you want to archive this product?")) {
+        fetch(`/admin/inventoryArchive/${product_id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload(); 
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    }
+}
+function filterTable() {
+    let input = document.getElementById('searchInput');
+    let filter = input.value.toLowerCase();
+    let table = document.querySelector('.custom-table');
+    let tr = table.getElementsByTagName('tr');
 
+    for (let i = 1; i < tr.length; i++) { 
+        let td = tr[i].getElementsByTagName('td');
+        let found = false;
+        for (let j = 0; j < td.length; j++) {
+            if (td[j] && td[j].textContent.toLowerCase().indexOf(filter) > -1) {
+                found = true;
+                break;
+            }
+        }
+        tr[i].style.display = found ? '' : 'none';
+    }
+}

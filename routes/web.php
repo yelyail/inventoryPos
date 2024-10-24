@@ -47,8 +47,12 @@ Route::controller(supervisorController::class)->group(function() {
    Route::post('/admin/StoreSupply', 'storeSupplier')->name('storeSupplier');
    Route::post('/admin/storeProduct', 'storeInventory')->name('storeInventory');
    Route::patch('/admin/approve/{id}', 'approve')->name('approve');
+   Route::patch('/admin/userarchive/{id}', 'userArchive')->name('userArchive');
+   Route::patch('/admin/supplierArchive/{id}', 'supplierArchive')->name('supplierArchive');
+   Route::patch('/admin/inventoryArchive/{id}', 'inventoryArchive')->name('inventoryArchive');
 });
 Route::post('/storeSerial', [supervisorController::class, 'storeSerial'])->name('storeSerial');
+Route::post('/storeOrder', [supervisorController::class, 'storeOrder'])->name('storeOrder');
 // for the user
 Route::controller(supervisorController::class)->group(function() {
     Route::get('staff/dashboard', 'staffDashboard')->name('staffDashboard');
@@ -61,15 +65,6 @@ Route::controller(supervisorController::class)->group(function() {
     Route::post('staff/staffStorePending', 'staffStorePending')->name('staffStorePending');
     Route::patch('staff/approve/{id}', 'staffApprove')->name('staffApprove');
 });
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-// });
 
 // require __DIR__.'/auth.php';
 // //-------------------------------------------------------------------------------------------------------

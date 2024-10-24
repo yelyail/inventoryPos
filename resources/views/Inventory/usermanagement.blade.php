@@ -14,7 +14,7 @@
 <div id="main" class="main-content-flow flex-1 bg-white-100 mt-13 md:mt-2 md:ml-60 pb-28 md:pb-10">
     <div class="w-full flex flex-col flex-grow mt-1">
         <div class="w-full p-5">
-            <div class="bg-gray border border-black-950">
+            <div class="bg-gray">
                 <!-- Header Section with Search Box and Add Button -->
                 <div class="flex justify-between items-center uppercase text-gray-800 rounded-tl-lg rounded-tr-lg p-2">
                     <h1 class="prod_title text-2xl font-bold ">User Information</h1>
@@ -60,12 +60,18 @@
                                 <td class="px-4 py-2 text-sm text-gray-700">{{ '+63 ' . substr($user->phone_number, 0, 3) . ' ' . substr($user->phone_number, 3, 3) . ' ' . substr($user->phone_number, 6) }}</td>
                                 <td class="text-center">
                                     <div class="flex space-x-2">
-                                        <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded flex items-center">
-                                            <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
-                                        </button>
-                                        <button class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded flex items-center">
-                                            <i class="fa-solid fa-box-archive mr-2"></i></i>Archive
-                                        </button>   
+                                        @if($user->archived == 0)
+                                            <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded flex items-center" 
+                                                    onclick="event.stopPropagation();">
+                                                <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
+                                            </button>   
+                                            <button class="bg-gray-500 hover:bg-gray-700 text-white px-2 py-1 rounded flex items-center" 
+                                                    onclick="event.stopPropagation(); userArchive('{{ $user->user_id }}', this)">
+                                                <i class="fa-solid fa-box-archive mr-2"></i>Archived
+                                            </button>
+                                            @else
+                                                <span class="badge bg-gray-500 hover:bg-gray-700 text-white px-2 py-1 rounded flex items-center">Inactive</span>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

@@ -12,7 +12,7 @@
 <div id="main" class="main-content-flow flex-1 bg-white-100 mt-15 md:mt-4 md:ml-60 pb-30 md:pb-20">
   <div class="flex flex-row flex-wrap flex-grow mt-1">
     <div class="w-full p-2">
-      <div class="bg-gray border border-black-950">
+      <div class="bg-gray">
         <div class="flex justify-between items-center uppercase text-gray-800 rounded-tl-lg rounded-tr-lg p-2">
           <h1 class="font-bold uppercase text-gray-600 text-3xl">Pending Verification</h1>
           <div class="flex space-x-2">

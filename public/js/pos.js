@@ -97,6 +97,8 @@ function openPosSerialModal(button) {
     const productName = button.getAttribute('data-product-name');
     const productId = button.getAttribute('data-product-id');
     const serialNumbers = button.getAttribute('data-serial').split(', '); // Convert to array
+    const productImage = button.getAttribute('data-product-image'); // Get product image
+    const productPrice = button.getAttribute('data-product-price'); // Get product price
 
     document.getElementById('addSerialProductName').textContent = productName;
     document.getElementById('addSerialProductId').value = productId;
@@ -115,14 +117,12 @@ function openPosSerialModal(button) {
         serialList.appendChild(row);
     });
 
-    // Ensure the Add button works when clicked
-    document.getElementById('addSerialButton').onclick = function () {
+    document.getElementById('addorderButton').onclick = function () {
         const selectedSerials = document.querySelectorAll('input[name="serial"]:checked');
         if (selectedSerials.length > 0) {
             selectedSerials.forEach(selectedSerial => {
                 const serialValue = selectedSerial.value;
-                // Add to the Order Summary
-                addToOrderSummary(productName, serialValue, productId);
+                addToOrderSummary(productName, serialValue, productId, productImage, productPrice);
             });
             closeSerialModal('serialModal');
         } else {
@@ -133,16 +133,156 @@ function openPosSerialModal(button) {
     document.getElementById('serialModal').classList.remove('hidden');
 }
 
-
-// Close modal function (implement if you haven't)
 function closeSerialModal(modalId) {
     document.getElementById(modalId).classList.add('hidden');
 }
-// Function to update quantity
-function updateQuantity(button, change) {
-    const quantityElement = button.parentElement.querySelector('.font-semibold');
-    let quantity = parseInt(quantityElement.textContent);
-    quantity = Math.max(1, quantity + change); // Prevent quantity from going below 1
-    quantityElement.textContent = quantity;
+
+// calculating
+let subtotal = 0; // Initialize subtotal globally
+
+function addToOrderSummary(productName, serialValue, productId, productImage, productPrice) {
+    const orderList = document.querySelector('.px-5.py-4.mt-5.overflow-y-auto.h-64');
+
+    const orderItem = document.createElement('div');
+    orderItem.className = 'flex flex-row justify-between items-center mb-4 order-item';
+    
+    const priceNumber = parseFloat(productPrice.replace(/[^0-9.-]+/g, ""));
+    subtotal += priceNumber; 
+    
+    orderItem.innerHTML = `
+        <div class="flex flex-row items-center w-1/4">
+            <img src="${productImage}" class="w-10 h-10" alt="${productId}">
+            <span class="ml-4 font-semibold text-sm">${productName}</span>
+        </div>
+        <div class="w-32 flex justify-between">
+            <span class="px-2 py-1 font-normal item-serial">${serialValue}</span>
+        </div>
+        <div class="w-32 flex justify-between">
+            <span class="px-3 py-1 font-semibold item-price">₱ ${priceNumber.toFixed(2)}</span>
+        </div>
+        <div class="font-normal text-lg w-1/4 text-center">${productPrice}</div>
+    `;
+
+    orderList.appendChild(orderItem); 
+    updateDiscount();
+    updateSummary(); 
 }
+const formatCurrency = (value) => {
+    return new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(value);
+};
+function updateDiscount() {
+    const discountSelect = document.getElementById('discountSelect');
+    const discountRate = parseFloat(discountSelect.value);
+    const discountAmount = subtotal * discountRate;
+
+    document.getElementById('discountDisplay').textContent =formatCurrency(discountAmount); 
+    updateSummary();
+}
+
+function updateSummary() {
+    const discount = parseFloat(document.getElementById('discountDisplay').textContent.replace(/[^0-9.-]+/g, "")) || 0; 
+    let vatTax = 0; 
+
+    if (discount === 0) { 
+        const vatRate = 0.12; 
+        vatTax = subtotal * vatRate; 
+    }
+
+    const subtotalDisplay = document.getElementById('subtotalDisplay');
+    const totalDisplay = document.getElementById('totalDisplay'); 
+    const vatTaxDisplay = document.getElementById('vatTaxDisplay');
+
+    const total = subtotal - discount + vatTax; 
+    
+    
+    
+    subtotalDisplay.textContent = formatCurrency(subtotal); 
+    vatTaxDisplay.textContent = formatCurrency(vatTax); 
+    totalDisplay.textContent = formatCurrency(total); 
+    
+}
+
+document.getElementById('category').addEventListener('change', function() {
+    const selectedCategory = this.value;
+    const items = document.querySelectorAll('#itemsContainer .item');
+
+    items.forEach(item => {
+        const itemCategory = item.getAttribute('data-category');
+
+        if (selectedCategory === "" || itemCategory === selectedCategory) {
+            item.style.display = ''; 
+        } else {
+            item.style.display = 'none'; 
+        }
+    });
+});
+
+// confirming payment
+// document.getElementById('orderForm').addEventListener('submit', function(event) {
+//     event.preventDefault();
+
+//     // Gather order details
+//     const orderData = {
+//         paymentMethod: document.getElementById('gcashCheckbox').checked ? 'GCash' : 'Cash',
+//         gcash: {
+//             name: document.getElementById('gcashName').value,
+//             address: document.getElementById('gcashAddress').value,
+//             reference: document.getElementById('gcashReference').value,
+//         },
+//         cash: {
+//             amount: document.getElementById('cashAmount').value,
+//             address: document.getElementById('cashAddress').value,
+//             name: document.getElementById('cashName').value,
+//         },
+//         items: [],
+//         subtotal: subtotal,
+//         discount: parseFloat(document.getElementById('discountDisplay').textContent.replace(/[^0-9.-]+/g, "")) || 0,
+//         total: parseFloat(document.getElementById('totalDisplay').textContent.replace(/[^0-9.-]+/g, "")) || 0,
+//     };
+
+//     // Gather items from the order summary
+//     const orderItems = document.querySelectorAll('.order-item');
+//     orderItems.forEach(item => {
+//         const productName = item.querySelector('span').textContent;
+//         const itemPriceText = item.querySelector('.item-price').textContent;
+//         const itemPrice = parseFloat(itemPriceText.replace(/[^0-9.-]+/g, ""));
+        
+//         orderData.items.push({ name: productName, price: itemPrice });
+//     });
+
+//     // Send the data to the server
+//     fetch('/storeOrder', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'X-CSRF-TOKEN': csrfToken,
+//         },
+//         body: JSON.stringify(orderData),
+//     })
+//     .then(response => {
+//         // Check if the response is okay (status in the range 200-299)
+//         if (!response.ok) {
+//             throw new Error('Network response was not ok');
+//         }
+//         return response.json(); // Attempt to parse JSON
+//     })
+//     .then(data => {
+//         console.log('Success:', data);
+//     })
+//     .catch((error) => {
+//         console.error('Error:', error);
+//     });
+// });
+    
+
+
+
+
+
+
 

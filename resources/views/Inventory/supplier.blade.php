@@ -15,8 +15,7 @@
 <div id="main" class="main-content-flow flex-1 bg-white-100 mt-13 md:mt-2 md:ml-60 pb-28 md:pb-10">
     <div class="w-full flex flex-col flex-grow mt-1">
         <div class="w-full p-3">
-            <div class="bg-gray border border-black-950">
-                <!-- Header Section with Search Box and Add Button -->
+            <div class="bg-gray">
                 <div class="flex justify-between items-center uppercase text-gray-800 rounded-tl-lg rounded-tr-lg p-2">
                     <h1 class="prod_title text-2xl font-bold">Supplier</h1>
                 </div>
@@ -61,12 +60,18 @@
                                 <td class="px-4 py-2 text-sm text-gray-700">{{ $supplier->supplier_email }}</td>
                                 <td class="text-center">
                                     <div class="flex space-x-2">
-                                        <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded flex items-center">
-                                            <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
-                                        </button>
-                                        <button class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded flex items-center">
-                                            <i class="fa-solid fa-box-archive mr-2"></i>Archive
-                                        </button>   
+                                        @if($supplier->status == 0)
+                                            <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded flex items-center" 
+                                                    onclick="event.stopPropagation();">
+                                                <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
+                                            </button>   
+                                            <button class="bg-gray-500 hover:bg-gray-700 text-white px-2 py-1 rounded flex items-center" 
+                                                    onclick="event.stopPropagation(); supplierArchive('{{ $supplier->supplier_ID }}', this)">
+                                                <i class="fa-solid fa-box-archive mr-2"></i>Archived
+                                            </button>
+                                        @else
+                                            <span class="badge bg-gray-500 text-white px-2 py-1 rounded flex items-center">Inactive</span>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

@@ -102,6 +102,7 @@
     <script src="{{ asset('js/side.js') }}"></script>
     <script src="{{ asset('js/alert.js') }}"></script>
     <script src="{{asset('js/inventory.js') }}"></script>
+    <script src="{{ asset('js/pos.js') }}"></script>
     <script src="{{ asset('js/search.js') }}"></script>
 </body>
 </html>

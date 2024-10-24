@@ -100,3 +100,6 @@ input[type="checkbox"]:checked + span {
 .prod_upper{
     text-transform: capitalize;
 }
+.cat{
+    font-size: 15px;
+}
