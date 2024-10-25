@@ -60,7 +60,6 @@
         <!-- right section -->
         <div class="w-full lg:w-2/5">
           <!-- header -->
-          <form id="orderForm" action="{{route('storeOrder')}}" method="POST" class="mt-5">
             <div class="flex flex-row items-center justify-between px-5">
                 <div class="font-bold text-xl">Order Summary</div>
             </div>
@@ -97,15 +96,16 @@
                     <div class="flex flex-row justify-between items-center">
                         <div class="flex flex-row space-x-4">
                             <label class="flex items-center">
-                                <input type="checkbox" class="invisible-checkbox" id="cashCheckbox" />
+                                <input type="radio" class="invisible-checkbox" name="paymentMethod" id="cashCheckbox" value="Cash" />
                                 <span class="bg-white text-blue-500 px-4 py-2 rounded-md hover:bg-blue-100 flex items-center">Cash</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="checkbox" class="invisible-checkbox" id="gcashCheckbox"/>
+                                <input type="radio" class="invisible-checkbox" name="paymentMethod" id="gcashCheckbox" value="GCash" />
                                 <span class="bg-white text-blue-500 px-4 py-2 rounded-md hover:bg-blue-100 flex items-center">GCash</span>
                             </label>
                         </div>
                     </div>
+
                     <!-- Cash Payment Inputs -->
                     <div id="cashNameDiv" class="mt-4 hidden">
                         <label for="cashName" class="block text-gray-700">Enter Name</label>
@@ -137,11 +137,10 @@
 
             <!-- Submit Button -->
             <div class="px-5 mt-5">
-                <button type="submit" class="confirm px-12 py-4 rounded-md shadow-lg text-center bg-green-500 text-white font-semibold focus:outline-none">
+                <button id="confirmPayment" class="confirm px-12 py-4 rounded-md shadow-lg text-center bg-green-500 text-white font-semibold focus:outline-none">
                     Confirm Payment
                 </button>
             </div>
-          </form>
         </div>
       </div>
 <!-- Modal for Serial Numbers -->

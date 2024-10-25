@@ -223,3 +223,69 @@ function filterTable() {
         tr[i].style.display = found ? '' : 'none';
     }
 }
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('searchInput').addEventListener('keyup', filterTable);
+    document.getElementById('filter-button').addEventListener('click', filterTable); // Ensure this matches the button ID
+
+    function filterTable() {
+        let table = document.querySelector('.cstm-table');
+        let searchInput = document.getElementById('searchInput').value.toLowerCase();
+        let fromDate = document.getElementById('from_date').value ? new Date(document.getElementById('from_date').value) : null;
+        let toDate = document.getElementById('to_date').value ? new Date(document.getElementById('to_date').value) : null;
+
+        let tr = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+            let td = tr[i].getElementsByTagName('td');
+            let showRow = true;
+
+            // Search filtering
+            if ((td[1] && td[1].textContent.toLowerCase().indexOf(searchInput) === -1) && 
+                (td[2] && td[2].textContent.toLowerCase().indexOf(searchInput) === -1)) {
+                showRow = false;
+            }
+
+            if (td[6]) { // Make sure to use the correct index for the date column
+                let rowDate = new Date(td[6].textContent.trim()); // Assuming index 6 corresponds to "Date Added"
+                if ((fromDate && rowDate < fromDate) || (toDate && rowDate > toDate)) {
+                    showRow = false;
+                }
+            }
+
+            tr[i].style.display = showRow ? '' : 'none'; // Show or hide the row
+        }
+    }
+});
+// for updating 
+function openEditModal(userId, fullname, username, jobTitle, phoneNumber) {
+    document.getElementById('editEmployeeId').value = userId;
+    document.getElementById('editEmployeeName').value = fullname;
+    document.getElementById('editUserName').value = username;
+    document.getElementById('editJobRole').value = jobTitle; 
+    document.getElementById('editPhoneNumber').value = phoneNumber;
+
+    // Show the modal
+    const modal = document.getElementById('editEmployeeModal');
+    modal.classList.remove('hidden'); 
+}
+function openEditSupplierModal(supplier_id, supplier_name, supplier_phone, supplier_address, supplier_email) {
+    document.getElementById('editSupplierId').value = supplier_id;
+    document.getElementById('editSupplierName').value = supplier_name;
+    document.getElementById('editPhoneNumber').value = supplier_phone;
+    document.getElementById('editSupplierAddress').value = supplier_address; 
+    document.getElementById('editSupplierEmail').value = supplier_email;
+
+    // Show the modal
+    const modal = document.getElementById('editSupplierModal');
+    modal.classList.remove('hidden'); 
+}
+
+// To close the modal
+function closeEditUserModal() {
+    const modal = document.getElementById('editEmployeeModal');
+    modal.classList.add('hidden');
+}
+function closeEditSupplierModal() {
+    const modal = document.getElementById('editSupplierModal');
+    modal.classList.add('hidden');
+}

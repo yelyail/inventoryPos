@@ -137,18 +137,20 @@ function closeSerialModal(modalId) {
     document.getElementById(modalId).classList.add('hidden');
 }
 
-// calculating
 const productMap = {};
 let subtotal = 0;
+let total = 0;
 
 function addToOrderSummary(productName, serialValue, productId, productImage, productPrice) {
-    const orderList = document.querySelector('.px-5.py-4.mt-5.overflow-y-auto.h-64');
+    const orderList = document.querySelector('.px-5.py-4.mt-5.overflow-y-auto.h-64');  
     const priceNumber = parseFloat(productPrice.replace(/[^0-9.-]+/g, ""));
-    
+
     const serialArray = serialValue ? serialValue.split(',').map(serial => serial.trim()) : [];
     const quantity = serialArray.length;
 
+    // Use `let` instead of `const` for mutable variables
     if (productMap[productId]) {
+        // Increment the existing quantity
         productMap[productId].quantity += quantity;
         productMap[productId].serialArray.push(...serialArray);
     } else {
@@ -157,14 +159,16 @@ function addToOrderSummary(productName, serialValue, productId, productImage, pr
             productName,
             productPrice,
             priceNumber,
-            quantity,
+            quantity: quantity, // Ensure this is set correctly
             serialArray
         };
     }
 
-    orderList.innerHTML = ''; 
+    console.log('Updated productMap:', productMap);
 
+    orderList.innerHTML = ''; 
     subtotal = 0;
+
     for (const product of Object.values(productMap)) {
         const orderItem = document.createElement('div');
         orderItem.className = 'flex flex-row justify-between items-center mb-4 order-item';
@@ -172,7 +176,7 @@ function addToOrderSummary(productName, serialValue, productId, productImage, pr
         // Calculate total price for the item
         const totalPrice = (product.priceNumber * product.quantity).toFixed(2);
         
-        subtotal += parseFloat(totalPrice.replace(/[^0-9.-]+/g, ""));
+        subtotal += parseFloat(totalPrice);
 
         orderItem.innerHTML = `
             <div class="flex flex-row items-center w-1/4">
@@ -183,20 +187,21 @@ function addToOrderSummary(productName, serialValue, productId, productImage, pr
                 <span class="px-2 py-1 font-semibold item-quantity">Qty: ${product.quantity}</span>
             </div>
             <div class="w-32 flex justify-between">
-                <span class="px-2 py-1 font-semibold item-price"> ${formatCurrency(product.priceNumber)}</span>
+                <span class="px-2 py-1 font-semibold item-price">${formatCurrency(product.priceNumber)}</span>
             </div>
             <div class="w-32 flex justify-between">
-                <span class="px-2 py-1 font-semibold item-total">${formatCurrency(totalPrice)}</span> <!-- Display total price -->
+                <span class="px-2 py-1 font-semibold item-total">${formatCurrency(totalPrice)}</span>
             </div>
         `;
 
         orderList.appendChild(orderItem); 
     }
 
+    console.log('Subtotal:', subtotal);
+
     updateDiscount();
     updateSummary(); 
 }
-
 // Format currency function
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-PH', {
@@ -227,15 +232,12 @@ function updateSummary() {
     const subtotalDisplay = document.getElementById('subtotalDisplay');
     const totalDisplay = document.getElementById('totalDisplay'); 
     const vatTaxDisplay = document.getElementById('vatTaxDisplay');
-
-    const total = subtotal - discount + vatTax; 
+    total = subtotal - discount + vatTax; 
 
     subtotalDisplay.textContent = formatCurrency(subtotal); 
     vatTaxDisplay.textContent = formatCurrency(vatTax); 
     totalDisplay.textContent = formatCurrency(total); 
 }
-
-
 document.getElementById('category').addEventListener('change', function() {
     const selectedCategory = this.value;
     const items = document.querySelectorAll('#itemsContainer .item');
@@ -250,60 +252,90 @@ document.getElementById('category').addEventListener('change', function() {
         }
     });
 });
+document.getElementById('confirmPayment').addEventListener('click', function() {
+    const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
 
-// confirming payment
-// document.getElementById('orderForm').addEventListener('submit', function(event) {
-//     event.preventDefault();
+    if (!selectedPaymentMethod) {
+        alert('Please select a payment method.');
+        return;
+    }
 
-//     // Gather order details
-//     const orderData = {
-//         paymentMethod: document.getElementById('gcashCheckbox').checked ? 'GCash' : 'Cash',
-//         gcash: {
-//             name: document.getElementById('gcashName').value,
-//             address: document.getElementById('gcashAddress').value,
-//             reference: document.getElementById('gcashReference').value,
-//         },
-//         cash: {
-//             amount: document.getElementById('cashAmount').value,
-//             address: document.getElementById('cashAddress').value,
-//             name: document.getElementById('cashName').value,
-//         },
-//         items: [],
-//         subtotal: subtotal,
-//         discount: parseFloat(document.getElementById('discountDisplay').textContent.replace(/[^0-9.-]+/g, "")) || 0,
-//         total: parseFloat(document.getElementById('totalDisplay').textContent.replace(/[^0-9.-]+/g, "")) || 0,
-//     };
+    const paymentMethod = selectedPaymentMethod.value;
+    const orderSummary = [];
 
-//     // Gather items from the order summary
-//     const orderItems = document.querySelectorAll('.order-item');
-//     orderItems.forEach(item => {
-//         const productName = item.querySelector('span').textContent;
-//         const itemPriceText = item.querySelector('.item-price').textContent;
-//         const itemPrice = parseFloat(itemPriceText.replace(/[^0-9.-]+/g, ""));
-        
-//         orderData.items.push({ name: productName, price: itemPrice });
-//     });
+    console.log('Global total:', total);  // Debug log for global total
+    console.log('Product Map:', productMap);  // Debug log for product map
 
-//     // Send the data to the server
-//     fetch('/storeOrder', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'X-CSRF-TOKEN': csrfToken,
-//         },
-//         body: JSON.stringify(orderData),
-//     })
-//     .then(response => {
-//         // Check if the response is okay (status in the range 200-299)
-//         if (!response.ok) {
-//             throw new Error('Network response was not ok');
-//         }
-//         return response.json(); // Attempt to parse JSON
-//     })
-//     .then(data => {
-//         console.log('Success:', data);
-//     })
-//     .catch((error) => {
-//         console.error('Error:', error);
-//     });
-// });
+    // Collect product data from productMap
+    if (productMap && Object.keys(productMap).length > 0) {
+        for (const [productId, product] of Object.entries(productMap)) {
+            orderSummary.push({
+                productId: productId,
+                productName: product.productName,
+                quantity: product.quantity,
+                pricePerItem: product.priceNumber,
+                totalPrice: (product.priceNumber * product.quantity).toFixed(2),
+                serialNumbers: product.serialArray,
+            });
+        }
+    } else {
+        alert('Product map is empty. Please add products to your cart.');
+        return;
+    }
+
+    console.log('Order Summary:', orderSummary);
+
+    // Check if totalAmount is valid
+    const totalAmount = total;
+    if (isNaN(totalAmount) || totalAmount <= 0) {
+        alert('Total amount is invalid. Please check your order.');
+        return;
+    }
+
+    const formData = {
+        orderSummary: orderSummary,
+        paymentMethod: paymentMethod,
+        totalAmount: totalAmount,
+    };
+
+    console.log("Form Data to send:", formData);
+
+    const orderList = document.querySelector('.px-5.py-4.mt-5.overflow-y-auto.h-64');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    fetch('/storeOrder', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify(formData),
+    })
+    .then(response => {
+        console.log('Server Response:', response);  // Log the raw server response
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Server error: ${response.status} ${response.statusText}. Response: ${text}`);
+            });
+        }
+        return response.json();  // Parse the JSON response
+    })
+    .then(jsonData => {
+        console.log('Parsed server response:', jsonData);
+        if (jsonData.success) {
+            alert('Payment confirmed and order placed successfully!');
+            productMap = {};  // Reset product map
+            orderList.innerHTML = '';  // Clear order list display
+        } else {
+            alert('An error occurred during payment confirmation: ' + jsonData.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(`An error occurred: ${error.message}. Please try again.`);
+    });
+});
+
+
+
+

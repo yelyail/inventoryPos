@@ -24,4 +24,9 @@ class User extends Authenticatable
     ];
 
     public $timestamp = true;
+
+    public function order()
+    {
+        return $this->hasMany(order::class, 'user_id', 'user_id');
+    }
 }

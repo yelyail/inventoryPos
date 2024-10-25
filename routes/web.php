@@ -50,6 +50,10 @@ Route::controller(supervisorController::class)->group(function() {
    Route::patch('/admin/userarchive/{id}', 'userArchive')->name('userArchive');
    Route::patch('/admin/supplierArchive/{id}', 'supplierArchive')->name('supplierArchive');
    Route::patch('/admin/inventoryArchive/{id}', 'inventoryArchive')->name('inventoryArchive');
+   
+   Route::post('/admin/updateProduct', 'updateProduct')->name('updateProduct');
+   Route::post('/admin/editUser', 'editUser')->name('editUser');
+   Route::post('/admin/editSupplier', 'editSupplier')->name('editSupplier');
 });
 Route::post('/storeSerial', [supervisorController::class, 'storeSerial'])->name('storeSerial');
 Route::post('/storeOrder', [supervisorController::class, 'storeOrder'])->name('storeOrder');

@@ -13,7 +13,7 @@ class product extends Model
     protected $primaryKey = 'product_id';
 
     protected $fillable = [
-        'supplier_id',
+        'supplier_ID',
         'category_Id',
         'product_name',
         'unitPrice',
@@ -28,7 +28,7 @@ class product extends Model
 
     public function supplier()
     {
-        return $this->belongsTo(supplier::class, 'supplier_id', 'supplier_id');
+        return $this->belongsTo(supplier::class, 'supplier_ID', 'supplier_ID');
     }
 
     public function category()

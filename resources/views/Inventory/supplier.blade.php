@@ -56,15 +56,15 @@
                             <tr>
                                 <td class="px-4 py-2 text-sm text-gray-700">{{ ucwords(strtolower($supplier->supplier_name)) }}</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">{{ '+63 ' . substr($supplier->supplier_phone, 0, 3) . ' ' . substr($supplier->supplier_phone, 3, 3) . ' ' . substr($supplier->supplier_phone, 6) }}</td>
-                                <td class="px-4 py-2 text-sm text-gray-700">{{ $supplier->supplier_address }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-700">{{ ucwords(strtolower($supplier->supplier_address)) }}</td>
                                 <td class="px-4 py-2 text-sm text-gray-700">{{ $supplier->supplier_email }}</td>
                                 <td class="text-center">
                                     <div class="flex space-x-2">
                                         @if($supplier->status == 0)
                                             <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded flex items-center" 
-                                                    onclick="event.stopPropagation();">
+                                                onclick="event.stopPropagation(); openEditSupplierModal('{{ $supplier->supplier_ID }}', '{{ addslashes($supplier->supplier_name) }}', '{{ addslashes($supplier->supplier_phone) }}', '{{ addslashes($supplier->supplier_address) }}', '{{ $supplier->supplier_email }}')">
                                                 <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
-                                            </button>   
+                                            </button>
                                             <button class="bg-gray-500 hover:bg-gray-700 text-white px-2 py-1 rounded flex items-center" 
                                                     onclick="event.stopPropagation(); supplierArchive('{{ $supplier->supplier_ID }}', this)">
                                                 <i class="fa-solid fa-box-archive mr-2"></i>Archived
@@ -78,6 +78,49 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal for editing a user -->
+<div class="fixed z-10 inset-0 overflow-y-auto hidden" id="editSupplierModal" tabindex="-1" >
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg">
+            <div class="px-6 py-4 border-b">
+                <h2 class="text-xl font-semibold">Update Supplier</h2>
+                <button type="button" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700" data-bs-dismiss="modal" aria-label="Close">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="px-6 py-4">
+                <form id="editSupplierForm" action="{{ route('editSupplier') }}" method="POST" novalidate>
+                    @csrf
+                    <input type="hidden" id="editSupplierId" name="id">
+                    <div class="mb-4">
+                        <label for="editSupplierName" class="block text-sm font-medium text-gray-700">Supplier Name</label>
+                        <input type="text" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="editSupplierName" name="supplier_name" required>
+                        <div class="text-red-500 text-sm mt-1 hidden" id="editSupplierNameFeedback">Please enter the supplier's name.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editPhoneNumber" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <input type="tel" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="editPhoneNumber" name="supplier_phone" pattern="[0-9]{10}" required>
+                        <div class="text-red-500 text-sm mt-1 hidden" id="editPhoneNumberFeedback">Please enter a valid phone number.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editSupplierAddress" class="block text-sm font-medium text-gray-700">Address</label>
+                        <input type="text" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="editSupplierAddress" name="supplier_address" required>
+                        <div class="text-red-500 text-sm mt-1 hidden" id="editSupplierAddressFeedback">Please enter an address.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editSupplierEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="editSupplierEmail" name="supplier_email" required>
+                        <div class="text-red-500 text-sm mt-1 hidden" id="editSupplierEmailFeedback">Please enter a valid email.</div>
+                    </div>
+                    <div class="flex justify-end space-x-2 mt-4">
+                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md" onclick="closeEditSupplierModal()">Close</button>
+                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md">Update</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

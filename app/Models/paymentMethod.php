@@ -16,6 +16,12 @@ class paymentMethod extends Model
         'paymentType',
         'reference_num',
         'amount_paid',
+        'discount',
     ];
+    public $timestamps = true;
+    public function order()
+    {
+        return $this->hasMany(order::class, 'payment_id','payment_id');
+    }
 
 }

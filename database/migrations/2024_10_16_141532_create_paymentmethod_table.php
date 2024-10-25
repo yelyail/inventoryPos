@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('paymentType');
             $table->string('reference_num');
             $table->decimal('amount_paid');
+            $table->decimal('discount');
             $table->timestamps();
         });
     }

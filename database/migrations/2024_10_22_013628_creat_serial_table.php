@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('serial_id');
             $table->unsignedBigInteger('product_ID');
             $table->string('serial_number');
+            $table->string('status');
             $table->foreign('product_ID')->references('product_ID')->on('product');
             $table->timestamps();
         });

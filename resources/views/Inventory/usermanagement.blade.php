@@ -62,15 +62,16 @@
                                     <div class="flex space-x-2">
                                         @if($user->archived == 0)
                                             <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded flex items-center" 
-                                                    onclick="event.stopPropagation();">
+                                                onclick="event.stopPropagation(); openEditModal('{{ $user->user_id }}', '{{ addslashes($user->fullname) }}', '{{ addslashes($user->username) }}', '{{ addslashes($user->job_title) }}', '{{ $user->phone_number }}')">
                                                 <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
-                                            </button>   
+                                            </button>
+  
                                             <button class="bg-gray-500 hover:bg-gray-700 text-white px-2 py-1 rounded flex items-center" 
                                                     onclick="event.stopPropagation(); userArchive('{{ $user->user_id }}', this)">
                                                 <i class="fa-solid fa-box-archive mr-2"></i>Archived
                                             </button>
-                                            @else
-                                                <span class="badge bg-gray-500 hover:bg-gray-700 text-white px-2 py-1 rounded flex items-center">Inactive</span>
+                                        @else
+                                            <span class="badge bg-gray-500 hover:bg-gray-700 text-white px-2 py-1 rounded flex items-center">Inactive</span>
                                         @endif
                                     </div>
                                 </td>
@@ -82,6 +83,62 @@
         </div>
     </div>
 </div>
+<!-- Modal for editing a user -->
+<div class="fixed z-10 inset-0 overflow-y-auto hidden" id="editEmployeeModal" tabindex="-1" >
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg">
+            <div class="px-6 py-4 border-b">
+                <h2 class="text-xl font-semibold">Edit Employee</h2>
+                <button type="button" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700" data-bs-dismiss="modal" aria-label="Close">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="px-6 py-4">
+                <form id="editEmployeeForm" action="{{ route('editUser') }}" method="POST" novalidate>
+                    @csrf
+                    <input type="hidden" id="editEmployeeId" name="id">
+                    <div class="mb-4">
+                        <label for="editEmployeeName" class="block text-sm font-medium text-gray-700">Employee Name</label>
+                        <input type="text" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="editEmployeeName" name="fullname" required>
+                        <div class="text-red-500 text-sm mt-1 hidden" id="editEmployeeNameFeedback">Please enter the employee's name.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editUserName" class="block text-sm font-medium text-gray-700">Username</label>
+                        <input type="text" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="editUserName" name="username" required>
+                        <div class="text-red-500 text-sm mt-1 hidden" id="editUserNameFeedback">Please enter a username.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editJobRole" class="block text-sm font-medium text-gray-700">Job Role</label>
+                        <select class="mt-1 block w-full p-2 border border-gray-300 rounded-md" name="jobtype" id="editJobRole" required>
+                            <option value="" disabled selected hidden>Choose Job Role</option>
+                            <option value="supervisor">Supervisor</option>
+                            <option value="officeStaff">Office Staff</option>
+                            <option value="technician">Technician</option>
+                        </select>
+                        <div class="text-red-500 text-sm mt-1 hidden" id="editJobRoleFeedback">Please select a job role.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editPhoneNumber" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <input type="tel" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="editPhoneNumber" name="user_contact" pattern="[0-9]{10}" required>
+                        <div class="text-red-500 text-sm mt-1 hidden" id="editPhoneNumberFeedback">Please enter a valid phone number.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editPassword" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md" id="editPassword" name="password" placeholder="Enter new password (optional)">
+                        <small class="text-gray-500">Leave blank if you don't want to change the password.</small>
+                    </div>
+                    <div class="flex justify-end space-x-2 mt-4">
+                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md" onclick="closeEditUserModal()">Close</button>
+                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md">Update</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- Modal for Adding New User -->
 <div id="staticBackdropUser" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="staticBackdropUserLabel">
     <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">

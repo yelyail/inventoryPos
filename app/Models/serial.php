@@ -14,6 +14,7 @@ class serial extends Model
     protected $fillable = [
         'product_id',
         'serial_number',
+        'status'
     ];
     public $timestamps = true;
     public function product()

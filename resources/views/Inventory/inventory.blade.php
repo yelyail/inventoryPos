@@ -68,9 +68,19 @@
                             <div class="flex space-x-2">
                                 @if($product->status == 'approve')
                                     <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded flex items-center" 
-                                        onclick="event.stopPropagation(); editProduct('{{ $product->product_id }}')">
+                                        onclick="event.stopPropagation(); editProduct({ 
+                                            product_id: '{{ $product->product_id }}',
+                                            category_name: '{{ $product->category_name }}',
+                                            brand_name: '{{ $product->brand_name }}',
+                                            model_name: '{{ $product->model_name }}',
+                                            unit: '{{ $product->unit }}',
+                                            unitPrice: '{{ $product->unitPrice }}',
+                                            date_added: '{{ $product->date_added }}',
+                                            supplier_name: '{{ $product->supplier_name }}'
+                                        })">
                                         <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
-                                    </button>   
+                                    </button>
+
                                     <button class="bg-gray-500 hover:bg-gray-700 text-white px-2 py-1 rounded flex items-center" 
                                         onclick="event.stopPropagation(); inventoryArchive('{{ $product->product_id }}', this)">
                                         <i class="fa-solid fa-box-archive mr-2"></i>Archived
@@ -91,6 +101,82 @@
       </div>
     </div>
   </div>
+</div>
+<!-- Modal for editing a product -->
+<div id="editProductModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="editProductModalLabel">
+    <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
+        <div class="flex justify-between items-center p-4 border-b">
+            <h1 class="text-lg font-semibold" id="editProductModalLabel">Update Product</h1>
+            <button type="button" class="text-gray-500 hover:text-gray-700" onclick="closeEditProductModal()">
+                &times; <!-- Close button -->
+            </button>
+        </div>
+        <div class="p-4">
+            <form id="editInventoryForm" action="{{ route('updateProduct') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="_method" value="PUT"> <!-- Spoofing PUT method -->
+                <input type="hidden" id="edit_product_id" name="product_id"> <!-- Hidden field for product ID -->
+
+                <div class="mb-4">
+                    <label for="edit_categoryName" class="block text-sm font-medium text-gray-700">Category Name</label>
+                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_categoryName" name="category_name" required>
+                </div>
+                <div class="mb-4">
+                    <label for="edit_brand_name" class="block text-sm font-medium text-gray-700">Brand Name</label>
+                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_brand_name" name="brand_name" required>
+                </div>
+                <div class="mb-4">
+                    <label for="edit_product_name" class="block text-sm font-medium text-gray-700">Model Name</label>
+                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_product_name" name="product_name" required>
+                </div>
+                <div class="mb-4">
+                    <label for="edit_typeOfUnit" class="block text-sm font-medium text-gray-700">Units</label>
+                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_typeOfUnit" name="typeOfUnit" required>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="edit_unitPrice" class="block text-sm font-medium text-gray-700">Price</label>
+                        <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_unitPrice" name="unitPrice" required>
+                    </div>
+                    <div>
+                        <label for="edit_added_date" class="block text-sm font-medium text-gray-700">Date Added</label>
+                        <input type="date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_added_date" name="added_date" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="edit_warranty_supplier" class="block text-sm font-medium text-gray-700">Warranty</label>
+                        <input type="number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_warranty_supplier" name="warranty_supplier" required>
+                    </div>
+                    <div>
+                        <label for="edit_warrantyUnit" class="block text-sm font-medium text-gray-700">Warranty Units</label>
+                        <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_warrantyUnit" name="warrantyUnit" required>
+                            <option value="days">Days</option>
+                            <option value="weeks">Weeks</option>
+                            <option value="months">Months</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="edit_suppName" class="block text-sm font-medium text-gray-700">Supplier Name</label>
+                    <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_suppName" name="supplierName" required>
+                        @foreach($suppliers as $supplier)
+                        <option value="{{ $supplier->supplier_ID }}">{{ $supplier->supplier_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="edit_product_image" class="block text-sm font-medium text-gray-700">Product Image</label>
+                    <input type="file" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_product_image" name="product_image">
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button type="button" class="bg-gray-300 text-black px-4 py-2 rounded-md mr-2" onclick="closeEditProductModal()">Cancel</button>
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md">Update</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
 </div>
 
 <!-- Modal for Adding New Product -->

@@ -15,4 +15,9 @@ class customer extends Model
         'customer_name',
         'customer_address',
     ];
+    public $timestamps = true;
+    public function order()
+    {
+        return $this->hasMany(order::class, 'customer_id');
+    }
 }

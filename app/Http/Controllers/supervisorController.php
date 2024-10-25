@@ -10,8 +10,11 @@ use App\Models\User;
 use App\Models\serial;
 use App\Models\inventory;
 use App\Models\order;
+use App\Models\customer;
+use App\Models\paymentMethod;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class supervisorController extends Controller
 {
@@ -188,8 +191,6 @@ class supervisorController extends Controller
             'supplierName' => 'required|exists:supplier,supplier_ID',
             'product_image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
-
-        Log::info($request);
         try {
             $imagePath = $request->file('product_image')->store('products', 'public');
 
@@ -423,8 +424,103 @@ class supervisorController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to archive supplier: ' . $e->getMessage()]);
         }
     }
+    public function updateProduct(Request $request)
+    {
+        // Validate incoming request
+        $validated = $request->validate([
+            'product_id' => 'required|exists:product,product_id', // Ensure the product exists
+            'category_name' => 'required|string|max:255',
+            'brand_name' => 'required|string|max:255',
+            'product_name' => 'required|string|max:255',
+            'typeOfUnit' => 'required|string|max:255',
+            'unitPrice' => 'required|numeric',
+            'added_date' => 'required|date',
+            'warranty_supplier' => 'required|numeric',
+            'warrantyUnit' => 'required|string|in:days,weeks,months',
+            'supplierName' => 'required|exists:supplier,supplier_ID',
+            'product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Allow image to be nullable
+        ]);
 
+        // Retrieve the product from the database
+        $product = product::findOrFail($request->product_id);
+
+        // Update the product details
+        $product->category->category_name = $request->category_name;
+        $product->category->brand_name = $request->brand_name;
+        $product->product_name = $request->product_name;
+        $product->typeOfUnit = $request->typeOfUnit;
+        $product->unitPrice = $request->unitPrice;
+        $product->added_date = $request->added_date;
+        $product->inventory->warranty_supplier = $request->warranty_supplier;
+        $product->supplier_ID = $request->supplierName;
+
+        if ($request->hasFile('product_image')) {
+            // Delete the old image if necessary
+            if ($product->product_image) {
+                Storage::delete($product->product_image); // Ensure you have the correct storage setup
+            }
+
+            // Store the new image
+            $imagePath = $request->file('product_image')->store('product_images', 'public');
+            $product->product_image = $imagePath;
+        }
+
+        // Save the updated product
+        $product->save();
+
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Product updated successfully!');
+    }
+
+    public function editUser(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'id' => 'required|integer|exists:users,user_id',
+            'fullname' => 'required|string|max:255',
+            'username' => 'required|string|max:255',
+            'jobtype' => 'required|string|max:50',
+            'user_contact' => 'required|string|regex:/^\d{10}$/',
+            'password' => 'nullable|string|min:6', 
+        ]);
+
+        // Find the user and update
+        $user = User::findOrFail($request->id);
+        $user->fullname = $request->fullname;
+        $user->username = $request->username;
+        $user->job_title = $request->jobtype;
+        $user->phone_number = $request->user_contact;
+
+        // Update password if provided
+        if ($request->password) {
+            $user->password = bcrypt($request->password); // Encrypt the new password
+        }
+
+        $user->save(); // Save changes
+
+        return redirect()->back()->with('success', 'User updated successfully!');
+    }
+    public function editSupplier(Request $request){
+        $request->validate([
+            'id' => 'required|integer|exists:supplier,supplier_ID',
+            'supplier_name' => 'required|string|max:255',
+            'supplier_email' => 'required|email',
+            'supplier_phone' => 'required|digits:10', 
+            'supplier_address' => 'required|string',
+        ]);
+
+        $supplier = supplier::findOrFail($request->id); 
+        $supplier->supplier_name = $request->supplier_name;
+        $supplier->supplier_email = $request->supplier_email;
+        $supplier->supplier_address = $request->supplier_address;
+        $supplier->supplier_phone = $request->supplier_phone;
     
+        $supplier->save(); // Save changes
+    
+        return redirect()->back()->with('success', 'Supplier updated successfully!');
+    }
+    
+
     // for the user
     public function staffPos() {
         $categories = category::all(); 
@@ -588,8 +684,6 @@ class supervisorController extends Controller
             'supplierName' => 'required|exists:supplier,supplier_ID',
             'product_image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
-
-        Log::info($request);
         try {
             $imagePath = $request->file('product_image')->store('products', 'public');
 
@@ -639,6 +733,8 @@ class supervisorController extends Controller
     public function storeOrder(Request $request) {
         // Validate the incoming request data
         $validatedData = $request->validate([
+            'customer.name' => 'required|string',
+            'customer.address' => 'required|string',
             'paymentMethod' => 'required|string',
             'gcash.name' => 'nullable|string',
             'gcash.address' => 'nullable|string',
@@ -647,41 +743,68 @@ class supervisorController extends Controller
             'cash.address' => 'nullable|string',
             'cash.amount' => 'nullable|numeric',
             'items' => 'required|array',
+            'items.*.name' => 'required|integer', // Ensure the product ID is an integer
+            'items.*.quantity' => 'required|integer|min:1', // Quantity must be at least 1
             'subtotal' => 'required|numeric',
             'discount' => 'required|numeric',
             'total' => 'required|numeric',
         ]);
     
-        $order = new order(); // Assuming you have an Order model
-        $order->payment_method = $validatedData['paymentMethod'];
-        $order->subtotal = $validatedData['subtotal'];
-        $order->discount = $validatedData['discount'];
-        $order->total = $validatedData['total'];
+        Log::info($validatedData);
     
-        if ($validatedData['paymentMethod'] === 'GCash') {
-            $order->gcash_name = $validatedData['gcash']['name'];
-            $order->gcash_address = $validatedData['gcash']['address'];
-            $order->gcash_reference = $validatedData['gcash']['reference'];
-        } else {
-            $order->cash_name = $validatedData['cash']['name'];
-            $order->cash_address = $validatedData['cash']['address'];
-            $order->cash_amount = $validatedData['cash']['amount'];
+        try {
+            Log::info('Entering order storage process');
+    
+            // Step 1: Save the customer details
+            $customer = Customer::create([
+                'customer_name' => $validatedData['customer']['name'],
+                'customer_address' => $validatedData['customer']['address'],
+            ]);
+            Log::info('Customer saved:', $customer->toArray());
+    
+            // Step 2: Prepare payment data
+            $paymentData = [
+                'paymentType' => $validatedData['paymentMethod'],
+                'discount' => $validatedData['discount'],
+                'amount_paid' => $validatedData['total'], 
+            ];
+            if ($validatedData['paymentMethod'] === 'gcash') {
+                $paymentData['reference_num'] = $validatedData['gcash']['reference'];
+            } elseif ($validatedData['paymentMethod'] === 'cash') {
+                $paymentData['amount_paid'] = $validatedData['cash']['amount'];
+            }
+    
+            $payment = PaymentMethod::create($paymentData);
+    
+            // Step 3: Save the order
+            $order = Order::create([
+                'customer_id' => $customer->customer_id,
+                'payment_id' => $payment->payment_id,
+                'order_date' => now(),
+                'total_amount' => $validatedData['totaarray: l'],
+                'qty_order' => array_sum(array_column($validatedData['items'], 'quantity')),
+            ]);
+    
+            // Step 4: Save each order item in the inventory
+            foreach ($validatedData['items'] as $item) {
+                Inventory::create([
+                    'product_id' => $item['name'], 
+                    'date_arrived' => now(),
+                    'warranty_supplier' => '1 year', 
+                    'status' => 'sold', 
+                    'order_id' => $order->order_id,
+                    'quantity' => $item['quantity'], 
+                ]);
+            }
+            return response()->json(['message' => 'Order stored successfully!', 'order' => $order], 201);
+        } catch (\Exception $e) {
+            Log::error('Failed to store order: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to store order: ' . $e->getMessage()], 500);
         }
-    
-        // Save the order
-        $order->save();
-    
-        foreach ($validatedData['items'] as $item) {
-            $orderItem = new order(); 
-            $orderItem->order_id = $order->id; // Foreign key reference to the order
-            $orderItem->name = $item['name'];
-            $orderItem->price = $item['price'];
-            $orderItem->save();
-        }
-    
-        // Return a response (success or redirect)
-        return response()->json(['message' => 'Order stored successfully!', 'order' => $order], 201);
     }
+    
+    
+    
     
     private function dashboardView($view, $data = []) {
         $products = DB::table('product')
