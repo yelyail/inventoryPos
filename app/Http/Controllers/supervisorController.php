@@ -12,6 +12,7 @@ use App\Models\inventory;
 use App\Models\order;
 use App\Models\customer;
 use App\Models\paymentMethod;
+use App\Models\repair;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -202,7 +203,7 @@ class supervisorController extends Controller
                 ]);
             }
             $product = product::create([
-                'supplier_id' => $request->supplierName,
+                'supplier_ID' => $request->supplierName,
                 'category_Id' => $category->category_id, // Use the ID of the existing or newly created category
                 'product_name' => $request->product_name,
                 'unitPrice' => $request->unitPrice,
@@ -222,6 +223,63 @@ class supervisorController extends Controller
                 'date_arrived' => $request->added_date,
                 'warranty_supplier' => $expirationDate,
                 'status' => 'approve',
+            ]);
+
+            return redirect()->back()->with('success', 'Product added successfully.');
+        } catch (\Exception $e) {
+            Log::error('Failed to add product: ', [
+                'error' => $e->getMessage(),
+                'request' => $request->all(),
+            ]);
+
+            return redirect()->back()->with('error', 'Failed to add product: ' . $e->getMessage());
+        }
+    }
+    public function storePending(Request $request)
+    {
+        $request->validate([
+            'category_name' => 'required|string|max:255',
+            'brand_name' => 'required|string|max:255',
+            'product_name' => 'required|string|max:255',
+            'typeOfUnit' => 'required|string|max:50',
+            'unitPrice' => 'required|numeric',
+            'added_date' => 'required|date',
+            'warranty_supplier' => 'required|integer',
+            'warrantyUnit' => 'required|string|in:days,weeks,months',
+            'supplierName' => 'required|exists:supplier,supplier_ID',
+            'product_image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+        try {
+            $imagePath = $request->file('product_image')->store('products', 'public');
+
+            $category = category::where('category_name', $request->category_name)->first();
+            if (!$category) {
+                $category = category::create([
+                    'category_name' => $request->category_name,
+                    'brand_name' => $request->brand_name,
+                ]);
+            }
+            $product = product::create([
+                'supplier_ID' => $request->supplierName,
+                'category_Id' => $category->category_id, // Use the ID of the existing or newly created category
+                'product_name' => $request->product_name,
+                'unitPrice' => $request->unitPrice,
+                'added_date' => $request->added_date,
+                'typeOfUnit' => $request->typeOfUnit,
+                'product_image' => $imagePath,
+            ]);
+            $expirationDate = match($request->warrantyUnit) {
+                'days' => now()->addDays($request->warranty_supplier),
+                'weeks' => now()->addWeeks($request->warranty_supplier),
+                'months' => now()->addMonths($request->warranty_supplier),
+                default => null,
+            };
+
+            inventory::create([
+                'product_id' => $product->product_id,
+                'date_arrived' => $request->added_date,
+                'warranty_supplier' => $expirationDate,
+                'status' => 'pending',
             ]);
 
             return redirect()->back()->with('success', 'Product added successfully.');
@@ -288,6 +346,7 @@ class supervisorController extends Controller
         $products = DB::table('product')
             ->select(
                 'product.product_id',
+                'inventory.inventory_id',
                 'product.product_image',
                 'category.category_name',
                 'category.brand_name',
@@ -306,6 +365,7 @@ class supervisorController extends Controller
             ->where('inventory.status', '=', 'approve')
             ->groupBy(
                 'product.product_id',
+                'inventory.inventory_id',
                 'product.product_image',
                 'category.category_name',
                 'category.brand_name',
@@ -625,9 +685,6 @@ class supervisorController extends Controller
     
         return $this->dashboardView('OfficeStaff/staffdashboard', compact('pageTitle', 'pendingProducts','approvedProducts'));
     }
-    public function staffInventory() {
-        return view('OfficeStaff/staffInvside');
-    }
     public function staffPending() {
         $products = DB::table('product')
             ->select(
@@ -803,9 +860,40 @@ class supervisorController extends Controller
         }
     }
     
-    
-    
-    
+    public function requestRepair(Request $request)
+    {
+        try {
+            // Validate incoming request
+            $request->validate([
+                'inventory_id' => 'required|integer|exists:inventory,inventory_id', 
+                'ordDet_ID' => 'nullable|integer|exists:order,order_id', // Make ordDet_ID optional
+                'reason' => 'required|string|max:255'
+            ]);
+
+            $returnReason = $request->input('reason');
+            $currentDate = now(); 
+
+            $orderId = $request->filled('inventory_id') ? null : $request->input('ordDet_ID');
+
+            $newRepair = repair::create([
+                'order_id' => $orderId, 
+                'return_date' => $currentDate,
+                'return_reason' => $returnReason,
+                'return_status' => 'complete',
+            ]);
+
+            if ($newRepair) {
+                return response()->json(['success' => 'Repair request has been successfully submitted.'], 200);
+            } else {
+                return response()->json(['error' => 'Failed to submit repair request.'], 500);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error submitting repair request: ' . $e->getMessage());
+            return response()->json(['error' => 'An internal error occurred. Please try again later.'], 500);
+        }
+    }
+
     private function dashboardView($view, $data = []) {
         $products = DB::table('product')
         ->select(

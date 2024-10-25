@@ -13,6 +13,7 @@ class repair extends Model
     protected $primaryKey = 'repair_id';
     protected $fillable = [
         'order_id',
+        'inventory_id',
         'return_date',
         'return_reason',
         'return_status',

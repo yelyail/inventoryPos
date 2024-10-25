@@ -46,6 +46,7 @@ Route::controller(supervisorController::class)->group(function() {
 Route::controller(supervisorController::class)->group(function() {
    Route::post('/admin/StoreSupply', 'storeSupplier')->name('storeSupplier');
    Route::post('/admin/storeProduct', 'storeInventory')->name('storeInventory');
+   Route::post('/admin/storePending', 'storePending')->name('storePending');
    Route::patch('/admin/approve/{id}', 'approve')->name('approve');
    Route::patch('/admin/userarchive/{id}', 'userArchive')->name('userArchive');
    Route::patch('/admin/supplierArchive/{id}', 'supplierArchive')->name('supplierArchive');

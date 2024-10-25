@@ -1,6 +1,6 @@
 function openSerialModal(element) {
     const productName = element.getAttribute('data-product-name');
-    const productId = element.getAttribute('data-product-id'); // Assuming this is where you get the product ID
+    const productId = element.getAttribute('data-product-id');
     const serialData = element.getAttribute('data-serial');
     const createdAtData = element.getAttribute('data-created-at');
 
@@ -11,24 +11,26 @@ function openSerialModal(element) {
 
     document.getElementById('addSerialProductName').textContent = productName;
     const serialCreatedAtList = document.getElementById('serialCreatedAtList');
-    serialCreatedAtList.innerHTML = ''; // Clear previous content
+    serialCreatedAtList.innerHTML = ''; 
 
     serialNumbers.forEach((serial, index) => {
         const createdAt = createdAtDates[index] || 'N/A';
         const row = document.createElement('tr');
-
+    
         const serialCell = document.createElement('td');
         serialCell.classList.add('border', 'border-gray-200', 'p-2');
         serialCell.textContent = serial;
-
+    
         const createdAtCell = document.createElement('td');
         createdAtCell.classList.add('border', 'border-gray-300', 'p-2');
         createdAtCell.textContent = createdAt;
+    
         row.appendChild(serialCell);
         row.appendChild(createdAtCell);
-
+    
         serialCreatedAtList.appendChild(row);
     });
+    
 
     document.getElementById('serialModal').classList.remove('hidden');
 }
@@ -288,4 +290,66 @@ function closeEditUserModal() {
 function closeEditSupplierModal() {
     const modal = document.getElementById('editSupplierModal');
     modal.classList.add('hidden');
+}
+function showTransferAlert(inventory_id) {
+    Swal.fire({
+        title: "Replacement",
+        showDenyButton: true,
+        showCancelButton: false,
+        confirmButtonText: "Yes",
+        denyButtonText: "No"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Reasons for Requesting a replace',
+                input: 'select',
+                inputOptions: {
+                    'Defective Hardware Components': 'Defective Hardware Components',
+                    'Incompatibility with Other Components': 'Incompatibility with Other Components',
+                    'Overheating or Performance Degradation': 'Overheating or Performance Degradation',
+                    'Others': 'Others'
+                },
+                inputPlaceholder: 'Select reason',
+                confirmButtonText: 'Confirm',
+                showCancelButton: true,
+                cancelButtonText: 'Cancel'
+            }).then((reason) => {
+                if (reason.isConfirmed && reason.value) {
+                    let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    $.ajax({
+                        url: '/admin/return',
+                        method: 'POST',
+                        data: {
+                            _token: token,
+                            ordDet_ID: ordDet_ID,
+                            reason: reason.value
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                title: "Requesting Repair Confirmed",
+                                text: response.success,
+                                icon: "success"
+                            }).then(() => {
+                                document.getElementById('repair-btn-' + ordDet_ID).style.display = 'none';
+                                document.getElementById('ongoing-btn-' + ordDet_ID).style.display = 'block';
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                title: "Error",
+                                text: xhr.responseJSON?.error || "There was an issue submitting the request.",
+                                icon: "error"
+                            });
+                        }
+                    });
+                } else if (!reason.value) {
+                    Swal.fire("You must select a reason for the repair request.", "", "warning");
+                } else {
+                    Swal.fire("Requesting Repair has been canceled", "", "info");
+                }
+            });
+        } else if (result.isDenied) {
+            Swal.fire("Requesting Repair has been canceled", "", "info");
+        }
+    });
 }

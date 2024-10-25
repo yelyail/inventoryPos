@@ -67,7 +67,8 @@
                                     <td class="px-4 py-2">{{ $product->unitPrice }}</td> 
                                     <td class="px-4 py-2">{{ \Carbon\Carbon::parse($product->date_added)->format('Y-m-d') }}</td> 
                                     <td class="px-4 py-2">
-                                        <button class="bg-blue-200 hover:bg-blue-300 text-black px-2 py-1 rounded flex items-center" >
+                                        <button class="bg-blue-200 hover:bg-blue-300 text-black px-2 py-1 rounded flex items-center" 
+                                                onclick="showTransferAlert('{{$product->inventory_id }}', this)">
                                             Request Replace
                                         </button>
                                     </td> 

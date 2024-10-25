@@ -42,42 +42,44 @@
               </tr>
             </thead>
             <tbody>
-            @foreach($products as $product)
+                @foreach($products as $product)
                 <tr class="cursor-pointer hover:opacity-80" 
-                    data-product-id="{{ $product->product_id }}" 
-                    data-product-name="{{ $product->model_name }}" 
-                    data-serial="{{ isset($product->serial_numbers) ? implode(', ', $product->serial_numbers) : '' }}" 
-                    onclick="openSerialModal(this)">
-                        <td>
-                            <img src="{{ asset("storage/{$product->product_image}") }}" 
-                                alt="{{ $product->model_name }}" 
-                                style="width: 200px; height: 100px;">
-                        </td>
-                        <td>{{ ucwords(strtolower($product->category_name ?? 'N/A')) }}</td>
-                        <td>{{ ucwords(strtolower($product->brand_name ?? 'N/A')) }}</td>
-                        <td>{{ ucwords(strtolower($product->model_name ?? 'N/A')) }}</td>
-                        <td>{{ ucwords(strtolower($product->supplier_name ?? 'N/A')) }}</td>
-                        <td class="text-center">{{ $product->serial_count ?? '0' }}</td> 
-                        <td>₱{{ number_format($product->unitPrice, 2) }}</td>
-                        <td>{{ \Carbon\Carbon::parse($product->date_added)->format('Y-m-d') }}</td>
-                        <td>
-                            @if ($product->warranty_expired)
-                                {{ \Carbon\Carbon::parse($product->warranty_expired)->format('Y-m-d') }}
-                            @else
-                                N/A
-                            @endif
-                        </td>
-                        <td>{{ $product->unit ?? 'N/A' }}</td>
-                        <td class="text-center">
-                            <div class="flex space-x-2">
-                                <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded flex items-center" onclick="event.stopPropagation();">
-                                    <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
-                                </button>
-                                <button class="bg-red-500 hover:bg-red-700 text-white px-2 py-1 rounded flex items-center" onclick="event.stopPropagation();">
-                                    <i class="fa-solid fa-box-archive mr-2"></i>Archive
-                                </button>   
-                            </div>
-                        </td>
+                        data-product-id="{{ $product->product_id }}" 
+                        data-product-name="{{ $product->model_name }}" 
+                        data-serial="{{ $product->serial_numbers ? implode(', ', array_column($product->serial_numbers, 'serial_number')) : '' }}" 
+                        data-created-at="{{ $product->serial_numbers ? implode(', ', array_column($product->serial_numbers, 'created_at')) : '' }}" 
+                        onclick="openSerialModal(this)">
+                            <td>
+                                <img src="{{ asset("storage/{$product->product_image}") }}" 
+                                    alt="{{ $product->model_name }}" 
+                                    style="width: 200px; height: 100px;">
+                            </td>
+                            <td>{{ ucwords(strtolower($product->category_name ?? 'N/A')) }}</td>
+                            <td>{{ ucwords(strtolower($product->brand_name ?? 'N/A')) }}</td>
+                            <td>{{ ucwords(strtolower($product->model_name ?? 'N/A')) }}</td>
+                            <td>{{ ucwords(strtolower($product->supplier_name ?? 'N/A')) }}</td>
+                            <td class="text-center">{{ $product->serial_count ?? '0' }}</td> 
+                            <td>₱{{ number_format($product->unitPrice, 2) }}</td>
+                            <td>{{ \Carbon\Carbon::parse($product->date_added)->format('Y-m-d') }}</td>
+                            <td>
+                                @if ($product->warranty_expired)
+                                    {{ \Carbon\Carbon::parse($product->warranty_expired)->format('Y-m-d') }}
+                                @else
+                                    N/A
+                                @endif
+                            </td>
+                            <td>{{ $product->unit ?? 'N/A' }}</td>
+                            <td class="text-center">
+                                <div class="flex space-x-2">
+                                    <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded flex items-center" onclick="event.stopPropagation();">
+                                        <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
+                                    </button>
+                                    <button class="bg-gray-500 hover:bg-gray-700 text-white px-2 py-1 rounded flex items-center" 
+                                        onclick="event.stopPropagation(); inventoryArchive('{{ $product->product_id }}', this)">
+                                        <i class="fa-solid fa-box-archive mr-2"></i>Archived
+                                    </button>
+                                </div>
+                            </td>
                     </tr>
                 @endforeach
             </tbody>
@@ -98,7 +100,7 @@
             </button>
         </div>
         <div class="p-4">
-        <form id="inventoryForm" action="{{ route('storeInventory') }}" method="POST" enctype="multipart/form-data">
+        <form id="inventoryForm" action="{{ route('storePending') }}" method="POST" enctype="multipart/form-data">
           @csrf
                 <div class="mb-4">
                     <label for="categoryName" class="block text-sm font-medium text-gray-700">Category Name</label>
@@ -173,7 +175,7 @@
             </button>
         </div>
         <div class="p-4">
-            <table class="min-w-full border-collapse border border-gray-300">
+            <table class="min-w-full border-collapse border border-gray-100">
                 <thead>
                     <tr>
                         <th class="border border-gray-300 p-2 text-left">Serial #</th>
@@ -190,7 +192,6 @@
         </div>
     </div>
 </div>
-
 <!-- Modal for Adding New Serial Number -->
 <div id="addSerialModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="addSerialModalLabel">
     <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
