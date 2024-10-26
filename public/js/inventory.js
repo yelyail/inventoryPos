@@ -289,7 +289,7 @@ function closeEditSupplierModal() {
     const modal = document.getElementById('editSupplierModal');
     modal.classList.add('hidden');
 }
-function showTransferAlert(inventory_id) {
+function showTransferAlert(serial_Id) {
     Swal.fire({
         title: "Replacement",
         showDenyButton: true,
@@ -299,7 +299,7 @@ function showTransferAlert(inventory_id) {
     }).then((result) => {
         if (result.isConfirmed) {
             Swal.fire({
-                title: 'Reasons for Requesting a replace',
+                title: 'Reasons for Requesting a Replace',
                 input: 'select',
                 inputOptions: {
                     'Defective Hardware Components': 'Defective Hardware Components',
@@ -313,13 +313,13 @@ function showTransferAlert(inventory_id) {
                 cancelButtonText: 'Cancel'
             }).then((reason) => {
                 if (reason.isConfirmed && reason.value) {
-                    let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                     $.ajax({
                         url: '/admin/requestReplace',
                         method: 'POST',
                         data: {
                             _token: token,
-                            inventory_id: inventory_id,
+                            serial_id: serial_Id, // Change here
                             reason: reason.value
                         },
                         success: function(response) {
@@ -328,11 +328,12 @@ function showTransferAlert(inventory_id) {
                                 text: response.success,
                                 icon: "success"
                             }).then(() => {
-                                document.getElementById('repair-btn-' + inventory_id).style.display = 'none';
-                                document.getElementById('ongoing-btn-' + inventory_id).style.display = 'block';
+                                document.getElementById('repair-btn-' + serial_Id).style.display = 'none';
+                                document.getElementById('ongoing-btn-' + serial_Id).style.display = 'block';
                             });
                         },
                         error: function(xhr) {
+                            console.error("Error submitting request:", xhr); // Log error for debugging
                             Swal.fire({
                                 title: "Error",
                                 text: xhr.responseJSON?.error || "There was an issue submitting the request.",
@@ -351,6 +352,8 @@ function showTransferAlert(inventory_id) {
         }
     });
 }
+
+
 function showRepairAlert(order_id) {
     Swal.fire({
         title: "Repair",

@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('replace', function (Blueprint $table) {
             $table->id('replace_id');
-            $table->unsignedBigInteger('inventory_id');
+            $table->unsignedBigInteger('serial_id');
             $table->date('replace_date');
             $table->string('replace_reason');
-            $table->string('replace_status');
-            $table->foreign('inventory_id')->references('inventory_id')->on('inventory');
+            $table->foreign('serial_id')->references('serial_id')->on('serial');
             $table->timestamps();
         });
     }

@@ -318,14 +318,14 @@ document.getElementById('confirmPayment').addEventListener('click', function() {
                 throw new Error(`Server error: ${response.status} ${response.statusText}. Response: ${text}`);
             });
         }
-        return response.json();  // Parse the JSON response
+        return response.json(); 
     })
     .then(jsonData => {
         console.log('Parsed server response:', jsonData);
         if (jsonData.success) {
             alert('Payment confirmed and order placed successfully!');
-            productMap = {};  // Reset product map
-            orderList.innerHTML = '';  // Clear order list display
+            productMap = {};  
+            orderList.innerHTML = '';  
         } else {
             alert('An error occurred during payment confirmation: ' + jsonData.message);
         }

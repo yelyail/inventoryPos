@@ -71,14 +71,13 @@
                                     
                                     <td class="px-4 py-2">
                                         <button class="bg-blue-200 hover:bg-blue-300 text-black px-2 py-1 rounded flex items-center" 
-                                                onclick="showTransferAlert('{{ $product->inventory_id }}', this)">
+                                                onclick="showTransferAlert('{{ $product->serial_Id }}', this)">
                                             Request Replace
                                         </button>
                                     </td>
                                 </tr>
                             @endforeach
                         @endforeach
-
                     </tbody>
                 </table>
             </div>

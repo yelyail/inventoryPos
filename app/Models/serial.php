@@ -21,4 +21,7 @@ class serial extends Model
     {
         return $this->belongsTo(product::class, 'product_id');
     }
+    public function replace() {
+        return $this->hasMany(replace::class, 'inventory_id', 'inventory_id');
+    }
 }

@@ -179,7 +179,7 @@
     </div>
 </div>
 <!-- Modal for Adding New Product -->
-<div id="staticBackdrop" class="fixed z-10 inset-0 overflow-y-auto hidden" role="dialog" aria-labelledby="staticBackdropLabel" aria-modal="true">
+<div id="staticBackdrop" class="fixed z-10 inset-0 mt-12 overflow-y-auto hidden" role="dialog" aria-labelledby="staticBackdropLabel" aria-modal="true">
     <div class="flex items-center justify-center min-h-screen">
         <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 h-3/4">
             <div class="flex justify-between items-center p-4 border-b">
@@ -216,7 +216,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label for="unitPrice" class="block text-sm font-medium text-gray-700">Price</label>
-                            <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="unitPrice" name="unitPrice" placeholder="Enter price in USD" required>
+                            <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="unitPrice" name="unitPrice" placeholder="Enter price" required>
                         </div>
                         <div>
                             <label for="added_date" class="block text-sm font-medium text-gray-700">Date Added</label>
@@ -260,10 +260,6 @@
         </div>
     </div>
 </div>
-
-
-
-
 <!-- Modal for Serial Numbers -->
 <div id="serialModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="serialModalLabel">
     <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">

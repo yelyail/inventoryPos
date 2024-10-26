@@ -55,34 +55,35 @@
     <div class="downdash" style="overflow:auto !important; max-height: 400px;">
         <div class="stat place-items-center">
             <div class="stat-title">Defective Products</div>
-            <table id="dataTableDamaged" class="table table-s">
-                <thead style="font-size: 20px !important; color: #222831; top: 0; background-color: bg-gray-100; text-align: center;">
-                    <tr>
-                        <th>Product Image</th>
-                        <th>Serial #</th>
-                        <th>Category</th>
-                        <th>Brand</th>
-                        <th>Model</th>
-                        <th>Unit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($defectiveProducts as $product)
+                <table id="dataTableDamaged" class="table table-s">
+                    <thead style="font-size: 20px !important; color: #222831; top: 0; background-color: bg-gray-100; text-align: center;">
                         <tr>
-                            <td class="text-1xl flex items-center justify-center">
-                                <img src="{{ asset("storage/{$product->product_image}") }}" 
-                                alt="{{ $product->model_name }}" 
-                                style="width: 70px; height: 50px;">
-                            </td>
-                            <td style="font-size: 15px !important; text-align: center;">{{ $product->serial_number }}</td>
-                            <td style="font-size: 15px !important; text-align: center;">{{ $product->category_name }}</td>
-                            <td style="font-size: 15px !important; text-align: center;">{{ $product->brand_name }}</td>
-                            <td style="font-size: 15px !important; text-align: center;">{{ $product->model_name }}</td>
-                            <td style="font-size: 15px !important; text-align: center;">{{ $product->typeOfUnit }}</td>
+                            <th>Product Image</th>
+                            <th>Serial #</th>
+                            <th>Category</th>
+                            <th>Brand</th>
+                            <th>Model</th>
+                            <th>Unit</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($defectiveProducts as $product)
+                            <tr>                  
+                                <td class="text-2xl flex items-center justify-center">
+                                    <img src="{{ asset("storage/{$product->product_image}") }}" 
+                                        alt="{{ $product->model_name }}" 
+                                        style="width: 70px; height: 50px;">
+                                </td>
+                                <td class="cat">{{ $product->serial_number ?? 'N/A' }}</td> <!-- Adjust to access serial_number directly -->
+                                <td class="cat">{{ ucwords(strtolower($product->category_name ?? 'N/A')) }}</td>
+                                <td class="cat">{{ ucwords(strtolower($product->brand_name ?? 'N/A')) }}</td>
+                                <td class="cat">{{ ucwords(strtolower($product->model_name ?? 'N/A')) }}</td>
+                                <td class="cat">{{ $product->typeOfUnit ?? 'N/A' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
         </div>
     </div>
 </div>
