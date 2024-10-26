@@ -23,7 +23,7 @@ class supervisorController extends Controller
     public function dashboard() {
         $pageTitle = 'Dashboard';
     
-        // Fetch products with serial counts for pending status
+        // pang pending
         $pendingProducts = DB::table('product')
             ->select(
                 'product.product_id',
@@ -50,7 +50,7 @@ class supervisorController extends Controller
                 'product.added_date'
             )
             ->get();
-    
+        // pang low stocks
         $approvedProducts = DB::table('product')
             ->select(
                 'product.product_id',
@@ -78,38 +78,30 @@ class supervisorController extends Controller
                 'supplier.supplier_name',
                 'product.added_date'
             )->get();
-            $defectiveProducts = DB::table('product')
-            ->select(
-                'product.product_id',
-                'serial.serial_number',
-                'product.product_image',
-                'category.category_name',
-                'category.brand_name',
-                'product.product_name as model_name',
-                'product.added_date as date_added',
-                'product.typeOfUnit',
-                DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
-                DB::raw('COUNT(serial.serial_number) as serial_count')
-            )
-            ->join('inventory', 'product.product_id', '=', 'inventory.product_id')
-            ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
-            ->join('category', 'product.category_Id', '=', 'category.category_id')
-            ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
-            ->where('replace.status', '=', 'inprogress')
-            ->groupBy(
-                'product.product_id',
-                'product.product_image',
-                'serial.serial_number',
-                'category.category_name',
-                'category.brand_name',
-                'product.product_name',
-                'product.typeOfUnit',
-                'supplier.supplier_name',
-                'product.added_date'
-            )->get();
+
+            // pang defective di pa finish yawa
+            
+            $defectiveProducts = DB::table('replace')
+                ->select(
+                    'replace.replace_id',
+                    'product.product_image',
+                    'serial.serial_number',
+                    'category.category_name',
+                    'category.brand_name',
+                    'product.product_name as model_name',
+                    'product.typeOfUnit'
+                )
+                ->leftJoin('inventory', 'replace.inventory_id', '=', 'inventory.inventory_id')
+                ->leftJoin('product', 'inventory.product_id', '=', 'product.product_id')
+                ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
+                ->leftJoin('category', 'product.category_Id', '=', 'category.category_id')
+                ->where('serial.status', '=', 'inprogress') // Only select rows with "inprogress" status
+                ->whereNotNull('replace.replace_id') // Ensure replace_id is not null
+                ->get();
+
         $products = $pendingProducts->merge($approvedProducts);
     
-        return $this->dashboardView('Inventory/dashboard', compact('pageTitle', 'pendingProducts','approvedProducts','inProgressProducts'));
+        return $this->dashboardView('Inventory/dashboard', compact('pageTitle', 'pendingProducts','approvedProducts','defectiveProducts'));
     }
     public function pos() {
         $categories = category::all(); 
@@ -155,7 +147,7 @@ class supervisorController extends Controller
             }
         return view('Inventory/pos', compact('categories', 'products'));
     }
-    // adding/viewing of inventory
+    // adding/viewing of inventory di na hilabtan fak shit
     public function inventory() {
         $products = DB::table('product')
             ->select(
@@ -178,7 +170,7 @@ class supervisorController extends Controller
             ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
             ->join('category', 'product.category_Id', '=', 'category.category_id')
             ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id') // Use LEFT JOIN to count serials
-            ->where('inventory.status', '<>', 'pending')
+            ->where('inventory.status', '=', 'approve')
             ->groupBy(
                 'product.product_id',
                 'product.product_image',
@@ -238,7 +230,7 @@ class supervisorController extends Controller
             }
             $product = product::create([
                 'supplier_ID' => $request->supplierName,
-                'category_Id' => $category->category_id, // Use the ID of the existing or newly created category
+                'category_Id' => $category->category_id,
                 'product_name' => $request->product_name,
                 'unitPrice' => $request->unitPrice,
                 'added_date' => $request->added_date,
@@ -270,64 +262,7 @@ class supervisorController extends Controller
             return redirect()->back()->with('error', 'Failed to add product: ' . $e->getMessage());
         }
     }
-    public function storePending(Request $request)
-    {
-        $request->validate([
-            'category_name' => 'required|string|max:255',
-            'brand_name' => 'required|string|max:255',
-            'product_name' => 'required|string|max:255',
-            'typeOfUnit' => 'required|string|max:50',
-            'unitPrice' => 'required|numeric',
-            'added_date' => 'required|date',
-            'warranty_supplier' => 'required|integer',
-            'warrantyUnit' => 'required|string|in:days,weeks,months',
-            'supplierName' => 'required|exists:supplier,supplier_ID',
-            'product_image' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-        try {
-            $imagePath = $request->file('product_image')->store('products', 'public');
-
-            $category = category::where('category_name', $request->category_name)->first();
-            if (!$category) {
-                $category = category::create([
-                    'category_name' => $request->category_name,
-                    'brand_name' => $request->brand_name,
-                ]);
-            }
-            $product = product::create([
-                'supplier_ID' => $request->supplierName,
-                'category_Id' => $category->category_id, // Use the ID of the existing or newly created category
-                'product_name' => $request->product_name,
-                'unitPrice' => $request->unitPrice,
-                'added_date' => $request->added_date,
-                'typeOfUnit' => $request->typeOfUnit,
-                'product_image' => $imagePath,
-            ]);
-            $expirationDate = match($request->warrantyUnit) {
-                'days' => now()->addDays($request->warranty_supplier),
-                'weeks' => now()->addWeeks($request->warranty_supplier),
-                'months' => now()->addMonths($request->warranty_supplier),
-                default => null,
-            };
-
-            inventory::create([
-                'product_id' => $product->product_id,
-                'date_arrived' => $request->added_date,
-                'warranty_supplier' => $expirationDate,
-                'status' => 'pending',
-            ]);
-
-            return redirect()->back()->with('success', 'Product added successfully.');
-        } catch (\Exception $e) {
-            Log::error('Failed to add product: ', [
-                'error' => $e->getMessage(),
-                'request' => $request->all(),
-            ]);
-
-            return redirect()->back()->with('error', 'Failed to add product: ' . $e->getMessage());
-        }
-    }
-    // adding new serial
+    // adding new serial di na hilabtan fak shit
     public function storeSerial(Request $request)
     {
         try {
@@ -348,7 +283,7 @@ class supervisorController extends Controller
             return response()->json(['error' => 'An error occurred while saving the serial number.'], 500);
         }
     }
-    // adding/viewing of supplier
+    // adding/viewing of supplier di na hilabtan fak shit
     public function supplier() {
         $suppliers = supplier::all();
 
@@ -396,7 +331,7 @@ class supervisorController extends Controller
                 'product.unitPrice',
                 'product.added_date as date_added',
                 DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
-                DB::raw('MAX(replace.replace_date) as last_replace_date'),
+                'replace.replace_date as replace_date',
                 'replace.replace_status as replace_status', // Include replace status
                 'product.typeOfUnit as unit',
                 DB::raw('COUNT(serial.serial_number) as serial_count')
@@ -419,6 +354,7 @@ class supervisorController extends Controller
                 'product.product_name',
                 'supplier.supplier_name',
                 'product.unitPrice',
+                'replace.replace_date',
                 'product.added_date',
                 'replace.replace_status', // Group by replace status
                 'product.typeOfUnit'
@@ -440,8 +376,6 @@ class supervisorController extends Controller
     
         return view('Inventory/Report', compact('products'));
     }
-    
-    
     public function salesReport() {
         return view('Inventory/salesReport');
     }
@@ -489,7 +423,7 @@ class supervisorController extends Controller
         return view('Inventory/pending', compact('products'));
     }
 
-    // for the buttons here
+    // for the buttons here di na hilabtan fak shit
     public function approve($id) {
         try {
             DB::table('inventory')
@@ -633,6 +567,8 @@ class supervisorController extends Controller
     
         return redirect()->back()->with('success', 'Supplier updated successfully!');
     }
+
+
     // for the user
     public function staffPos() {
         $categories = category::all(); 
@@ -680,6 +616,8 @@ class supervisorController extends Controller
     }
     public function staffDashboard() {
         $pageTitle = 'Dashboard';
+    
+        // pang pending
         $pendingProducts = DB::table('product')
             ->select(
                 'product.product_id',
@@ -706,8 +644,7 @@ class supervisorController extends Controller
                 'product.added_date'
             )
             ->get();
-    
-        // Fetch products with serial counts for approved status
+        // pang low stocks
         $approvedProducts = DB::table('product')
             ->select(
                 'product.product_id',
@@ -716,6 +653,7 @@ class supervisorController extends Controller
                 'category.brand_name',
                 'product.product_name as model_name',
                 'product.added_date as date_added',
+                'product.typeOfUnit',
                 DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
                 DB::raw('COUNT(serial.serial_number) as serial_count')
             )
@@ -730,55 +668,100 @@ class supervisorController extends Controller
                 'category.category_name',
                 'category.brand_name',
                 'product.product_name',
+                'product.typeOfUnit',
                 'supplier.supplier_name',
                 'product.added_date'
             )->get();
+
+            // pan gdefective
+            $defectiveProducts = DB::table('product')
+                ->select(
+                    'product.product_id',
+                    'serial.serial_number',
+                    'product.product_image',
+                    'category.category_name',
+                    'category.brand_name',
+                    'product.product_name as model_name',
+                    'product.added_date as date_added',
+                    'product.typeOfUnit',
+                    DB::raw('MAX(inventory.warranty_supplier) as warranty_expired')
+                )
+                ->join('inventory', 'product.product_id', '=', 'inventory.product_id')
+                ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
+                ->join('category', 'product.category_Id', '=', 'category.category_id')
+                ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
+                ->join('replace', 'inventory.inventory_id', '=', 'replace.inventory_id') 
+                ->where('replace.replace_status', '=', 'inprogress') 
+                ->whereNotNull('serial.serial_number') 
+                ->whereNotNull('replace.replace_id') 
+                ->groupBy(
+                    'product.product_id',
+                    'serial.serial_number',
+                    'product.product_image',
+                    'category.category_name',
+                    'category.brand_name',
+                    'product.product_name',
+                    'product.added_date',
+                    'product.typeOfUnit',
+                    'supplier.supplier_name'
+                )->get();
         $products = $pendingProducts->merge($approvedProducts);
     
-        return $this->dashboardView('OfficeStaff/staffdashboard', compact('pageTitle', 'pendingProducts','approvedProducts'));
+        return $this->dashboardView('OfficeStaff/staffdashboard', compact('pageTitle', 'pendingProducts','approvedProducts','defectiveProducts'));
     }
     public function staffPending() {
-        $products = DB::table('product')
+         $products = DB::table('product')
             ->select(
                 'product.product_id',
                 'product.product_image',
                 'category.category_name',
                 'category.brand_name',
                 'product.product_name as model_name',
+                'product.product_description',
                 'supplier.supplier_name',
                 'product.unitPrice',
                 'product.added_date as date_added',
                 DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
                 'product.typeOfUnit as unit',
-                DB::raw('COUNT(serial.serial_number) as serial_count') 
+                DB::raw('COUNT(serial.serial_number) as serial_count'),
+                DB::raw('GROUP_CONCAT(serial.serial_number) as serial_numbers'),
+                'inventory.status'
             )
             ->join('inventory', 'product.product_id', '=', 'inventory.product_id')
             ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
             ->join('category', 'product.category_Id', '=', 'category.category_id')
             ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id') // Use LEFT JOIN to count serials
-            ->where('inventory.status', '=', 'pending')
+            ->where('inventory.status', '<>', 'pending')
             ->groupBy(
                 'product.product_id',
                 'product.product_image',
                 'category.category_name',
                 'category.brand_name',
                 'product.product_name',
+                'product.product_description',
                 'supplier.supplier_name',
                 'product.unitPrice',
                 'product.added_date',
-                'product.typeOfUnit'
+                'product.typeOfUnit',
+                'inventory.status'
             )
             ->get();
-    
         foreach ($products as $product) {
             $product->serial_numbers = DB::table('serial')
+                ->select('serial_number', 'created_at')
                 ->where('product_id', $product->product_id)
-                ->pluck('serial_number')
+                ->get()
+                ->map(function ($serial) {
+                    return [
+                        'serial_number' => $serial->serial_number,
+                        'created_at' => $serial->created_at,
+                    ];
+                })
                 ->toArray();
         }
     
         $suppliers = supplier::all();
-        return view('OfficeStaff/staffpending',compact('products', 'suppliers'));
+        return view('OfficeStaff/staffpending', compact('products', 'suppliers'));
     }
     public function staffStorePending(Request $request){
         $request->validate([
@@ -786,6 +769,7 @@ class supervisorController extends Controller
             'brand_name' => 'required|string|max:255',
             'product_name' => 'required|string|max:255',
             'typeOfUnit' => 'required|string|max:50',
+            'product_description' => 'required|string|max:1000',
             'unitPrice' => 'required|numeric',
             'added_date' => 'required|date',
             'warranty_supplier' => 'required|integer',
@@ -804,12 +788,13 @@ class supervisorController extends Controller
                 ]);
             }
             $product = product::create([
-                'supplier_id' => $request->supplierName,
-                'category_Id' => $category->category_id, 
+                'supplier_ID' => $request->supplierName,
+                'category_Id' => $category->category_id,
                 'product_name' => $request->product_name,
                 'unitPrice' => $request->unitPrice,
                 'added_date' => $request->added_date,
                 'typeOfUnit' => $request->typeOfUnit,
+                'product_description' => $request->product_description,
                 'product_image' => $imagePath,
             ]);
             $expirationDate = match($request->warrantyUnit) {
@@ -836,7 +821,6 @@ class supervisorController extends Controller
             return redirect()->back()->with('error', 'Failed to add product: ' . $e->getMessage());
         }
     }
-
 
     //for both users
     public function storeOrder(Request $request) {
@@ -945,26 +929,34 @@ class supervisorController extends Controller
                 'inventory_id' => 'required|integer|exists:inventory,inventory_id', 
                 'reason' => 'required|string|max:255'
             ]);
+            
             $replaceReason = $request->input('reason');
             $currentDate = now(); 
+            
             $newReplace = replace::create([
                 'inventory_id' => $request->input('inventory_id'),
                 'replace_date' => $currentDate,
                 'replace_reason' => $replaceReason,
                 'replace_status' => 'inprogress',
             ]);
-
+    
             if ($newReplace) {
+                DB::table('serial')
+                    ->join('inventory', 'serial.product_id', '=', 'inventory.product_id')
+                    ->where('inventory.inventory_id', $request->input('inventory_id'))
+                    ->update(['serial.status' => 'inprogress']);
+    
                 return response()->json(['success' => 'Replace request has been successfully submitted.'], 200);
             } else {
                 return response()->json(['error' => 'Failed to submit replace request.'], 500);
             }
-
+    
         } catch (\Exception $e) {
             Log::error('Error submitting replace request: ' . $e->getMessage());
             return response()->json(['error' => 'An internal error occurred. Please try again later.'], 500);
         }
     }
+    
 
     private function dashboardView($view, $data = []) {
         $products = DB::table('product')

@@ -68,32 +68,16 @@
                         <td>{{ $product->unit ?? 'N/A' }}</td>
                         <td>
                             <div class="flex space-x-2">
-                                @if($product->status == 'approve')
+                                <div class="flex space-x-2">
                                     <button class="bg-green-500 hover:bg-green-700 text-white px-2 py-1 rounded flex items-center" 
-                                        onclick="event.stopPropagation(); 
-                                                openEditProduct(
-                                                    '{{ $product->product_id }}', 
-                                                    '{{ addslashes($product->model_name) }}', 
-                                                    '{{ addslashes($product->product_image) }}', 
-                                                    '{{ $product->category_name }}',
-                                                    '{{ $product->brand_name }}',
-                                                    '{{ $product->supplier_name }}',
-                                                    '{{ $product->unitPrice }}',
-                                                    '{{ $product->warranty_expired }}',
-                                                    '{{ $product->unit }}',
-                                                    '{{ $product->date_added }}',
-                                                )">
+                                            onclick="event.stopPropagation(); approveProduct('{{ $product->product_id }}', this)">
+                                        <i class="fa-solid fa-check mr-2"></i>Approved
+                                    </button>
+                                    <button class="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded flex items-center" 
+                                            onclick="event.stopPropagation();">
                                         <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
-                                    </button>
-                                    <button class="bg-gray-500 hover:bg-gray-700 text-white px-2 py-1 rounded flex items-center" 
-                                        onclick="event.stopPropagation(); inventoryArchive('{{ $product->product_id }}', this)">
-                                        <i class="fa-solid fa-box-archive mr-2"></i>Archived
-                                    </button>
-                                @elseif($product->status == 'pending')
-                                    <span class="badge bg-yellow-500 text-white px-2 py-1 rounded flex items-center">Pending</span>
-                                @else
-                                    <span class="badge bg-gray-500 text-white px-2 py-1 rounded flex items-center">Inactive</span>
-                                @endif
+                                    </button>   
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -179,7 +163,7 @@
     </div>
 </div>
 <!-- Modal for Adding New Product -->
-<div id="staticBackdrop" class="fixed z-10 inset-0 overflow-y-auto hidden" role="dialog" aria-labelledby="staticBackdropLabel" aria-modal="true">
+<div id="staticBackdrop" class="fixed z-10 inset-0 mt-12 overflow-y-auto hidden" role="dialog" aria-labelledby="staticBackdropLabel" aria-modal="true">
     <div class="flex items-center justify-center min-h-screen">
         <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 h-3/4">
             <div class="flex justify-between items-center p-4 border-b">
@@ -189,7 +173,7 @@
                 </button>
             </div>
             <div class="p-4 h-full overflow-y-auto">
-                <form id="inventoryForm" action="{{ route('storePending') }}" method="POST" enctype="multipart/form-data">
+                <form id="inventoryForm" action="{{ route('staffStorePending') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" id="addProduct_id" name="product_id"> 
 
@@ -260,9 +244,6 @@
         </div>
     </div>
 </div>
-
-
-
 
 <!-- Modal for Serial Numbers -->
 <div id="serialModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="serialModalLabel">

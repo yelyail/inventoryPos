@@ -21,4 +21,6 @@ class replace extends Model
         return $this->belongsTo(inventory::class, 'inventory_id', 'inventory_id');
     }
     
+    
+    
 }

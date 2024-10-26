@@ -22,10 +22,10 @@ class product extends Model
         'typeOfUnit',
         'product_image',
     ];
-    public function inventory()
-    {
+    public function inventory() {
         return $this->hasMany(inventory::class, 'product_id', 'product_id');
     }
+    
 
     public function supplier()
     {

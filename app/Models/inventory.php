@@ -27,4 +27,5 @@ class inventory extends Model
         return $this->hasMany(replace::class, 'inventory_id', 'inventory_id');
     }
     
+    
 }

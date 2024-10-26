@@ -66,7 +66,7 @@
                                     <td class="px-4 py-2">{{ $product->unitPrice }}</td> 
                                     <td class="px-4 py-2">{{ \Carbon\Carbon::parse($product->date_added)->format('Y-m-d') }}</td> 
                                     <td class="px-4 py-2">
-                                        {{ $product->last_replace_date ? \Carbon\Carbon::parse($product->last_replace_date)->format('Y-m-d') : 'N/A' }}
+                                        {{ $product->replace_date ? \Carbon\Carbon::parse($product->replace_date)->format('Y-m-d') : 'N/A' }}
                                     </td>
                                     
                                     <td class="px-4 py-2">
