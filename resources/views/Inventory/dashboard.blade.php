@@ -67,17 +67,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>
-                            <div class="avatar">
-                                <img class="imgava" src="" alt="" style="width: 50px; height: 50px;  border-radius: 50%;">
-                            </div>
-                        </td>
-                        <td style="font-size: 15px !important; text-align: center;"></td>
-                        <td style="font-size: 15px !important; text-align: center;"></td>
-                        <td style="font-size: 15px !important; text-align: center;"></td>
-                        <td style="font-size: 15px !important; text-align: center;"></td>
-                    </tr>
+                    @foreach ($inProgressProducts as $product)
+                        @foreach ($product->inventory as $inventory)
+                            @foreach ($inventory->replace as $replacement)
+                                @if ($replacement->replace_status === 'in-progress')
+                                    <tr>
+                                        <td>
+                                            <div class="avatar">
+                                                <img class="imgava" src="{{ $product->product_image }}" alt="" style="width: 50px; height: 50px; border-radius: 50%;">
+                                            </div>
+                                        </td>
+                                        <td style="font-size: 15px !important; text-align: center;">{{ $product->serial->serial_number }}</td>
+                                        <td style="font-size: 15px !important; text-align: center;">{{ $product->category->category_name }}</td>
+                                        <td style="font-size: 15px !important; text-align: center;">{{ $product->category->brand_name }}</td>
+                                        <td style="font-size: 15px !important; text-align: center;">{{ $product->product_name }}</td>
+                                        <td style="font-size: 15px !important; text-align: center;">{{ $product->typeOfUnit }}</td>
+                                    </tr>
+                                @endif
+                            @endforeach
+                        @endforeach
+                    @endforeach
                 </tbody>
             </table>
         </div>

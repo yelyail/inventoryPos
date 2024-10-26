@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('category_Id');
             $table->float('unitPrice');
             $table->string('product_name');
+            $table->string('product_description');
             $table->date('added_date');
             $table->string('typeOfUnit');
             $table->string('product_image');

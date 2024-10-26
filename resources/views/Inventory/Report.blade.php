@@ -49,32 +49,36 @@
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Serial #</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Product Name</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Supplier Name</th>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Date Sold</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Price</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Date Added</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Replace Date</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Return for Replace</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200" >
                         @foreach ($products as $product)
                             @foreach ($product->serial_numbers as $serial)
-                                <tr>                                    
+                                <tr>
                                     <td class="px-4 py-2">{{ $product->category_name }}</td>  
                                     <td class="px-4 py-2">{{ $serial }}</td> 
                                     <td class="px-4 py-2">{{ $product->model_name }}</td> 
                                     <td class="px-4 py-2">{{ $product->supplier_name }}</td> 
-                                    <td class="px-4 py-2">{{ $product->quantity_sold ?? 'N/A' }}</td> 
                                     <td class="px-4 py-2">{{ $product->unitPrice }}</td> 
                                     <td class="px-4 py-2">{{ \Carbon\Carbon::parse($product->date_added)->format('Y-m-d') }}</td> 
                                     <td class="px-4 py-2">
+                                        {{ $product->last_replace_date ? \Carbon\Carbon::parse($product->last_replace_date)->format('Y-m-d') : 'N/A' }}
+                                    </td>
+                                    
+                                    <td class="px-4 py-2">
                                         <button class="bg-blue-200 hover:bg-blue-300 text-black px-2 py-1 rounded flex items-center" 
-                                                onclick="showTransferAlert('{{$product->inventory_id }}', this)">
+                                                onclick="showTransferAlert('{{ $product->inventory_id }}', this)">
                                             Request Replace
                                         </button>
-                                    </td> 
+                                    </td>
                                 </tr>
                             @endforeach
                         @endforeach
+
                     </tbody>
                 </table>
             </div>

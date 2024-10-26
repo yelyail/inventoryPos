@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('repair', function (Blueprint $table) {
             $table->id('repair_id');
             $table->unsignedBigInteger('order_id');
-            $table->unsignedBigInteger('inventory_id');
             $table->date('return_date');
             $table->string('return_reason');
             $table->string('return_status');
+            $table->foreign('order_id')->references('order_id')->on('order');
             $table->timestamps();
         });
     }

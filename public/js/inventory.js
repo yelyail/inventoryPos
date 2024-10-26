@@ -113,7 +113,6 @@ function openAddProductModal() {
 function closeAddProductModal() {
     document.getElementById('staticBackdrop').classList.add('hidden');
 }
-
 // for pending
 function approveProduct(productId, button) {
     if (confirm("Are you sure you want to approve this product?")) {
@@ -281,7 +280,6 @@ function openEditSupplierModal(supplier_id, supplier_name, supplier_phone, suppl
     const modal = document.getElementById('editSupplierModal');
     modal.classList.remove('hidden'); 
 }
-
 // To close the modal
 function closeEditUserModal() {
     const modal = document.getElementById('editEmployeeModal');
@@ -317,11 +315,11 @@ function showTransferAlert(inventory_id) {
                 if (reason.isConfirmed && reason.value) {
                     let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                     $.ajax({
-                        url: '/admin/return',
+                        url: '/admin/requestReplace',
                         method: 'POST',
                         data: {
                             _token: token,
-                            ordDet_ID: ordDet_ID,
+                            inventory_id: inventory_id,
                             reason: reason.value
                         },
                         success: function(response) {
@@ -330,8 +328,8 @@ function showTransferAlert(inventory_id) {
                                 text: response.success,
                                 icon: "success"
                             }).then(() => {
-                                document.getElementById('repair-btn-' + ordDet_ID).style.display = 'none';
-                                document.getElementById('ongoing-btn-' + ordDet_ID).style.display = 'block';
+                                document.getElementById('repair-btn-' + inventory_id).style.display = 'none';
+                                document.getElementById('ongoing-btn-' + inventory_id).style.display = 'block';
                             });
                         },
                         error: function(xhr) {
@@ -353,3 +351,92 @@ function showTransferAlert(inventory_id) {
         }
     });
 }
+function showRepairAlert(order_id) {
+    Swal.fire({
+        title: "Repair",
+        showDenyButton: true,
+        showCancelButton: false,
+        confirmButtonText: "Yes",
+        denyButtonText: "No"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Reasons for Requesting a repair',
+                input: 'select',
+                inputOptions: {
+                    'Defective Hardware Components': 'Defective Hardware Components',
+                    'Incompatibility with Other Components': 'Incompatibility with Other Components',
+                    'Overheating or Performance Degradation': 'Overheating or Performance Degradation',
+                    'Others': 'Others'
+                },
+                inputPlaceholder: 'Select reason',
+                confirmButtonText: 'Confirm',
+                showCancelButton: true,
+                cancelButtonText: 'Cancel'
+            }).then((reason) => {
+                if (reason.isConfirmed && reason.value) {
+                    let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    $.ajax({
+                        url: '/admin/requestRepair',
+                        method: 'POST',
+                        data: {
+                            _token: token,
+                            order_id: inventory_id,
+                            reason: reason.value
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                title: "Requesting Repair Confirmed",
+                                text: response.success,
+                                icon: "success"
+                            }).then(() => {
+                                document.getElementById('repair-btn-' + order_id).style.display = 'none';
+                                document.getElementById('ongoing-btn-' + order_id).style.display = 'block';
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                title: "Error",
+                                text: xhr.responseJSON?.error || "There was an issue submitting the request.",
+                                icon: "error"
+                            });
+                        }
+                    });
+                } else if (!reason.value) {
+                    Swal.fire("You must select a reason for the repair request.", "", "warning");
+                } else {
+                    Swal.fire("Requesting Repair has been canceled", "", "info");
+                }
+            });
+        } else if (result.isDenied) {
+            Swal.fire("Requesting Repair has been canceled", "", "info");
+        }
+    });
+}
+function openEditProduct(productId, productName, productImage, categoryName, brandName, supplierName, unitPrice, warrantySupplier, warrantyUnit, dateAdded, typeOfUnit) {
+    document.getElementById('edit_product_id').value = productId;
+    document.getElementById('edit_product_name').value = productName;
+    document.getElementById('edit_categoryName').value = categoryName;
+    document.getElementById('edit_brand_name').value = brandName;
+    document.getElementById('edit_suppName').value = supplierName;
+    document.getElementById('edit_unitPrice').value = parseFloat(unitPrice).toFixed(2);
+    document.getElementById('edit_typeOfUnit').value = typeOfUnit; // Added
+    document.getElementById('edit_added_date').value = new Date(dateAdded).toISOString().split('T')[0];
+    document.getElementById('edit_warranty_supplier').value = warrantySupplier;
+    document.getElementById('edit_warrantyUnit').value = warrantyUnit;
+
+    const imgElement = document.getElementById('productImage');
+    console.log('Image Element:', imgElement); // Log the image element
+    
+    if (productImage && imgElement) {
+        imgElement.src = `/storage/${productImage}`;
+        imgElement.style.display = 'block'; // Show the image
+    }
+    document.getElementById('editProductModal').classList.remove('hidden');
+}
+
+function closeEditProduct(){
+    const modal = document.getElementById('editProductModal');
+    modal.classList.add('hidden');
+}
+

@@ -55,7 +55,10 @@ Route::controller(supervisorController::class)->group(function() {
    Route::post('/admin/updateProduct', 'updateProduct')->name('updateProduct');
    Route::post('/admin/editUser', 'editUser')->name('editUser');
    Route::post('/admin/editSupplier', 'editSupplier')->name('editSupplier');
+   Route::post('/admin/requestRepair', 'requestRepair')->name('requestRepair');
+   Route::post('/admin/requestReplace', 'requestReplace')->name('requestReplace');
 });
+
 Route::post('/storeSerial', [supervisorController::class, 'storeSerial'])->name('storeSerial');
 Route::post('/storeOrder', [supervisorController::class, 'storeOrder'])->name('storeOrder');
 // for the user

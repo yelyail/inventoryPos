@@ -63,84 +63,85 @@
             <div class="flex flex-row items-center justify-between px-5">
                 <div class="font-bold text-xl">Order Summary</div>
             </div>
-            <div class="px-5 py-4 mt-5 overflow-y-auto h-64"></div>
-            <div class="px-5 mt-5">
-                <div class="py-4 rounded-md shadow-lg">
-                    <div class="px-4 flex justify-between">
-                        <span class="font-semibold text-sm">Subtotal</span>
-                        <span id="subtotalDisplay" class="font-bold">₱ 0.00</span>
-                    </div>
-                    <div class="px-4 flex justify-between">
-                        <span class="font-semibold text-sm">Discount</span>
-                        <select id="discountSelect" class="border rounded-md" onchange="updateDiscount()">
-                            <option value="0">None</option>
-                            <option value="0.20">Senior Citizen (20%)</option>
-                            <option value="0.20">PWD (20%)</option>
-                        </select>
-                        <span id="discountDisplay" class="font-bold">₱ 0.00</span>
-                    </div>
-                    <div class="px-4 flex justify-between">
-                        <span class="font-semibold text-sm">VAT Tax</span> 
-                        <span id="vatTaxDisplay" class="font-bold">₱ 0.00</span> 
-                    </div>
-                    <div class="border-t-2 mt-3 py-2 px-4 flex items-center justify-between">
-                        <span class="font-semibold text-2xl">Total</span>
-                        <span id="totalDisplay" class="font-bold text-2xl">₱ 0.00</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payment Section -->
-            <div class="px-5 mt-5">
-                <div class="rounded-md shadow-lg px-4 py-4">
-                    <div class="flex flex-row justify-between items-center">
-                        <div class="flex flex-row space-x-4">
-                            <label class="flex items-center">
-                                <input type="radio" class="invisible-checkbox" name="paymentMethod" id="cashCheckbox" value="Cash" />
-                                <span class="bg-white text-blue-500 px-4 py-2 rounded-md hover:bg-blue-100 flex items-center">Cash</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="radio" class="invisible-checkbox" name="paymentMethod" id="gcashCheckbox" value="GCash" />
-                                <span class="bg-white text-blue-500 px-4 py-2 rounded-md hover:bg-blue-100 flex items-center">GCash</span>
-                            </label>
+                <div class="px-5 py-4 mt-5 overflow-y-auto h-64"></div>
+                    <div class="px-5 mt-5">
+                        <div class="py-4 rounded-md shadow-lg">
+                            <!-- put a form here hahahaha -->
+                            <div class="px-4 flex justify-between">
+                                <span class="font-semibold text-sm">Subtotal</span>
+                                <span id="subtotalDisplay" class="font-bold">₱ 0.00</span>
+                            </div>
+                            <div class="px-4 flex justify-between">
+                                <span class="font-semibold text-sm">Discount</span>
+                                <select id="discountSelect" class="border rounded-md" onchange="updateDiscount()">
+                                    <option value="0">None</option>
+                                    <option value="0.20">Senior Citizen (20%)</option>
+                                    <option value="0.20">PWD (20%)</option>
+                                </select>
+                                <span id="discountDisplay" class="font-bold">₱ 0.00</span>
+                            </div>
+                            <div class="px-4 flex justify-between">
+                                <span class="font-semibold text-sm">VAT Tax</span> 
+                                <span id="vatTaxDisplay" class="font-bold">₱ 0.00</span> 
+                            </div>
+                            <div class="border-t-2 mt-3 py-2 px-4 flex items-center justify-between">
+                                <span class="font-semibold text-2xl">Total</span>
+                                <span id="totalDisplay" class="font-bold text-2xl">₱ 0.00</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Cash Payment Inputs -->
-                    <div id="cashNameDiv" class="mt-4 hidden">
-                        <label for="cashName" class="block text-gray-700">Enter Name</label>
-                        <input type="text" id="cashName" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" />
-                    </div>
-                    <div id="cashAddressDiv" class="mt-4 hidden">
-                        <label for="cashAddress" class="block text-gray-700">Enter Address</label>
-                        <input type="text" id="cashAddress" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" />
-                    </div>
-                    <div id="cashAmountDiv" class="mt-4 hidden">
-                        <label for="cashAmount" class="block text-gray-700">Enter Cash Amount</label>
-                        <input type="number" id="cashAmount" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" />
-                    </div>
-                    <!-- GCash Payment Inputs -->
-                    <div id="gcashNameDiv" class="mt-4 hidden">
-                        <label for="gcashName" class="block text-gray-700">Enter Name</label>
-                        <input type="text" id="gcashName" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" />
-                    </div>
-                    <div id="gcashAddressDiv" class="mt-4 hidden">
-                        <label for="gcashAddress" class="block text-gray-700">Enter Address</label>
-                        <input type="text" id="gcashAddress" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" />
-                    </div>
-                    <div id="gcashReferenceDiv" class="mt-4 hidden">
-                        <label for="gcashReference" class="block text-gray-700">Reference Number</label>
-                        <input type="number" id="gcashReference" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" />
+                <!-- Payment Section -->
+                <div class="px-5 mt-5">
+                    <div class="rounded-md shadow-lg px-4 py-4">
+                        <div class="flex flex-row justify-between items-center">
+                            <div class="flex flex-row space-x-4">
+                                <label class="flex items-center">
+                                    <input type="radio" class="invisible-checkbox" name="paymentMethod" id="cashCheckbox" value="Cash" />
+                                    <span class="bg-white text-blue-500 px-4 py-2 rounded-md hover:bg-blue-100 flex items-center">Cash</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" class="invisible-checkbox" name="paymentMethod" id="gcashCheckbox" value="GCash" />
+                                    <span class="bg-white text-blue-500 px-4 py-2 rounded-md hover:bg-blue-100 flex items-center">GCash</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Cash Payment Inputs -->
+                        <div id="cashNameDiv" class="mt-4 hidden">
+                            <label for="cashName" class="block text-gray-700">Enter Name</label>
+                            <input type="text" id="cashName" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" />
+                        </div>
+                        <div id="cashAddressDiv" class="mt-4 hidden">
+                            <label for="cashAddress" class="block text-gray-700">Enter Address</label>
+                            <input type="text" id="cashAddress" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" />
+                        </div>
+                        <div id="cashAmountDiv" class="mt-4 hidden">
+                            <label for="cashAmount" class="block text-gray-700">Enter Cash Amount</label>
+                            <input type="number" id="cashAmount" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" />
+                        </div>
+                        <!-- GCash Payment Inputs -->
+                        <div id="gcashNameDiv" class="mt-4 hidden">
+                            <label for="gcashName" class="block text-gray-700">Enter Name</label>
+                            <input type="text" id="gcashName" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" />
+                        </div>
+                        <div id="gcashAddressDiv" class="mt-4 hidden">
+                            <label for="gcashAddress" class="block text-gray-700">Enter Address</label>
+                            <input type="text" id="gcashAddress" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" />
+                        </div>
+                        <div id="gcashReferenceDiv" class="mt-4 hidden">
+                            <label for="gcashReference" class="block text-gray-700">Reference Number</label>
+                            <input type="number" id="gcashReference" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" />
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Submit Button -->
-            <div class="px-5 mt-5">
-                <button id="confirmPayment" class="confirm px-12 py-4 rounded-md shadow-lg text-center bg-green-500 text-white font-semibold focus:outline-none">
-                    Confirm Payment
-                </button>
-            </div>
+                <!-- Submit Button -->
+                <div class="px-5 mt-5">
+                    <button id="confirmPayment" class="confirm px-12 py-4 rounded-md shadow-lg text-center bg-green-500 text-white font-semibold focus:outline-none">
+                        Confirm Payment
+                    </button>
+                </div>
         </div>
       </div>
 <!-- Modal for Serial Numbers -->

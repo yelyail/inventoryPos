@@ -16,6 +16,7 @@ class product extends Model
         'supplier_ID',
         'category_Id',
         'product_name',
+        'product_description',
         'unitPrice',
         'added_date',
         'typeOfUnit',

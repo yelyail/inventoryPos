@@ -13,6 +13,7 @@ use App\Models\order;
 use App\Models\customer;
 use App\Models\paymentMethod;
 use App\Models\repair;
+use App\Models\replace;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -50,7 +51,6 @@ class supervisorController extends Controller
             )
             ->get();
     
-        // Fetch products with serial counts for approved status
         $approvedProducts = DB::table('product')
             ->select(
                 'product.product_id',
@@ -59,6 +59,7 @@ class supervisorController extends Controller
                 'category.brand_name',
                 'product.product_name as model_name',
                 'product.added_date as date_added',
+                'product.typeOfUnit',
                 DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
                 DB::raw('COUNT(serial.serial_number) as serial_count')
             )
@@ -73,12 +74,42 @@ class supervisorController extends Controller
                 'category.category_name',
                 'category.brand_name',
                 'product.product_name',
+                'product.typeOfUnit',
+                'supplier.supplier_name',
+                'product.added_date'
+            )->get();
+            $defectiveProducts = DB::table('product')
+            ->select(
+                'product.product_id',
+                'serial.serial_number',
+                'product.product_image',
+                'category.category_name',
+                'category.brand_name',
+                'product.product_name as model_name',
+                'product.added_date as date_added',
+                'product.typeOfUnit',
+                DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
+                DB::raw('COUNT(serial.serial_number) as serial_count')
+            )
+            ->join('inventory', 'product.product_id', '=', 'inventory.product_id')
+            ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
+            ->join('category', 'product.category_Id', '=', 'category.category_id')
+            ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
+            ->where('replace.status', '=', 'inprogress')
+            ->groupBy(
+                'product.product_id',
+                'product.product_image',
+                'serial.serial_number',
+                'category.category_name',
+                'category.brand_name',
+                'product.product_name',
+                'product.typeOfUnit',
                 'supplier.supplier_name',
                 'product.added_date'
             )->get();
         $products = $pendingProducts->merge($approvedProducts);
     
-        return $this->dashboardView('Inventory/dashboard', compact('pageTitle', 'pendingProducts','approvedProducts'));
+        return $this->dashboardView('Inventory/dashboard', compact('pageTitle', 'pendingProducts','approvedProducts','inProgressProducts'));
     }
     public function pos() {
         $categories = category::all(); 
@@ -133,6 +164,7 @@ class supervisorController extends Controller
                 'category.category_name',
                 'category.brand_name',
                 'product.product_name as model_name',
+                'product.product_description',
                 'supplier.supplier_name',
                 'product.unitPrice',
                 'product.added_date as date_added',
@@ -153,6 +185,7 @@ class supervisorController extends Controller
                 'category.category_name',
                 'category.brand_name',
                 'product.product_name',
+                'product.product_description',
                 'supplier.supplier_name',
                 'product.unitPrice',
                 'product.added_date',
@@ -185,6 +218,7 @@ class supervisorController extends Controller
             'brand_name' => 'required|string|max:255',
             'product_name' => 'required|string|max:255',
             'typeOfUnit' => 'required|string|max:50',
+            'product_description' => 'required|string|max:1000',
             'unitPrice' => 'required|numeric',
             'added_date' => 'required|date',
             'warranty_supplier' => 'required|integer',
@@ -209,6 +243,7 @@ class supervisorController extends Controller
                 'unitPrice' => $request->unitPrice,
                 'added_date' => $request->added_date,
                 'typeOfUnit' => $request->typeOfUnit,
+                'product_description' => $request->product_description,
                 'product_image' => $imagePath,
             ]);
             $expirationDate = match($request->warrantyUnit) {
@@ -295,18 +330,24 @@ class supervisorController extends Controller
     // adding new serial
     public function storeSerial(Request $request)
     {
-        $request->validate([
-            'serial_number' => 'required|string|max:255',
-            'product_id' => 'required|exists:product,product_id',
-        ]);
-
-        $serial = new Serial();
-        $serial->serial_number = $request->serial_number;
-        $serial->product_id = $request->product_id;
-        $serial->save();
-        return response()->json(['success' => 'Serial number added successfully.']);
+        try {
+            $request->validate([
+                'serial_number' => 'required|string|max:255',
+                'product_id' => 'required|exists:product,product_id',
+            ]);
+    
+            $serial = new serial();
+            $serial->serial_number = $request->serial_number;
+            $serial->product_id = $request->product_id;
+            $serial->status = 'available';
+            $serial->save();
+    
+            return response()->json(['success' => 'Serial number added successfully.']);
+        } catch (\Exception $e) {
+            Log::error('Error storing serial: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while saving the serial number.'], 500);
+        }
     }
-
     // adding/viewing of supplier
     public function supplier() {
         $suppliers = supplier::all();
@@ -355,6 +396,8 @@ class supervisorController extends Controller
                 'product.unitPrice',
                 'product.added_date as date_added',
                 DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
+                DB::raw('MAX(replace.replace_date) as last_replace_date'),
+                'replace.replace_status as replace_status', // Include replace status
                 'product.typeOfUnit as unit',
                 DB::raw('COUNT(serial.serial_number) as serial_count')
             )
@@ -362,6 +405,10 @@ class supervisorController extends Controller
             ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
             ->join('category', 'product.category_Id', '=', 'category.category_id')
             ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
+            ->leftJoin('replace', function($join) {
+                $join->on('inventory.inventory_id', '=', 'replace.inventory_id')
+                     ->where('replace.replace_status', '=', 'complete'); // Filter by complete status
+            })
             ->where('inventory.status', '=', 'approve')
             ->groupBy(
                 'product.product_id',
@@ -373,24 +420,27 @@ class supervisorController extends Controller
                 'supplier.supplier_name',
                 'product.unitPrice',
                 'product.added_date',
+                'replace.replace_status', // Group by replace status
                 'product.typeOfUnit'
             )
-            ->orderBy('product.added_date', 'desc')  // Order by latest added date
+            ->orderBy('product.added_date', 'desc')
             ->get();
-
+    
+        // Fetch serial numbers for each product
         foreach ($products as $product) {
             $product->serial_numbers = DB::table('serial')
                 ->where('product_id', $product->product_id)
-                ->orderBy('serial_number') 
-                ->pluck('serial_number') 
+                ->orderBy('serial_number')
+                ->pluck('serial_number')
                 ->toArray();
         }
     
-        // Sort products by model_name
+        // Sort products by added_date
         $products = $products->sortBy('added_date');
     
         return view('Inventory/Report', compact('products'));
     }
+    
     
     public function salesReport() {
         return view('Inventory/salesReport');
@@ -484,11 +534,9 @@ class supervisorController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to archive supplier: ' . $e->getMessage()]);
         }
     }
-    public function updateProduct(Request $request)
-    {
-        // Validate incoming request
+    public function updateProduct(Request $request) {
         $validated = $request->validate([
-            'product_id' => 'required|exists:product,product_id', // Ensure the product exists
+            'product_id' => 'required|exists:product,product_id',
             'category_name' => 'required|string|max:255',
             'brand_name' => 'required|string|max:255',
             'product_name' => 'required|string|max:255',
@@ -498,37 +546,43 @@ class supervisorController extends Controller
             'warranty_supplier' => 'required|numeric',
             'warrantyUnit' => 'required|string|in:days,weeks,months',
             'supplierName' => 'required|exists:supplier,supplier_ID',
-            'product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Allow image to be nullable
+            'product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
-        // Retrieve the product from the database
-        $product = product::findOrFail($request->product_id);
-
-        // Update the product details
-        $product->category->category_name = $request->category_name;
-        $product->category->brand_name = $request->brand_name;
+    
+        $product = Product::findOrFail($request->product_id);
+    
+        // Update category
+        if ($product->category) {
+            $product->category->category_name = $request->category_name;
+            $product->category->brand_name = $request->brand_name;
+            $product->category->save();
+        }
+    
+        // Update inventory
+        if ($product->inventory) {
+            $product->inventory->warranty_supplier = $request->warranty_supplier;
+            $product->inventory->save();
+        }
+    
+        // Update product attributes
         $product->product_name = $request->product_name;
         $product->typeOfUnit = $request->typeOfUnit;
         $product->unitPrice = $request->unitPrice;
         $product->added_date = $request->added_date;
-        $product->inventory->warranty_supplier = $request->warranty_supplier;
         $product->supplier_ID = $request->supplierName;
-
+    
+        // Handle product image upload
         if ($request->hasFile('product_image')) {
-            // Delete the old image if necessary
             if ($product->product_image) {
-                Storage::delete($product->product_image); // Ensure you have the correct storage setup
+                Storage::delete($product->product_image);
             }
-
-            // Store the new image
             $imagePath = $request->file('product_image')->store('product_images', 'public');
             $product->product_image = $imagePath;
         }
-
-        // Save the updated product
+    
+        // Save product
         $product->save();
-
-        // Redirect back with a success message
+    
         return redirect()->back()->with('success', 'Product updated successfully!');
     }
 
@@ -579,8 +633,6 @@ class supervisorController extends Controller
     
         return redirect()->back()->with('success', 'Supplier updated successfully!');
     }
-    
-
     // for the user
     public function staffPos() {
         $categories = category::all(); 
@@ -863,33 +915,53 @@ class supervisorController extends Controller
     public function requestRepair(Request $request)
     {
         try {
-            // Validate incoming request
             $request->validate([
-                'inventory_id' => 'required|integer|exists:inventory,inventory_id', 
-                'ordDet_ID' => 'nullable|integer|exists:order,order_id', // Make ordDet_ID optional
+                'order_id' => 'required|integer|exists:repair,order_id', 
                 'reason' => 'required|string|max:255'
             ]);
-
-            $returnReason = $request->input('reason');
+            $replaceReason = $request->input('reason');
             $currentDate = now(); 
-
-            $orderId = $request->filled('inventory_id') ? null : $request->input('ordDet_ID');
-
-            $newRepair = repair::create([
-                'order_id' => $orderId, 
+            $newReplace = repair::create([
+                'order_id' => $request->input('order_id'),
                 'return_date' => $currentDate,
-                'return_reason' => $returnReason,
+                'return_reason' => $replaceReason,
                 'return_status' => 'complete',
             ]);
 
-            if ($newRepair) {
-                return response()->json(['success' => 'Repair request has been successfully submitted.'], 200);
+            if ($newReplace) {
+                return response()->json(['success' => 'Replace request has been successfully submitted.'], 200);
             } else {
-                return response()->json(['error' => 'Failed to submit repair request.'], 500);
+                return response()->json(['error' => 'Failed to submit replace request.'], 500);
             }
 
         } catch (\Exception $e) {
-            Log::error('Error submitting repair request: ' . $e->getMessage());
+            return response()->json(['error' => 'An internal error occurred. Please try again later.'], 500);
+        }
+    }
+    public function requestReplace(Request $request)
+    {
+        try {
+            $request->validate([
+                'inventory_id' => 'required|integer|exists:inventory,inventory_id', 
+                'reason' => 'required|string|max:255'
+            ]);
+            $replaceReason = $request->input('reason');
+            $currentDate = now(); 
+            $newReplace = replace::create([
+                'inventory_id' => $request->input('inventory_id'),
+                'replace_date' => $currentDate,
+                'replace_reason' => $replaceReason,
+                'replace_status' => 'inprogress',
+            ]);
+
+            if ($newReplace) {
+                return response()->json(['success' => 'Replace request has been successfully submitted.'], 200);
+            } else {
+                return response()->json(['error' => 'Failed to submit replace request.'], 500);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error submitting replace request: ' . $e->getMessage());
             return response()->json(['error' => 'An internal error occurred. Please try again later.'], 500);
         }
     }

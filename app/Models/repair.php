@@ -13,9 +13,13 @@ class repair extends Model
     protected $primaryKey = 'repair_id';
     protected $fillable = [
         'order_id',
-        'inventory_id',
         'return_date',
         'return_reason',
         'return_status',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(order::class, 'order_id', 'order_id');
+    }
 }
