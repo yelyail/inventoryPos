@@ -84,6 +84,10 @@ function addNewSerial(event) {
             if (response.status === 419) {
                 alert('Session expired. Please refresh the page and try again.');
                 return;
+            } else if (response.status === 409) { 
+                return response.json().then(data => {
+                    alert(data.error); 
+                });
             }
             return response.json();
         })
@@ -416,27 +420,35 @@ function showRepairAlert(order_id) {
         }
     });
 }
-function openEditProduct(productId, productName, productImage, categoryName, brandName, supplierName, unitPrice, warrantySupplier, warrantyUnit, dateAdded, typeOfUnit) {
+function openEditProduct(productId, productName, productImage, productDescription, categoryName, brandName, supplierName, unitPrice, warrantySupplier, warrantyUnit, dateAdded, typeOfUnit) {
+    // Set the values in the modal
     document.getElementById('edit_product_id').value = productId;
     document.getElementById('edit_product_name').value = productName;
     document.getElementById('edit_categoryName').value = categoryName;
+    document.getElementById('edit_product_description').value = productDescription; // Fixed typo: changed product_description to productDescription
     document.getElementById('edit_brand_name').value = brandName;
     document.getElementById('edit_suppName').value = supplierName;
     document.getElementById('edit_unitPrice').value = parseFloat(unitPrice).toFixed(2);
-    document.getElementById('edit_typeOfUnit').value = typeOfUnit; // Added
-    document.getElementById('edit_added_date').value = new Date(dateAdded).toISOString().split('T')[0];
-    document.getElementById('edit_warranty_supplier').value = warrantySupplier;
-    document.getElementById('edit_warrantyUnit').value = warrantyUnit;
+    document.getElementById('edit_typeOfUnit').value = typeOfUnit || ''; // Default to empty string if undefined
+    document.getElementById('edit_added_date').value = new Date(dateAdded).toISOString().split('T')[0]; // Format the date
+    document.getElementById('edit_warranty_supplier').value = warrantySupplier || ''; // Default to empty string if undefined
+    document.getElementById('edit_warrantyUnit').value = warrantyUnit || ''; // Default to empty string if undefined
 
-    const imgElement = document.getElementById('productImage');
-    console.log('Image Element:', imgElement); // Log the image element
+    const imgElement = document.getElementById('productImage'); // Ensure this element exists in your HTML
+    console.log('Image Element:', imgElement); // Log the image element for debugging
     
+    // Display the product image if it exists
     if (productImage && imgElement) {
         imgElement.src = `/storage/${productImage}`;
         imgElement.style.display = 'block'; // Show the image
+    } else if (imgElement) {
+        imgElement.style.display = 'none'; // Hide the image if no product image is provided
     }
+
+    // Remove the hidden class to show the modal
     document.getElementById('editProductModal').classList.remove('hidden');
 }
+
 
 function closeEditProduct(){
     const modal = document.getElementById('editProductModal');

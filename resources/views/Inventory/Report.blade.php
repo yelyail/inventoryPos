@@ -57,26 +57,23 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200" >
                         @foreach ($products as $product)
-                            @foreach ($product->serial_numbers as $serial)
-                                <tr>
-                                    <td class="px-4 py-2">{{ $product->category_name }}</td>  
-                                    <td class="px-4 py-2">{{ $serial }}</td> 
-                                    <td class="px-4 py-2">{{ $product->model_name }}</td> 
-                                    <td class="px-4 py-2">{{ $product->supplier_name }}</td> 
-                                    <td class="px-4 py-2">{{ $product->unitPrice }}</td> 
-                                    <td class="px-4 py-2">{{ \Carbon\Carbon::parse($product->date_added)->format('Y-m-d') }}</td> 
-                                    <td class="px-4 py-2">
-                                        {{ $product->replace_date ? \Carbon\Carbon::parse($product->replace_date)->format('Y-m-d') : 'N/A' }}
-                                    </td>
-                                    
-                                    <td class="px-4 py-2">
-                                        <button class="bg-blue-200 hover:bg-blue-300 text-black px-2 py-1 rounded flex items-center" 
-                                                onclick="showTransferAlert('{{ $product->serial_Id }}', this)">
-                                            Request Replace
-                                        </button>
-                                    </td>
-                                </tr>
-                            @endforeach
+                            <tr>
+                                <td class="px-4 py-2">{{ $product->category_name }}</td>  
+                                <td class="px-4 py-2">{{ $product->serial_number }}</td> 
+                                <td class="px-4 py-2">{{ $product->model_name }}</td> 
+                                <td class="px-4 py-2">{{ $product->supplier_name }}</td> 
+                                <td class="px-4 py-2">{{ $product->unitPrice }}</td> 
+                                <td class="px-4 py-2">{{ \Carbon\Carbon::parse($product->date_added)->format('Y-m-d') }}</td> 
+                                <td class="px-4 py-2">
+                                    {{ $product->replace_date ? \Carbon\Carbon::parse($product->replace_date)->format('Y-m-d') : 'N/A' }}
+                                </td>
+                                <td class="px-4 py-2">
+                                    <button class="bg-blue-200 hover:bg-blue-300 text-black px-2 py-1 rounded flex items-center" 
+                                            onclick="showTransferAlert('{{ $product->serial_Id }}', this)">
+                                        Request Replace
+                                    </button>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>

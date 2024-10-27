@@ -18,6 +18,6 @@ class customer extends Model
     public $timestamps = true;
     public function order()
     {
-        return $this->hasMany(order::class, 'customer_id');
+        return $this->hasMany(orders::class, 'customer_id');
     }
 }

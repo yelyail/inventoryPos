@@ -20,6 +20,6 @@ class repair extends Model
 
     public function order()
     {
-        return $this->belongsTo(order::class, 'order_id', 'order_id');
+        return $this->belongsTo(orders::class, 'order_id', 'order_id');
     }
 }

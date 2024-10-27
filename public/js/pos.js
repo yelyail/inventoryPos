@@ -132,7 +132,6 @@ function openPosSerialModal(button) {
 
     document.getElementById('serialModal').classList.remove('hidden');
 }
-
 function closeSerialModal(modalId) {
     document.getElementById(modalId).classList.add('hidden');
 }
@@ -148,9 +147,7 @@ function addToOrderSummary(productName, serialValue, productId, productImage, pr
     const serialArray = serialValue ? serialValue.split(',').map(serial => serial.trim()) : [];
     const quantity = serialArray.length;
 
-    // Use `let` instead of `const` for mutable variables
     if (productMap[productId]) {
-        // Increment the existing quantity
         productMap[productId].quantity += quantity;
         productMap[productId].serialArray.push(...serialArray);
     } else {
@@ -238,6 +235,123 @@ function updateSummary() {
     vatTaxDisplay.textContent = formatCurrency(vatTax); 
     totalDisplay.textContent = formatCurrency(total); 
 }
+document.querySelectorAll('input[name="paymentMethod"]').forEach((input) => {
+    input.addEventListener('change', function() {
+        // Hide all payment fields initially
+        document.getElementById('cashFields').style.display = 'none';
+        document.getElementById('gcashFields').style.display = 'none';
+
+        // Show relevant fields based on the selected payment method
+        if (this.value === 'cash') {
+            document.getElementById('cashFields').style.display = 'block';
+        } else if (this.value === 'gcash') {
+            document.getElementById('gcashFields').style.display = 'block';
+        }
+
+        // Store the payment details if the payment method changes
+        updatePaymentDetails();
+    });
+});
+
+function updatePaymentDetails() {
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'N/A';
+
+    let paymentName = null;
+    let paymentAddress = null;
+    let payment = null;
+
+    if (paymentMethod === 'cash') {
+        paymentName = document.getElementById('cashName').value.trim() || null;
+        paymentAddress = document.getElementById('cashAddress').value.trim() || null;
+        payment = parseFloat(document.getElementById('cashAmount').value.replace(/[^0-9.-]+/g, "")) || 0;
+
+    } else if (paymentMethod === 'gcash') {
+        paymentName = document.getElementById('gcashName').value.trim() || null;
+        paymentAddress = document.getElementById('gcashAddress').value.trim() || null;
+        payment = total; // Assuming total is the correct amount for GCash payment
+    }
+
+    // You can store these values in a variable or use them directly in your sendToDatabase function
+    console.log('Payment Details:', {
+        paymentMethod,
+        paymentName,
+        paymentAddress,
+        payment
+    });
+}
+
+function sendToDatabase() {
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'N/A';
+    const discountAmount = parseFloat(document.getElementById('discountDisplay').textContent.replace(/[^0-9.-]+/g, ""));
+    const total = parseFloat(document.getElementById('totalDisplay').textContent.replace(/[^0-9.-]+/g, ""));
+
+    let paymentName = null;
+    let paymentAddress = null;
+    let payment = null;
+
+    if (paymentMethod === 'cash') {
+        paymentName = document.getElementById('cashName').value.trim() || null; 
+        paymentAddress = document.getElementById('cashAddress').value.trim() || null; 
+        payment = parseFloat(document.getElementById('cashAmount').value.replace(/[^0-9.-]+/g, "")) || 0;
+    } else if (paymentMethod === 'gcash') {
+        paymentName = document.getElementById('gcashName').value.trim() || null; 
+        paymentAddress = document.getElementById('gcashAddress').value.trim() || null; 
+        payment = total; // Assuming total is the correct amount for GCash payment
+    }
+
+    // Prepare the data to be sent to the backend
+    const data = {
+        paymentMethod,
+        products: Array.from(Object.entries(productMap)).map(([productId, product]) => ({
+            productId,
+            quantity: product.quantity,
+            serialArray: product.serialArray,
+            price: product.priceNumber,
+        })),
+        paymentName,
+        paymentAddress,
+        referenceNum: paymentMethod === 'gcash' ? document.getElementById('gcashReference').value.trim() || null : null,
+        discountAmount,
+        total,
+    };
+
+    console.log(data); // Debugging output
+
+    $.ajax({
+        url: '/storeOrder',
+        type: 'POST',
+        contentType: 'application/json',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        data: JSON.stringify(data),
+        success: function(response) {
+            if (response.warning) {
+                console.warn(response.warning);
+            } else {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Order Confirmed! :)',
+                    text: response.message,
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        },
+        error: function(xhr) {
+            const errorMessage = xhr.responseJSON?.message || 'Something went wrong. Please try again!';            
+            Swal.fire({
+                icon: 'error',
+                title: 'Something went wrong :(',
+                text: errorMessage,
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+}
+
+
 document.getElementById('category').addEventListener('change', function() {
     const selectedCategory = this.value;
     const items = document.querySelectorAll('#itemsContainer .item');
@@ -252,90 +366,5 @@ document.getElementById('category').addEventListener('change', function() {
         }
     });
 });
-document.getElementById('confirmPayment').addEventListener('click', function() {
-    const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-
-    if (!selectedPaymentMethod) {
-        alert('Please select a payment method.');
-        return;
-    }
-
-    const paymentMethod = selectedPaymentMethod.value;
-    const orderSummary = [];
-
-    console.log('Global total:', total);  // Debug log for global total
-    console.log('Product Map:', productMap);  // Debug log for product map
-
-    // Collect product data from productMap
-    if (productMap && Object.keys(productMap).length > 0) {
-        for (const [productId, product] of Object.entries(productMap)) {
-            orderSummary.push({
-                productId: productId,
-                productName: product.productName,
-                quantity: product.quantity,
-                pricePerItem: product.priceNumber,
-                totalPrice: (product.priceNumber * product.quantity).toFixed(2),
-                serialNumbers: product.serialArray,
-            });
-        }
-    } else {
-        alert('Product map is empty. Please add products to your cart.');
-        return;
-    }
-
-    console.log('Order Summary:', orderSummary);
-
-    // Check if totalAmount is valid
-    const totalAmount = total;
-    if (isNaN(totalAmount) || totalAmount <= 0) {
-        alert('Total amount is invalid. Please check your order.');
-        return;
-    }
-
-    const formData = {
-        orderSummary: orderSummary,
-        paymentMethod: paymentMethod,
-        totalAmount: totalAmount,
-    };
-
-    console.log("Form Data to send:", formData);
-
-    const orderList = document.querySelector('.px-5.py-4.mt-5.overflow-y-auto.h-64');
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    fetch('/storeOrder', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: JSON.stringify(formData),
-    })
-    .then(response => {
-        console.log('Server Response:', response);  // Log the raw server response
-        if (!response.ok) {
-            return response.text().then(text => {
-                throw new Error(`Server error: ${response.status} ${response.statusText}. Response: ${text}`);
-            });
-        }
-        return response.json(); 
-    })
-    .then(jsonData => {
-        console.log('Parsed server response:', jsonData);
-        if (jsonData.success) {
-            alert('Payment confirmed and order placed successfully!');
-            productMap = {};  
-            orderList.innerHTML = '';  
-        } else {
-            alert('An error occurred during payment confirmation: ' + jsonData.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert(`An error occurred: ${error.message}. Please try again.`);
-    });
-});
-
-
 
 

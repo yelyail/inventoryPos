@@ -9,7 +9,7 @@ use App\Models\product;
 use App\Models\User;
 use App\Models\serial;
 use App\Models\inventory;
-use App\Models\order;
+use App\Models\orders;
 use App\Models\customer;
 use App\Models\paymentMethod;
 use App\Models\repair;
@@ -279,19 +279,29 @@ class supervisorController extends Controller
                 'serial_number' => 'required|string|max:255',
                 'product_id' => 'required|exists:product,product_id',
             ]);
-    
+
+            // Check if the serial number already exists for this product
+            $existingSerial = serial::where('serial_number', $request->serial_number)
+                ->where('product_id', $request->product_id)
+                ->first();
+
+            if ($existingSerial) {
+                return response()->json(['error' => 'This serial number already exists for the selected product.'], 409);
+            }
+
             $serial = new serial();
             $serial->serial_number = $request->serial_number;
             $serial->product_id = $request->product_id;
             $serial->status = 'available';
             $serial->save();
-    
+
             return response()->json(['success' => 'Serial number added successfully.']);
         } catch (\Exception $e) {
             Log::error('Error storing serial: ' . $e->getMessage());
             return response()->json(['error' => 'An error occurred while saving the serial number.'], 500);
         }
     }
+
     // adding/viewing of supplier di na hilabtan fak shit
     public function supplier() {
         $suppliers = supplier::all();
@@ -329,47 +339,47 @@ class supervisorController extends Controller
     
     public function report() {
         $products = DB::table('product')
-        ->select(
-            'product.product_id',
-            'inventory.inventory_id',
-            'product.product_image',
-            'category.category_name',
-            'category.brand_name',
-            'product.product_name as model_name',
-            'supplier.supplier_name',
-            'product.unitPrice',
-            'product.added_date as date_added',
-            DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
-            'replace.replace_date as replace_date', // Include replace status
-            'product.typeOfUnit as unit',
-            DB::raw('COUNT(serial.serial_number) as serial_count'),
-            'serial.serial_Id' // Add this line to select serial_Id
-        )
-        ->join('inventory', 'product.product_id', '=', 'inventory.product_id')
-        ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
-        ->join('category', 'product.category_Id', '=', 'category.category_id')
-        ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
-        ->leftJoin('replace', 'serial.serial_Id', '=', 'replace.replace_id')
-        ->where('inventory.status', '=', 'approve')
-        ->groupBy(
-            'product.product_id',
-            'inventory.inventory_id',
-            'product.product_image',
-            'category.category_name',
-            'category.brand_name',
-            'product.product_name',
-            'supplier.supplier_name',
-            'product.unitPrice',
-            'replace.replace_date',
-            'product.added_date',
-            'product.typeOfUnit',
-            'serial.serial_Id' // Add this line to group by serial_Id
-        )
-        ->orderBy('product.added_date', 'desc')
-        ->get();
+            ->select(
+                'product.product_id',
+                'inventory.inventory_id',
+                'product.product_image',
+                'category.category_name',
+                'serial.serial_number',
+                'category.brand_name',
+                'product.product_name as model_name',
+                'supplier.supplier_name',
+                'product.unitPrice',
+                'product.added_date as date_added',
+                DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
+                'product.typeOfUnit as unit',
+                DB::raw('COUNT(serial.serial_number) as serial_count'),
+                'serial.serial_Id',
+                DB::raw('(SELECT MAX(replace.replace_date)) as replace_date')
+            )
+            ->join('inventory', 'product.product_id', '=', 'inventory.product_id')
+            ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
+            ->join('category', 'product.category_Id', '=', 'category.category_id')
+            ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
+            ->leftJoin('replace', 'serial.serial_Id', '=', 'replace.serial_id')
+            ->where('inventory.status', '=', 'approve')
+            ->groupBy(
+                'product.product_id',
+                'inventory.inventory_id',
+                'product.product_image',
+                'serial.serial_number',
+                'category.category_name',
+                'category.brand_name',
+                'product.product_name',
+                'supplier.supplier_name',
+                'product.unitPrice',
+                'product.added_date',
+                'product.typeOfUnit',
+                'serial.serial_Id'
+            )
+            ->orderBy('product.added_date', 'desc')
+            ->get();
 
-    
-        // Fetch serial numbers for each product
+
         foreach ($products as $product) {
             $product->serial_numbers = DB::table('serial')
                 ->where('product_id', $product->product_id)
@@ -378,7 +388,6 @@ class supervisorController extends Controller
                 ->toArray();
         }
     
-        // Sort products by added_date
         $products = $products->sortBy('added_date');
     
         return view('Inventory/Report', compact('products'));
@@ -475,58 +484,61 @@ class supervisorController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to archive supplier: ' . $e->getMessage()]);
         }
     }
+
     public function updateProduct(Request $request) {
-        $validated = $request->validate([
+        $request->validate([
             'product_id' => 'required|exists:product,product_id',
             'category_name' => 'required|string|max:255',
             'brand_name' => 'required|string|max:255',
             'product_name' => 'required|string|max:255',
+            'product_description' => 'required|string',
             'typeOfUnit' => 'required|string|max:255',
             'unitPrice' => 'required|numeric',
             'added_date' => 'required|date',
-            'warranty_supplier' => 'required|numeric',
+            'warranty_supplier' => 'required|integer',
             'warrantyUnit' => 'required|string|in:days,weeks,months',
             'supplierName' => 'required|exists:supplier,supplier_ID',
-            'product_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'product_image' => 'nullable|image|max:2048',
         ]);
-    
-        $product = Product::findOrFail($request->product_id);
-    
-        // Update category
-        if ($product->category) {
-            $product->category->category_name = $request->category_name;
-            $product->category->brand_name = $request->brand_name;
-            $product->category->save();
-        }
-    
-        // Update inventory
-        if ($product->inventory) {
-            $product->inventory->warranty_supplier = $request->warranty_supplier;
-            $product->inventory->save();
-        }
-    
-        // Update product attributes
-        $product->product_name = $request->product_name;
-        $product->typeOfUnit = $request->typeOfUnit;
-        $product->unitPrice = $request->unitPrice;
-        $product->added_date = $request->added_date;
-        $product->supplier_ID = $request->supplierName;
-    
-        // Handle product image upload
-        if ($request->hasFile('product_image')) {
-            if ($product->product_image) {
-                Storage::delete($product->product_image);
-            }
-            $imagePath = $request->file('product_image')->store('product_images', 'public');
-            $product->product_image = $imagePath;
-        }
-    
-        // Save product
-        $product->save();
-    
-        return redirect()->back()->with('success', 'Product updated successfully!');
-    }
 
+        // Retrieve the product and associated category and inventory records
+        $product = Product::find($request->product_id);
+        $inventory = Inventory::where('product_id', $product->product_id)->first();
+        $category = Category::find($product->category_Id);
+
+        // Update category details
+        if ($category) {
+            $category->update([
+                'category_name' => $request->category_name,
+                'brand_name' => $request->brand_name,
+            ]);
+        }
+
+        // Update product details
+        $product->update([
+            'product_name' => $request->product_name,
+            'product_description' => $request->product_description,
+            'typeOfUnit' => $request->typeOfUnit,
+            'unitPrice' => $request->unitPrice,
+            'added_date' => $request->added_date,
+            'supplier_ID' => $request->supplierName,
+        ]);
+
+        // Update or create inventory details
+        if ($inventory) {
+            $inventory->update([
+                'warranty_supplier' => $request->warranty_supplier,
+            ]);
+        }
+
+        // Handle file upload for product image
+        if ($request->hasFile('product_image')) {
+            $path = $request->file('product_image')->store('product_images', 'public');
+            $product->update(['product_image' => $path]);
+        }
+
+        return redirect()->back()->with('success', 'Product updated successfully.');
+    }
     public function editUser(Request $request)
     {
         // Validate the incoming request
@@ -831,77 +843,11 @@ class supervisorController extends Controller
 
     //for both users
     public function storeOrder(Request $request) {
-        // Validate the incoming request data
-        $validatedData = $request->validate([
-            'customer.name' => 'required|string',
-            'customer.address' => 'required|string',
-            'paymentMethod' => 'required|string',
-            'gcash.name' => 'nullable|string',
-            'gcash.address' => 'nullable|string',
-            'gcash.reference' => 'nullable|string',
-            'cash.name' => 'nullable|string',
-            'cash.address' => 'nullable|string',
-            'cash.amount' => 'nullable|numeric',
-            'items' => 'required|array',
-            'items.*.name' => 'required|integer', // Ensure the product ID is an integer
-            'items.*.quantity' => 'required|integer|min:1', // Quantity must be at least 1
-            'subtotal' => 'required|numeric',
-            'discount' => 'required|numeric',
-            'total' => 'required|numeric',
+        $request->validate([
+            
         ]);
-    
-        Log::info($validatedData);
-    
-        try {
-            Log::info('Entering order storage process');
-    
-            // Step 1: Save the customer details
-            $customer = Customer::create([
-                'customer_name' => $validatedData['customer']['name'],
-                'customer_address' => $validatedData['customer']['address'],
-            ]);
-            Log::info('Customer saved:', $customer->toArray());
-    
-            // Step 2: Prepare payment data
-            $paymentData = [
-                'paymentType' => $validatedData['paymentMethod'],
-                'discount' => $validatedData['discount'],
-                'amount_paid' => $validatedData['total'], 
-            ];
-            if ($validatedData['paymentMethod'] === 'gcash') {
-                $paymentData['reference_num'] = $validatedData['gcash']['reference'];
-            } elseif ($validatedData['paymentMethod'] === 'cash') {
-                $paymentData['amount_paid'] = $validatedData['cash']['amount'];
-            }
-    
-            $payment = PaymentMethod::create($paymentData);
-    
-            // Step 3: Save the order
-            $order = Order::create([
-                'customer_id' => $customer->customer_id,
-                'payment_id' => $payment->payment_id,
-                'order_date' => now(),
-                'total_amount' => $validatedData['totaarray: l'],
-                'qty_order' => array_sum(array_column($validatedData['items'], 'quantity')),
-            ]);
-    
-            // Step 4: Save each order item in the inventory
-            foreach ($validatedData['items'] as $item) {
-                Inventory::create([
-                    'product_id' => $item['name'], 
-                    'date_arrived' => now(),
-                    'warranty_supplier' => '1 year', 
-                    'status' => 'sold', 
-                    'order_id' => $order->order_id,
-                    'quantity' => $item['quantity'], 
-                ]);
-            }
-            return response()->json(['message' => 'Order stored successfully!', 'order' => $order], 201);
-        } catch (\Exception $e) {
-            Log::error('Failed to store order: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to store order: ' . $e->getMessage()], 500);
-        }
     }
+        
     
     public function requestRepair(Request $request)
     {

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('supplier_address'); 
             $table->string('supplier_email');
             $table->string('supplier_phone');
-            $table->string('status'); // Add status if needed
+            $table->string('status'); 
             $table->timestamps(); 
         });
     }

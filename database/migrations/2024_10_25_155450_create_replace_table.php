@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('serial_id');
             $table->date('replace_date');
             $table->string('replace_reason');
-            $table->foreign('serial_id')->references('serial_id')->on('serial');
+            $table->foreign('serial_id')->references('serial_id')->on('serial')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

@@ -23,7 +23,7 @@ class product extends Model
         'product_image',
     ];
     public function inventory() {
-        return $this->hasMany(inventory::class, 'product_id', 'product_id');
+        return $this->hasOne(inventory::class, 'product_id', 'product_id');
     }
     
 
@@ -40,5 +40,4 @@ class product extends Model
     {
         return $this->hasMany(serial::class, 'product_id', 'product_id');
     }
-
 }

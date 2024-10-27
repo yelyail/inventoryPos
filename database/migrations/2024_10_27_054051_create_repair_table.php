@@ -16,8 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('order_id');
             $table->date('return_date');
             $table->string('return_reason');
-            $table->string('return_status');
-            $table->foreign('order_id')->references('order_id')->on('order');
+            $table->foreign('order_id')->references('order_id')->on('orders')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

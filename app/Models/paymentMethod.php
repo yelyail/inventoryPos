@@ -21,7 +21,7 @@ class paymentMethod extends Model
     public $timestamps = true;
     public function order()
     {
-        return $this->hasMany(order::class, 'payment_id','payment_id');
+        return $this->hasMany(orders::class, 'payment_id','payment_id');
     }
 
 }

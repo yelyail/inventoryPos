@@ -21,8 +21,8 @@ return new class extends Migration
             $table->date('added_date');
             $table->string('typeOfUnit');
             $table->string('product_image');
-            $table->foreign('supplier_ID')->references('supplier_id')->on('supplier');
-            $table->foreign('category_Id')->references('category_id')->on('category');
+            $table->foreign('supplier_ID')->references('supplier_id')->on('supplier')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('category_Id')->references('category_id')->on('category')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
