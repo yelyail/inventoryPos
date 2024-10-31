@@ -3,11 +3,6 @@
 @section('title', 'DAVCOM Consumer Goods Trading')
 
 @section('content')
-@if (session('success'))
-    <div class="bg-green-500 text-white p-4 rounded-lg">
-        {{ session('success') }}
-    </div>
-@endif
 
 <div id="main" class="main-content-flow flex-1 bg-white-100 mt-15 md:mt-4 md:ml-60 pb-30 md:pb-20">
   <div class="flex flex-row flex-wrap flex-grow mt-1">
@@ -59,7 +54,7 @@
                         <td>
                             <img src="{{ asset("storage/{$product->product_image}") }}" 
                                 alt="{{ $product->model_name }}" 
-                                style="width: 200px; height: 100px;">
+                                style="width: 100px; height: 100px;">
                         </td>
                         <td>{{ ucwords(strtolower($product->category_name ?? 'N/A')) }}</td>
                         <td>{{ ucwords(strtolower($product->brand_name ?? 'N/A')) }}</td>
@@ -83,9 +78,22 @@
                                     <i class="fa-solid fa-check mr-2"></i>Approved
                                 </button>
                                 <button class="bg-blue-500 hover:bg-blue-700 text-white px-2 py-1 rounded flex items-center" 
-                                        onclick="event.stopPropagation();">
+                                    onclick="event.stopPropagation(); 
+                                        openEditProduct(
+                                            '{{ $product->product_id }}', 
+                                            '{{ addslashes($product->model_name) }}', 
+                                            '{{ addslashes($product->product_image) }}', 
+                                            '{{ $product->product_description}}',
+                                            '{{ $product->category_name }}',
+                                            '{{ $product->brand_name }}',
+                                            '{{ $product->supplier_name }}',
+                                            '{{ $product->unitPrice }}',
+                                            '{{ $product->warranty_expired }}',
+                                            '{{ $product->unit }}',
+                                            '{{ $product->date_added }}',
+                                        )">
                                     <i class="fa-regular fa-pen-to-square mr-2"></i>Edit
-                                </button>   
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -96,6 +104,95 @@
       </div>
     </div>
   </div>
+</div>
+<!-- for editing the product modal -->
+<div id="editProductModal" class="fixed z-10 inset-0 mt-12 overflow-y-auto hidden" role="dialog" aria-labelledby="editProductModalLabel">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 h-3/4">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h1 class="text-lg font-semibold" id="editProductModalLabel">Update Product</h1>
+                <button type="button" class="text-gray-500 hover:text-gray-700" onclick="closeEditProduct()">
+                    &times;
+                </button>
+            </div>
+            <div class="p-4">
+                <form id="editInventoryForm" action="{{ route('updateProduct') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="hidden" id="edit_product_id" name="product_id">
+
+                    <div class="mb-4">
+                        <label for="edit_categoryName" class="block text-sm font-medium text-gray-700">Category Name</label>
+                        <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_categoryName" name="category_name" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="edit_brand_name" class="block text-sm font-medium text-gray-700">Brand Name</label>
+                        <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_brand_name" name="brand_name" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="edit_product_name" class="block text-sm font-medium text-gray-700">Model Name</label>
+                        <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_product_name" name="product_name" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="edit_product_description" class="block text-sm font-medium text-gray-700">Product Description</label>
+                        <textarea class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_product_description" name="product_description" placeholder="Enter product description" rows="4" required></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="edit_typeOfUnit" class="block text-sm font-medium text-gray-700">Units</label>
+                        <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_typeOfUnit" name="typeOfUnit" required>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="edit_unitPrice" class="block text-sm font-medium text-gray-700">Price</label>
+                            <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_unitPrice" name="unitPrice" required>
+                        </div>
+                        <div>
+                            <label for="edit_added_date" class="block text-sm font-medium text-gray-700">Date Added</label>
+                            <input type="date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_added_date" name="added_date" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="edit_warranty_supplier" class="block text-sm font-medium text-gray-700">Warranty</label>
+                            <input type="number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_warranty_supplier" name="warranty_supplier" required>
+                        </div>
+                        <div>
+                            <label for="edit_warrantyUnit" class="block text-sm font-medium text-gray-700">Warranty Units</label>
+                            <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_warrantyUnit" name="warrantyUnit" required>
+                                <option value="days">Days</option>
+                                <option value="weeks">Weeks</option>
+                                <option value="months">Months</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="edit_suppName" class="block text-sm font-medium text-gray-700">Supplier Name</label>
+                        <select class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_suppName" name="supplierName" required>
+                            @foreach($suppliers as $supplier)
+                                <option value="{{ $supplier->supplier_ID }}">{{ $supplier->supplier_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="productImage" class="block text-sm font-medium text-gray-700">Product Image</label>
+
+                        <input type="file" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_product_image" name="product_image">
+                    </div>
+
+                    <div class="flex justify-end mt-4">
+                        <button type="button" class="bg-gray-300 text-black px-4 py-2 rounded-md mr-2" onclick="closeEditProduct()">Cancel</button>
+                        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 <!-- Modal for Serial Numbers -->
 <div id="serialModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="serialModalLabel">

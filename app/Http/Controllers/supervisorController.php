@@ -316,17 +316,20 @@ class supervisorController extends Controller
                 'category.category_name',
                 'category.brand_name',
                 'product.product_name as model_name',
+                'product.product_description',
                 'supplier.supplier_name',
                 'product.unitPrice',
                 'product.added_date as date_added',
                 DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
                 'product.typeOfUnit as unit',
-                DB::raw('COUNT(serial.serial_number) as serial_count') 
+                DB::raw('COUNT(CASE WHEN serial.status = "available" THEN serial.serial_number END) as serial_count'), 
+                DB::raw('GROUP_CONCAT(CASE WHEN serial.status = "available" THEN serial.serial_number END) as serial_numbers'),
+                'inventory.status'
             )
             ->join('inventory', 'product.product_id', '=', 'inventory.product_id')
             ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
             ->join('category', 'product.category_Id', '=', 'category.category_id')
-            ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id') // Use LEFT JOIN to count serials
+            ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
             ->where('inventory.status', '=', 'pending')
             ->groupBy(
                 'product.product_id',
@@ -334,22 +337,32 @@ class supervisorController extends Controller
                 'category.category_name',
                 'category.brand_name',
                 'product.product_name',
+                'product.product_description',
                 'supplier.supplier_name',
                 'product.unitPrice',
                 'product.added_date',
-                'product.typeOfUnit'
+                'product.typeOfUnit',
+                'inventory.status'
             )
             ->get();
     
         foreach ($products as $product) {
             $product->serial_numbers = DB::table('serial')
+                ->select('serial_number', 'created_at')
                 ->where('product_id', $product->product_id)
-                ->pluck('serial_number')
+                ->where('status', 'available')
+                ->get()
+                ->map(function ($serial) {
+                    return [
+                        'serial_number' => $serial->serial_number,
+                        'created_at' => $serial->created_at,
+                    ];
+                })
                 ->toArray();
         }
     
-        $suppliers = supplier::all();
-        return view('Inventory/pending', compact('products'));
+        $suppliers = Supplier::all();
+        return view('Inventory/pending', compact('products','suppliers'));
     }
 
     // for the buttons here di na hilabtan fak shit
