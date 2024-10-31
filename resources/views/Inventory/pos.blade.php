@@ -97,11 +97,11 @@
                             <div class="flex flex-row justify-between items-center">
                                 <div class="flex flex-row space-x-4">
                                     <label class="flex items-center">
-                                        <input type="radio" class="invisible-checkbox" name="paymentMethod" id="cashCheckbox" value="Cash" />
+                                        <input type="radio" class="invisible-checkbox" name="paymentMethod" id="cashCheckbox" value="cash" />
                                         <span class="bg-white text-blue-500 px-4 py-2 rounded-md hover:bg-blue-100 flex items-center">Cash</span>
                                     </label>
                                     <label class="flex items-center">
-                                        <input type="radio" class="invisible-checkbox" name="paymentMethod" id="gcashCheckbox" value="GCash" />
+                                        <input type="radio" class="invisible-checkbox" name="paymentMethod" id="gcashCheckbox" value="gcash" />
                                         <span class="bg-white text-blue-500 px-4 py-2 rounded-md hover:bg-blue-100 flex items-center">GCash</span>
                                     </label>
                                 </div>

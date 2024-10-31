@@ -179,9 +179,9 @@
                             @endforeach
                         </select>
                     </div>
-
                     <div class="mb-4">
-                        <label for="edit_product_image" class="block text-sm font-medium text-gray-700">Product Image</label>
+                        <label for="productImage" class="block text-sm font-medium text-gray-700">Product Image</label>
+
                         <input type="file" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="edit_product_image" name="product_image">
                     </div>
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\ViewController;
 use App\Http\Controllers\DeleteController;
 use App\Http\Controllers\UpdateController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\printController;
 use App\Http\Controllers\supervisorController;
 
 /*
@@ -72,6 +73,9 @@ Route::controller(supervisorController::class)->group(function() {
     Route::post('staff/storeSerial', 'staffStoreSerial')->name('staffStoreSerial');
     Route::post('staff/staffStorePending', 'staffStorePending')->name('staffStorePending');
     Route::patch('staff/approve/{id}', 'staffApprove')->name('staffApprove');
+});
+Route::controller(printController::class)->group(function(){
+    Route::get('/inventoryReportPrint', 'inventoryReportPrint')->name('inventoryReportPrint');
 });
 
 // require __DIR__.'/auth.php';

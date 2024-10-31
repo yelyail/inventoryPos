@@ -9,7 +9,7 @@
             <div class="bg-gray">
                 <div class="flex justify-between items-center uppercase text-gray-800 rounded-tl-lg rounded-tr-lg p-2">
                     <h1 class="prod_title text-2xl font-bold">Inventory Reports</h1>
-                    <button type="button" class="btn custom-btn flex items-center p-2 text-white rounded bg-blue-500 hover:bg-blue-600" id="plus-button">
+                    <button type="button" class="btn custom-btn flex items-center p-2 text-white rounded bg-blue-500 hover:bg-blue-600" id="plus-button" onclick="generateSalesReport()">
                         <i class="fas fa-print mr-2"></i>
                         Generate Report
                     </button>

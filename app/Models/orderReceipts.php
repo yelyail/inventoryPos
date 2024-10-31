@@ -14,7 +14,6 @@ class orderReceipts extends Model
     protected $fillable = [
         'customer_id',
         'payment_id',
-        'user_id',
         'order_id',
         'order_date',
         'status',

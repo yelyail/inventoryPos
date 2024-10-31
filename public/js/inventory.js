@@ -425,30 +425,28 @@ function openEditProduct(productId, productName, productImage, productDescriptio
     document.getElementById('edit_product_id').value = productId;
     document.getElementById('edit_product_name').value = productName;
     document.getElementById('edit_categoryName').value = categoryName;
-    document.getElementById('edit_product_description').value = productDescription; // Fixed typo: changed product_description to productDescription
+    document.getElementById('edit_product_description').value = productDescription;
     document.getElementById('edit_brand_name').value = brandName;
     document.getElementById('edit_suppName').value = supplierName;
     document.getElementById('edit_unitPrice').value = parseFloat(unitPrice).toFixed(2);
-    document.getElementById('edit_typeOfUnit').value = typeOfUnit || ''; // Default to empty string if undefined
-    document.getElementById('edit_added_date').value = new Date(dateAdded).toISOString().split('T')[0]; // Format the date
-    document.getElementById('edit_warranty_supplier').value = warrantySupplier || ''; // Default to empty string if undefined
-    document.getElementById('edit_warrantyUnit').value = warrantyUnit || ''; // Default to empty string if undefined
+    document.getElementById('edit_typeOfUnit').value = typeOfUnit || '';
+    document.getElementById('edit_added_date').value = new Date(dateAdded).toISOString().split('T')[0];
+    document.getElementById('edit_warranty_supplier').value = warrantySupplier || '';
+    document.getElementById('edit_warrantyUnit').value = warrantyUnit || '';
 
-    const imgElement = document.getElementById('productImage'); // Ensure this element exists in your HTML
-    console.log('Image Element:', imgElement); // Log the image element for debugging
+    const imgElement = document.getElementById('productImage');
     
     // Display the product image if it exists
     if (productImage && imgElement) {
         imgElement.src = `/storage/${productImage}`;
-        imgElement.style.display = 'block'; // Show the image
+        imgElement.style.display = 'block';
     } else if (imgElement) {
-        imgElement.style.display = 'none'; // Hide the image if no product image is provided
+        imgElement.style.display = 'none';
     }
 
-    // Remove the hidden class to show the modal
+    // Show the modal
     document.getElementById('editProductModal').classList.remove('hidden');
 }
-
 
 function closeEditProduct(){
     const modal = document.getElementById('editProductModal');

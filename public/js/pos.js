@@ -236,119 +236,121 @@ function updateSummary() {
     totalDisplay.textContent = formatCurrency(total); 
 }
 document.querySelectorAll('input[name="paymentMethod"]').forEach((input) => {
-    input.addEventListener('change', function() {
-        // Hide all payment fields initially
-        document.getElementById('cashFields').style.display = 'none';
-        document.getElementById('gcashFields').style.display = 'none';
+        input.addEventListener('change', function() {
+            // Hide all payment fields initially
+            document.getElementById('cashNameDiv').style.display = 'none';
+            document.getElementById('cashAddressDiv').style.display = 'none';
+            document.getElementById('cashAmountDiv').style.display = 'none';
+            document.getElementById('gcashNameDiv').style.display = 'none';
+            document.getElementById('gcashAddressDiv').style.display = 'none';
+            document.getElementById('gcashReferenceDiv').style.display = 'none';
 
-        // Show relevant fields based on the selected payment method
-        if (this.value === 'cash') {
-            document.getElementById('cashFields').style.display = 'block';
-        } else if (this.value === 'gcash') {
-            document.getElementById('gcashFields').style.display = 'block';
+            // Show relevant fields based on the selected payment method
+            if (this.value === 'cash') {  // Updated to match 'Cash' case
+                document.getElementById('cashNameDiv').style.display = 'block';
+                document.getElementById('cashAddressDiv').style.display = 'block';
+                document.getElementById('cashAmountDiv').style.display = 'block';
+            } else if (this.value === 'gcash') {  // Updated to match 'GCash' case
+                document.getElementById('gcashNameDiv').style.display = 'block';
+                document.getElementById('gcashAddressDiv').style.display = 'block';
+                document.getElementById('gcashReferenceDiv').style.display = 'block';
+            }
+            updatePaymentDetails();
+        });
+    });
+
+    function updatePaymentDetails() {
+        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'N/A';
+        let paymentName = null;
+        let paymentAddress = null;
+        let payment = null;
+
+        if (paymentMethod === 'Cash') {
+            paymentName = document.getElementById('cashName')?.value.trim() || null;
+            paymentAddress = document.getElementById('cashAddress')?.value.trim() || null;
+            payment = parseFloat(document.getElementById('cashAmount')?.value.replace(/[^0-9.-]+/g, "")) || 0;
+        } else if (paymentMethod === 'GCash') {
+            paymentName = document.getElementById('gcashName')?.value.trim() || null;
+            paymentAddress = document.getElementById('gcashAddress')?.value.trim() || null;
+            payment = parseFloat(document.getElementById('totalDisplay')?.textContent.replace(/[^0-9.-]+/g, "")) || 0; // Assuming total is displayed on the page
         }
 
-        // Store the payment details if the payment method changes
-        updatePaymentDetails();
-    });
-});
-
-function updatePaymentDetails() {
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'N/A';
-
-    let paymentName = null;
-    let paymentAddress = null;
-    let payment = null;
-
-    if (paymentMethod === 'cash') {
-        paymentName = document.getElementById('cashName').value.trim() || null;
-        paymentAddress = document.getElementById('cashAddress').value.trim() || null;
-        payment = parseFloat(document.getElementById('cashAmount').value.replace(/[^0-9.-]+/g, "")) || 0;
-
-    } else if (paymentMethod === 'gcash') {
-        paymentName = document.getElementById('gcashName').value.trim() || null;
-        paymentAddress = document.getElementById('gcashAddress').value.trim() || null;
-        payment = total; // Assuming total is the correct amount for GCash payment
+        console.log('Payment Details:', {
+            paymentMethod,
+            paymentName,
+            paymentAddress,
+            payment
+        });
     }
 
-    // You can store these values in a variable or use them directly in your sendToDatabase function
-    console.log('Payment Details:', {
-        paymentMethod,
-        paymentName,
-        paymentAddress,
-        payment
-    });
-}
+    function sendToDatabase() {
+        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'N/A';
+        const discountAmount = parseFloat(document.getElementById('discountDisplay')?.textContent.replace(/[^0-9.-]+/g, "")) || 0;
+        const total = parseFloat(document.getElementById('totalDisplay')?.textContent.replace(/[^0-9.-]+/g, "")) || 0;
 
-function sendToDatabase() {
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'N/A';
-    const discountAmount = parseFloat(document.getElementById('discountDisplay').textContent.replace(/[^0-9.-]+/g, ""));
-    const total = parseFloat(document.getElementById('totalDisplay').textContent.replace(/[^0-9.-]+/g, ""));
+        let paymentName = null;
+        let paymentAddress = null;
+        let payment = null;
 
-    let paymentName = null;
-    let paymentAddress = null;
-    let payment = null;
+        if (paymentMethod === 'cash') {
+            paymentName = document.getElementById('cashName')?.value.trim() || null; 
+            paymentAddress = document.getElementById('cashAddress')?.value.trim() || null; 
+            payment = parseFloat(document.getElementById('cashAmount')?.value.replace(/[^0-9.-]+/g, "")) || 0;
+        } else if (paymentMethod === 'gcash') {
+            paymentName = document.getElementById('gcashName')?.value.trim() || null; 
+            paymentAddress = document.getElementById('gcashAddress')?.value.trim() || null; 
+            payment = total; 
+        }
 
-    if (paymentMethod === 'cash') {
-        paymentName = document.getElementById('cashName').value.trim() || null; 
-        paymentAddress = document.getElementById('cashAddress').value.trim() || null; 
-        payment = parseFloat(document.getElementById('cashAmount').value.replace(/[^0-9.-]+/g, "")) || 0;
-    } else if (paymentMethod === 'gcash') {
-        paymentName = document.getElementById('gcashName').value.trim() || null; 
-        paymentAddress = document.getElementById('gcashAddress').value.trim() || null; 
-        payment = total; // Assuming total is the correct amount for GCash payment
-    }
+        const data = {
+            paymentMethod,
+            products: Array.from(Object.entries(productMap)).map(([productId, product]) => ({
+                productId,
+                productName: product.productName,
+                quantity: product.quantity,
+                serialArray: product.serialArray,
+                price: product.priceNumber,
+            })),
+            paymentName,
+            paymentAddress,
+            referenceNum: paymentMethod === 'gcash' ? document.getElementById('gcashReference')?.value.trim() || null : null,
+            discountAmount,
+            total,
+        };
+        console.log("Data sent to database:", data); // Debugging output
 
-    // Prepare the data to be sent to the backend
-    const data = {
-        paymentMethod,
-        products: Array.from(Object.entries(productMap)).map(([productId, product]) => ({
-            productId,
-            quantity: product.quantity,
-            serialArray: product.serialArray,
-            price: product.priceNumber,
-        })),
-        paymentName,
-        paymentAddress,
-        referenceNum: paymentMethod === 'gcash' ? document.getElementById('gcashReference').value.trim() || null : null,
-        discountAmount,
-        total,
-    };
-
-    console.log(data); // Debugging output
-
-    $.ajax({
-        url: '/storeOrder',
-        type: 'POST',
-        contentType: 'application/json',
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        data: JSON.stringify(data),
-        success: function(response) {
-            if (response.warning) {
-                console.warn(response.warning);
-            } else {
+        $.ajax({
+            url: '/storeOrder',
+            type: 'POST',
+            contentType: 'application/json',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: JSON.stringify(data),
+            success: function(response) {
+                if (response.warning) {
+                    console.warn(response.warning);
+                } else {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Order Confirmed! :)',
+                        text: response.message,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            },
+            error: function(xhr) {
+                const errorMessage = xhr.responseJSON?.message || 'Something went wrong. Please try again!';            
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Order Confirmed! :)',
-                    text: response.message,
+                    icon: 'error',
+                    title: 'Something went wrong :(',
+                    text: errorMessage,
                     confirmButtonText: 'OK'
-                }).then(() => {
-                    window.location.reload();
                 });
             }
-        },
-        error: function(xhr) {
-            const errorMessage = xhr.responseJSON?.message || 'Something went wrong. Please try again!';            
-            Swal.fire({
-                icon: 'error',
-                title: 'Something went wrong :(',
-                text: errorMessage,
-                confirmButtonText: 'OK'
-            });
-        }
-    });
+        });
 }
 
 
