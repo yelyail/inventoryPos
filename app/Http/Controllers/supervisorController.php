@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Carbon\Carbon;
 
 class supervisorController extends Controller
 {
@@ -46,14 +47,14 @@ class supervisorController extends Controller
                 'product.added_date as date_added',
                 DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
                 'product.typeOfUnit as unit',
-                DB::raw('COUNT(serial.serial_number) as serial_count'),
-                DB::raw('GROUP_CONCAT(serial.serial_number) as serial_numbers'),
+                DB::raw('COUNT(CASE WHEN serial.status = "available" THEN serial.serial_number END) as serial_count'), 
+                DB::raw('GROUP_CONCAT(CASE WHEN serial.status = "available" THEN serial.serial_number END) as serial_numbers'),
                 'inventory.status'
             )
             ->join('inventory', 'product.product_id', '=', 'inventory.product_id')
             ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
             ->join('category', 'product.category_Id', '=', 'category.category_id')
-            ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id') // Use LEFT JOIN to count serials
+            ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
             ->where('inventory.status', '=', 'approve')
             ->groupBy(
                 'product.product_id',
@@ -69,6 +70,7 @@ class supervisorController extends Controller
                 'inventory.status'
             )
             ->get();
+    
         foreach ($products as $product) {
             $product->serial_numbers = DB::table('serial')
                 ->select('serial_number', 'created_at')
@@ -84,10 +86,9 @@ class supervisorController extends Controller
                 ->toArray();
         }
     
-        $suppliers = supplier::all();
+        $suppliers = Supplier::all();
         return view('Inventory/inventory', compact('products', 'suppliers'));
     }
-    
     public function storeInventory(Request $request)
     {
         $request->validate([
@@ -269,8 +270,44 @@ class supervisorController extends Controller
         return view('Inventory/Report', compact('products'));
     }
     public function salesReport() {
-        return view('Inventory/salesReport');
+        $VAT_RATE = 0.12; // Define the VAT rate
+    
+        $orderDetails = DB::table('orderreceipts')
+            ->select(
+                'c.customer_name',
+                'p.product_name',
+                's.serial_number',
+                'c.customer_address',
+                'p.unitPrice',
+                'pm.paymentType',
+                'pm.reference_num',
+                'pm.amount_paid',
+                'pm.discount',
+                'o.qtyOrder',
+                'o.total_amount',
+                'orderreceipts.order_date',
+                'orderreceipts.status'
+            )
+            ->leftJoin('orders as o', 'o.order_id', '=', 'orderreceipts.orderreceipts_id')
+            ->leftJoin('product as p', 'p.product_id', '=', 'o.product_id')
+            ->leftJoin('serial as s', 's.product_id', '=', 'p.product_id')
+            ->leftJoin('customer as c', 'c.customer_id', '=', 'orderreceipts.customer_id')
+            ->leftJoin('paymentmethod as pm', 'pm.payment_id', '=', 'orderreceipts.payment_id')
+            ->get();
+    
+        $orderDetails = $orderDetails->map(function ($order) use ($VAT_RATE) {
+            $orderDate = Carbon::parse($order->order_date);
+            $warrantyExpired = $orderDate->addYear();
+            
+            $order->warranty_expired = $warrantyExpired->isPast() ? 'Expired' : 'Valid';
+            $order->warranty_expiration_date = $warrantyExpired->format('Y-m-d');
+            $order->VAT = $order->total_amount * $VAT_RATE;
+            return $order;
+        });
+    
+        return view('Inventory/salesReport', compact('orderDetails'));
     }
+    
     public function pending() {  
         $products = DB::table('product')
             ->select(

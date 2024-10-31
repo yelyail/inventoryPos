@@ -46,10 +46,13 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Customer Name</th>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Particulars</th>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Quantity Ordered</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Product Name</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Serial Number</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Qty Ordered</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Unit Price</th>
-                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Payment</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Discount</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">VAT Tax</th> 
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Total Amount</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Payment Type</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Reference Number</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Order Date</th>
@@ -58,24 +61,29 @@
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Return for Repair</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200 " >
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach ($orderDetails as $orderDetail)
                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td class="px-4 py-2 text-sm text-gray-500">{{ ucwords(strtolower($orderDetail->customer_name)) }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-500">{{ ucwords(strtolower($orderDetail->product_name)) }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-500">{{ $orderDetail->serial_number }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-500">{{ $orderDetail->qtyOrder }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-500">₱{{ number_format($orderDetail->unitPrice, 2) }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-500">₱{{ number_format($orderDetail->discount, 2) }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-500">₱{{ number_format($orderDetail->VAT, 2) }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-500">₱{{ number_format($orderDetail->amount_paid, 2) }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-500">{{ ucwords(strtolower($orderDetail->paymentType)) }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-500">{{ $orderDetail->reference_num ?? 'N/A' }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-500">{{ $orderDetail->order_date }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-500">{{ $orderDetail->warranty_expired }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-500">{{ Session::get('fullname', 'User') }}</td>
                                 <td class="px-4 py-2">
                                     <button class="bg-blue-200 hover:bg-blue-300 text-black px-2 py-1 rounded flex items-center" >
                                         Request Repair
                                     </button>
                                 </td> 
                             </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
