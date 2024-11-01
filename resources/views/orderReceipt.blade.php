@@ -11,7 +11,7 @@
 
         }
         body {
-            font-family: monospace, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
         .container {
             width: 100%;
@@ -117,8 +117,8 @@
                 <h5>{{$date}}</h5>
             </div>
             <div class="company-info">
-                <h2>Double-K Computers</h2>
-                <p>#20 Pag-Asa Street, S.I.R.<br> Matina, Phase 2, Barangay Bucana<br>Davao City, Philippines 8000</p>
+                <h2>DavCom Consumer Goods Trading</h2>
+                <p>Door 22, E.C. Business Center, <br> C.M. Recto Street, Brgy. 34-D, Poblacion District, <br> Davao City, Davao Del Sur Philippines 8000</p>
             </div>
         </div>
         <hr>
@@ -126,8 +126,7 @@
         <div class="info">
             <div class="left">
                 <p><strong>Client:</strong>{{ ucwords(strtolower($customer_name))}}</p>
-                <p><strong>Delivery Address: </strong>{{ucwords(strtolower($address))}}</p>
-                <p><strong>Contact Person:</strong>{{ucwords(strtolower($customer_name))}}</p>
+                <p><strong>Address: </strong>{{ucwords(strtolower($address))}}</p>
             </div>
             <div class="right">
                 <p><strong>Transact Ref.:</strong>{{$reference}}</p>
@@ -138,7 +137,8 @@
         <table>
             <thead>
                 <tr>
-                    <th>Particulars</th>
+                    <th>Serial #</th>   
+                    <th>Items</th>
                     <th>Qty</th>
                     <th>Price</th>
                     <th>Amount</th>
@@ -147,15 +147,8 @@
             <tbody>
                 @foreach($orderItems as $item)
                     <tr>
-                        <td>
-                            @if(isset($item['product_name']) && $item['product_name'])
-                                {{ strtoupper($item['product_name']) }}
-                            @endif
-
-                            @if(isset($item['service_name']) && $item['service_name'])
-                                {{ strtoupper($item['service_name']) }}
-                            @endif
-                        </td>
+                        <td>{{ $item['serial_num'] }}</td>
+                        <td>{{ $item['product_name'] }}</td>
                         <td>{{ $item['quantity'] }}</td>
                         <td>Php {{ number_format($item['total_price'], 2) }}</td>
                         <td>Php {{ number_format($item['total_price'], 2) }}</td>
@@ -179,16 +172,28 @@
             </div>
             <div class="summary">
                 <div>
+                    <strong>Payment Method:</strong>
+                    <span>{{ ucwords(strtolower($payment_type)) }}</span>
+                </div>
+                <div>
+                    <strong>Subtotal:</strong>
+                    <span>Php {{ $subtotal }}</span>
+                </div>
+                <div>
+                    <strong>Discount:</strong>
+                    <span>Php {{ $discount }}</span>
+                </div>
+                <div>
+                    <strong>VAT Tax:</strong>
+                    <span>Php {{ $vat_amount }}</span>
+                </div>
+                <div>
                     <strong>Total Amount:</strong>
                     <span>Php {{ $total_price }}</span>
                 </div>
                 <div>
-                    <strong>Payment Method:</strong>
-                    <span>{{$payment_type}}</span>
-                </div>
-                <div>
                     <strong>Amount Paid:</strong>
-                    <span>Php{{ $payment }}</span>
+                    <span>Php {{ $payment }}</span>
                 </div>
                 <div>
                     <strong>Change:</strong>

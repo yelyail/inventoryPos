@@ -28,8 +28,9 @@ class orderReceipts extends Model
         return $this->belongsTo(paymentMethod::class, 'payment_id');
     }
 
-    public function user()
+    public function orders()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->hasMany(orders::class, 'order_id');
     }
+
 }

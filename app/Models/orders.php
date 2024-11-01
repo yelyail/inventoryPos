@@ -17,10 +17,10 @@ class orders extends Model
     ];
     public function orderreceipts()
     {
-        return $this->hasMany(orderreceipts::class);
+        return $this->hasMany(orderreceipts::class, 'order_id');
     }   
     public function product()
     {
-        return $this->belongsTo(product::class);
+        return $this->belongsTo(product::class, 'product_id', 'product_id');
     }
 }

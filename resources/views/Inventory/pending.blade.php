@@ -48,9 +48,7 @@
                         data-product-name="{{ $product->model_name }}" 
                         data-serial="{{ $product->serial_numbers ? implode(', ', array_column($product->serial_numbers, 'serial_number')) : '' }}" 
                         data-created-at="{{ $product->serial_numbers ? implode(', ', array_column($product->serial_numbers, 'created_at')) : '' }}"
-
                         onclick="openSerialModal(this)">              
-
                         <td>
                             <img src="{{ asset("storage/{$product->product_image}") }}" 
                                 alt="{{ $product->model_name }}" 

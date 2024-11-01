@@ -76,6 +76,8 @@ Route::controller(supervisorController::class)->group(function() {
 });
 Route::controller(printController::class)->group(function(){
     Route::get('/inventoryReportPrint', 'inventoryReportPrint')->name('inventoryReportPrint');
+    Route::get('/orderReceipt/{orderreceipts_id}', 'orderReceiptPrint')->name('orderReceiptPrint');
+
 });
 
 // require __DIR__.'/auth.php';

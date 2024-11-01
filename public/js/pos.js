@@ -161,8 +161,6 @@ function addToOrderSummary(productName, serialValue, productId, productImage, pr
         };
     }
 
-    console.log('Updated productMap:', productMap);
-
     orderList.innerHTML = ''; 
     subtotal = 0;
 
@@ -313,6 +311,7 @@ document.querySelectorAll('input[name="paymentMethod"]').forEach((input) => {
             })),
             paymentName,
             paymentAddress,
+            payment,
             referenceNum: paymentMethod === 'gcash' ? document.getElementById('gcashReference')?.value.trim() || null : null,
             discountAmount,
             total,
@@ -330,15 +329,18 @@ document.querySelectorAll('input[name="paymentMethod"]').forEach((input) => {
             success: function(response) {
                 if (response.warning) {
                     console.warn(response.warning);
-                } else {
+                } else if (response.orderreceipts_id) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Order Confirmed! :)',
                         text: response.message,
                         confirmButtonText: 'OK'
                     }).then(() => {
+                        window.open(`/orderReceipt/${response.orderreceipts_id}`, '_blank'); 
                         window.location.reload();
                     });
+                } else {
+                    console.error("orderreceipts_id is missing in the response");
                 }
             },
             error: function(xhr) {

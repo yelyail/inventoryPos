@@ -410,7 +410,6 @@ class supervisorController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to archive supplier: ' . $e->getMessage()]);
         }
     }
-
     public function updateProduct(Request $request) {
         $request->validate([
             'product_id' => 'required|exists:product,product_id',
@@ -494,7 +493,6 @@ class supervisorController extends Controller
     
         return redirect()->back()->with('success', 'Supplier updated successfully!');
     }
-
 
     // for the user
     public function staffPos() {
@@ -629,6 +627,7 @@ class supervisorController extends Controller
                 'products.*.serialArray' => 'array',
                 'products.*.price' => 'required|numeric|min:0',
                 'paymentName' => 'nullable|string',
+                'payment' => 'nullable|integer|min:0',  
                 'paymentAddress' => 'nullable|string',
                 'referenceNum' => 'nullable|string',
                 'discountAmount' => 'nullable|numeric|min:0',
@@ -645,7 +644,7 @@ class supervisorController extends Controller
             $payment = PaymentMethod::create([
                 'paymentType' => $validatedData['paymentMethod'],
                 'reference_num' => $validatedData['referenceNum'] ?? '',
-                'amount_paid' => $validatedData['total'],
+                'amount_paid' => $validatedData['payment'],
                 'discount' => $validatedData['discountAmount'] ?? 0,
             ]);
     
@@ -678,7 +677,7 @@ class supervisorController extends Controller
             return response()->json([
                 'message' => 'Order and receipt created successfully',
                 'order_id' => $order->order_id,
-                'order_receipt_id' => $orderReceipt->id,
+                'orderreceipts_id' => $orderReceipt->orderreceipts_id,
             ], 201);
     
         } catch (\Exception $e) {
@@ -686,7 +685,6 @@ class supervisorController extends Controller
             return response()->json(['message' => 'Failed to create order', 'error' => $e->getMessage()], 500);
         }
     }
-    
     
     public function requestRepair(Request $request)
     {
@@ -910,5 +908,4 @@ class supervisorController extends Controller
             }
         return view($view, compact('categories', 'products'));
     }
-
 }
