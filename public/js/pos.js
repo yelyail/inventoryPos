@@ -342,7 +342,7 @@ document.querySelectorAll('input[name="paymentMethod"]').forEach((input) => {
                 } else {
                     console.error("orderreceipts_id is missing in the response");
                 }
-            },
+            },            
             error: function(xhr) {
                 const errorMessage = xhr.responseJSON?.message || 'Something went wrong. Please try again!';            
                 Swal.fire({

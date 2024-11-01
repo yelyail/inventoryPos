@@ -25,8 +25,6 @@ class product extends Model
     public function inventory() {
         return $this->hasOne(inventory::class, 'product_id', 'product_id');
     }
-    
-
     public function supplier()
     {
         return $this->belongsTo(supplier::class, 'supplier_ID', 'supplier_ID');
@@ -38,6 +36,6 @@ class product extends Model
     }
     public function serial()
     {
-        return $this->hasMany(serial::class, 'product_id', 'product_id');
+        return $this->hasOne(serial::class, 'product_id', 'product_id');
     }
 }

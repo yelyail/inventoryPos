@@ -45,8 +45,8 @@ class printController extends Controller
         $reportCounter = $request->session()->get('report_counter', 1);
         $request->session()->put('report_counter', $reportCounter + 1);
     }
-    public function orderReceiptPrint($orderreceipts_id, $applyVat = true) {
-        $orderReceipt = orderReceipts::with(['orders.product', 'customer'])->findOrFail($orderreceipts_id);
+    public function orderReceiptPrint($orderreceipts_id) {
+        $orderReceipt = orderReceipts::with(['orders.product.serial', 'customer'])->findOrFail($orderreceipts_id);
         $orderItems = $orderReceipt->orders; 
     
         $totalPrice = 0;
@@ -54,8 +54,9 @@ class printController extends Controller
     
         $items = $orderItems->map(function($order) use (&$totalPrice, &$totalQuantity) {
             $product = $order->product;
+        
             if (!$product) {
-                Log::debug('Missing product for order ID: ' . $order->id);
+                Log::debug('Missing product for order ID: ' . $order->order_id . ' (Product ID: ' . $order->product_id . ')');
                 return [
                     'product_name' => 'Unknown Product',
                     'quantity' => $order->qtyOrder,
@@ -63,31 +64,31 @@ class printController extends Controller
                     'total_price' => $order->total_amount,
                 ];
             }
-    
-            // If the product exists, continue as normal
-            $serialNum = $product->serial->serial_num ?? 'N/A'; 
-    
+        
+            $serialNum = $product->serial->serial_number ?? 'N/A';
+            Log::info("Product Name: " . $product->product_name . ", Serial: " . $serialNum);
+            
             $totalPrice += $order->total_amount;
-            $totalQuantity += $order->qtyOrder; 
-    
+            $totalQuantity += $order->qtyOrder;
+        
             return [
                 'product_name' => $product->product_name,
                 'serial_num' => $serialNum,
                 'quantity' => $order->qtyOrder,
-                'serial_num' => $serialNum,
                 'total_price' => $order->total_amount,
             ];
         });
-    
-        $vatRate = 0.12; // 12% VAT
-        $vatAmount = $applyVat ? $totalPrice * $vatRate : 0;
-        $finalTotal = $totalPrice + $vatAmount;
     
         $representative = Session::get('fullname'); 
         $payment = paymentMethod::findOrFail($orderReceipt->payment_id);
         $reference = uniqid();
         $customer = $orderReceipt->customer;
         $discount = $payment->discount;
+    
+        // VAT Calculation
+        $vatRate = 0.12; // 12% VAT
+        $vatAmount = $totalPrice * $vatRate; // Calculate VAT based on subtotal
+        $finalTotal = $totalPrice + $vatAmount - $discount; // Final total after discount
     
         // Prepare data for the view
         $data = [
@@ -98,13 +99,13 @@ class printController extends Controller
             'address' => $customer->customer_address,
             'representative' => $representative,
             'orderItems' => $items, 
-            'discount' => $discount,
+            'discount' => number_format($discount, 2), 
             'subtotal' => number_format($totalPrice, 2),
             'vat_amount' => number_format($vatAmount, 2),
             'total_price' => number_format($finalTotal, 2),
-            'payment_type' => $payment->paymentType,
+            'payment_type' => $payment->payment_type,
             'payment' => number_format($payment->amount_paid, 2),
-            'amount_deducted' => number_format($finalTotal - $payment->amount_paid, 2),
+            'amount_deducted' => number_format($payment->amount_paid-$finalTotal, 2), // Amount still owed
         ];
     
         // Generate PDF
@@ -115,6 +116,4 @@ class printController extends Controller
     
         return $dompdf->stream('orderReceipt.pdf');
     }
-    
-    
 }

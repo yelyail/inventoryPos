@@ -17,7 +17,7 @@ class orders extends Model
     ];
     public function orderreceipts()
     {
-        return $this->hasMany(orderreceipts::class, 'order_id');
+        return $this->belongsTo(orderreceipts::class, 'order_id','order_id');
     }   
     public function product()
     {
