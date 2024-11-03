@@ -5,13 +5,13 @@
 @section('content')
 <div id="main" class="main-content-flow flex-1 bg-white-100 mt-13 md:mt-2 md:ml-60 pb-28 md:pb-10">
     <div class="w-full flex flex-col flex-grow mt-1">
-    <div class="w-full p-3">
+        <div class="w-full p-3">
             <div class="bg-gray">
                 <div class="flex justify-between items-center uppercase text-gray-800 rounded-tl-lg rounded-tr-lg p-2">
                     <h1 class="prod_title text-2xl font-bold">Sales Reports</h1>
-                    <button type="button" class="btn custom-btn flex items-center p-2 text-white rounded bg-blue-500 hover:bg-blue-600" id="plus-button">
+                    <button type="button" class="btn custom-btn flex items-center p-2 text-white rounded bg-blue-500 hover:bg-blue-600" onclick="generateSalesReport()">
                         <i class="fas fa-print mr-2"></i>
-                        Generate Report
+                        Generate Sales Report
                     </button>
                 </div>
             </div>
@@ -38,7 +38,7 @@
                         <label for="to_date" class="block text-sm font-medium text-gray-700">To Date</label>
                         <input type="date" id="to_date" class="form-control p-2 rounded-md" aria-label="To Date">
                     </div>
-                    <button type="button" class="btn btn-custom mt-5" id="filter-button">Filter</button>
+                    <button type="button" class="btn btn-custom mt-5" id="filter-button" onclick="filterTable()">Filter</button>
                 </div>
             </div>
             <div class="overflow-x-auto">

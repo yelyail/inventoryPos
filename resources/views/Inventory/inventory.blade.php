@@ -277,6 +277,7 @@
         </div>
     </div>
 </div>
+
 <!-- Modal for Serial Numbers -->
 <div id="serialModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="serialModalLabel">
     <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
