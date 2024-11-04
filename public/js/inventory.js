@@ -346,18 +346,16 @@ function showTransferAlert(serial_Id) {
                         }
                     });
                 } else if (!reason.value) {
-                    Swal.fire("You must select a reason for the repair request.", "", "warning");
+                    Swal.fire("You must select a reason for the replace request.", "", "warning");
                 } else {
-                    Swal.fire("Requesting Repair has been canceled", "", "info");
+                    Swal.fire("Requesting Replace has been canceled", "", "info");
                 }
             });
         } else if (result.isDenied) {
-            Swal.fire("Requesting Repair has been canceled", "", "info");
+            Swal.fire("Requesting Replace has been canceled", "", "info");
         }
     });
 }
-
-
 function showRepairAlert(order_id) {
     Swal.fire({
         title: "Repair",
@@ -368,7 +366,7 @@ function showRepairAlert(order_id) {
     }).then((result) => {
         if (result.isConfirmed) {
             Swal.fire({
-                title: 'Reasons for Requesting a repair',
+                title: 'Reasons for Repair',
                 input: 'select',
                 inputOptions: {
                     'Defective Hardware Components': 'Defective Hardware Components',
@@ -381,36 +379,42 @@ function showRepairAlert(order_id) {
                 showCancelButton: true,
                 cancelButtonText: 'Cancel'
             }).then((reason) => {
-                if (reason.isConfirmed && reason.value) {
-                    let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                    $.ajax({
-                        url: '/admin/requestRepair',
-                        method: 'POST',
-                        data: {
-                            _token: token,
-                            order_id: inventory_id,
-                            reason: reason.value
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                title: "Requesting Repair Confirmed",
-                                text: response.success,
-                                icon: "success"
-                            }).then(() => {
-                                document.getElementById('repair-btn-' + order_id).style.display = 'none';
-                                document.getElementById('ongoing-btn-' + order_id).style.display = 'block';
-                            });
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                title: "Error",
-                                text: xhr.responseJSON?.error || "There was an issue submitting the request.",
-                                icon: "error"
-                            });
-                        }
-                    });
-                } else if (!reason.value) {
-                    Swal.fire("You must select a reason for the repair request.", "", "warning");
+                if (reason.isConfirmed) {
+                    const selectedReason = reason.value; 
+                    if (selectedReason) {
+                        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                        $.ajax({
+                            url: '/admin/requestRepair',
+                            method: 'POST',
+                            data: {
+                                _token: token,
+                                order_id: order_id, 
+                                reason: selectedReason
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: "Requesting Repair Confirmed",
+                                    text: response.success || "Repair request submitted successfully.",
+                                    icon: "success"
+                                }).then(() => {
+                                    // Optionally hide buttons or update UI
+                                    document.getElementById('repair-btn-' + order_id).style.display = 'none';
+                                    document.getElementById('ongoing-btn-' + order_id).style.display = 'block';
+                                });
+                            },
+                            error: function(xhr) {
+                                console.error("Error submitting request:", xhr);
+                                console.error("Response:", xhr.responseText); // Log for detailed debugging
+                                Swal.fire({
+                                    title: "Error",
+                                    text: xhr.responseJSON?.error || "There was an issue submitting the request.",
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    } else {
+                        Swal.fire("You must select a reason for the repair request.", "", "warning");
+                    }
                 } else {
                     Swal.fire("Requesting Repair has been canceled", "", "info");
                 }
@@ -420,6 +424,7 @@ function showRepairAlert(order_id) {
         }
     });
 }
+
 function openEditProduct(productId, productName, productImage, productDescription, categoryName, brandName, supplierName, unitPrice, warrantySupplier, warrantyUnit, dateAdded, typeOfUnit) {
     // Set the values in the modal
     document.getElementById('edit_product_id').value = productId;

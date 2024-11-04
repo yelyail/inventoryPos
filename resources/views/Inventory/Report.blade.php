@@ -51,11 +51,12 @@
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Supplier Name</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Price</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Date Added</th>
+                            <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Warranty Expired</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Replace Date</th>
                             <th class="px-4 py-2 text-left text-sm font-medium text-gray-500">Return for Replace</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200" >
+                    <tbody class="bg-white divide-y divide-gray-200">
                         @foreach ($products as $product)
                             <tr>
                                 <td class="px-4 py-2">{{ $product->category_name }}</td>  
@@ -64,12 +65,20 @@
                                 <td class="px-4 py-2">{{ $product->supplier_name }}</td> 
                                 <td class="px-4 py-2">{{ $product->unitPrice }}</td> 
                                 <td class="px-4 py-2">{{ \Carbon\Carbon::parse($product->date_added)->format('Y-m-d') }}</td> 
+                                <td class="px-4 py-2">{{ \Carbon\Carbon::parse($product->warranty_expired)->format('Y-m-d') }}</td>  
                                 <td class="px-4 py-2">
                                     {{ $product->replace_date ? \Carbon\Carbon::parse($product->replace_date)->format('Y-m-d') : 'N/A' }}
                                 </td>
                                 <td class="px-4 py-2">
-                                    <button class="bg-blue-200 hover:bg-blue-300 text-black px-2 py-1 rounded flex items-center" 
-                                            onclick="showTransferAlert('{{ $product->serial_Id }}', this)">
+                                    @php
+                                        $warrantyExpired = \Carbon\Carbon::parse($product->warranty_expired)->isPast();
+                                    @endphp
+                                    <button class="bg-blue-200 hover:bg-blue-300 text-black px-2 py-1 rounded flex items-center 
+                                                {{ $warrantyExpired ? 'opacity-50 cursor-not-allowed' : '' }}" 
+                                            @if (!$warrantyExpired)
+                                                onclick="showTransferAlert('{{ $product->serial_Id }}', this)" 
+                                            @endif
+                                            {{ $warrantyExpired ? 'disabled' : '' }}>
                                         Request Replace
                                     </button>
                                 </td>

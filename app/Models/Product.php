@@ -22,9 +22,11 @@ class product extends Model
         'typeOfUnit',
         'product_image',
     ];
-    public function inventory() {
-        return $this->hasOne(inventory::class, 'product_id', 'product_id');
+    public function inventory() 
+    {
+        return $this->hasOne(inventory::class, 'product_id', 'product_ID');
     }
+
     public function supplier()
     {
         return $this->belongsTo(supplier::class, 'supplier_ID', 'supplier_ID');
@@ -34,8 +36,9 @@ class product extends Model
     {
         return $this->belongsTo(category::class, 'category_Id', 'category_id');
     }
+
     public function serial()
     {
-        return $this->hasOne(serial::class, 'product_id', 'product_id');
+        return $this->hasOne(serial::class, 'product_id', 'product_ID'); 
     }
 }

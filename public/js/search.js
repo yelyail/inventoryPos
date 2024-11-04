@@ -1,6 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const salesReportPrintUrl = "{{ route('salesReportPrint') }}"; // Ensure the URL is set
+
     document.getElementById('searchInput').addEventListener('keyup', filterTable);
     document.getElementById('filter-button').addEventListener('click', filterTable);
+    
+    // Add event listener for report generation button
+    document.getElementById('sales-button').addEventListener('click', generateSalesReport);
 
     function filterTable() {
         let table = document.querySelector('.cstm-table');
@@ -8,8 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
         let fromDate = document.getElementById('from_date').value ? new Date(document.getElementById('from_date').value) : null;
         let toDate = document.getElementById('to_date').value ? new Date(document.getElementById('to_date').value) : null;
         let tr = table.getElementsByTagName('tr');
-
-        console.log("Filtering from:", fromDate, "to:", toDate);
 
         for (let i = 1; i < tr.length; i++) {
             let td = tr[i].getElementsByTagName('td');
@@ -31,8 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         if ((!fromDate || rowDate >= fromDate) && (!toDate || rowDate <= toDate)) {
                             dateMatch = true;
                         }
-                    } else {
-                        console.warn(`Invalid date found in row ${i} (6th column): ${rowDateText}`);
                     }
                 }
                 if (!dateMatch && td[10]) {
@@ -43,8 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         if ((!fromDate || rowDate >= fromDate) && (!toDate || rowDate <= toDate)) {
                             dateMatch = true;
                         }
-                    } else {
-                        console.warn(`Invalid date found in row ${i} (11th column): ${rowDateText}`);
                     }
                 }
                 showRow = dateMatch;
@@ -54,24 +53,67 @@ document.addEventListener('DOMContentLoaded', function() {
             tr[i].style.display = showRow ? '' : 'none';
         }
     }
+    function generateSalesReport() {
+        let fromDate = document.getElementById('from_date').value;
+        let toDate = document.getElementById('to_date').value;
+
+        if (fromDate && toDate) {
+            let params = new URLSearchParams({
+                from_date: fromDate,
+                to_date: toDate,
+                download: true 
+            });
+
+            fetch("{{ route('salesReportPrint') }}?" + params.toString())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            if (data.error) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'No Records Found',
+                                    text: data.error,
+                                    confirmButtonText: 'Okay'
+                                });
+                            }
+                        });
+                    } else {
+                        window.location.href = "{{ route('salesReportPrint') }}?" + params.toString();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred while generating the report. Please try again later.',
+                        confirmButtonText: 'Okay'
+                    });
+                });
+        } else {
+            // Show SweetAlert for invalid date range
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Date Range',
+                text: 'Please select a valid date range before generating the report.',
+                confirmButtonText: 'Okay'
+            });
+        }
+    }
 });
+
+
 function generateInventoryReport() {
     let fromDate = document.getElementById('from_date').value;
     let toDate = document.getElementById('to_date').value;
 
     if (fromDate && toDate) {
-        window.location.href = "{{ route('inventoryReportPrint') }}?from_date=" + fromDate + "&to_date=" + toDate + "&download=true";
-    } else {
-        alert("Please select a valid date range before generating the report.");
-    }
-}
-
-function generateSalesReport() {
-    let fromDate = document.getElementById('from_date').value;
-    let toDate = document.getElementById('to_date').value;
-
-    if (fromDate && toDate) {
-        window.location.href = "/salesReportPrint?from_date=" + fromDate + "&to_date=" + toDate + "&download=true";
+        let params = new URLSearchParams({
+            from_date: fromDate,
+            to_date: toDate
+        });
+        let reportUrl = "{{ route('inventoryReportPrint') }}?" + params.toString();
+        window.location.href = reportUrl;
     } else {
         alert("Please select a valid date range before generating the report.");
     }

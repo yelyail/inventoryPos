@@ -17,7 +17,7 @@ class replace extends Model
     ];
 
     public function serial() {
-        return $this->belongsTo(serial::class, 'serial_ide', 'serial_id ');
+        return $this->belongsTo(serial::class, 'serial_id', 'serial_id ');
     }
     
     

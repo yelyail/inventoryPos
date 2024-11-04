@@ -20,17 +20,17 @@ class orderReceipts extends Model
     ];
     public function customer()  
     {
-        return $this->belongsTo(customer::class, 'customer_id');
+        return $this->belongsTo(customer::class, 'customer_id', 'customer_id');
     }
 
     public function payment()
     {
-        return $this->belongsTo(paymentMethod::class, 'payment_id');
+        return $this->belongsTo(paymentMethod::class, 'payment_id', 'payment_id'); 
     }
 
     public function orders()
     {
-        return $this->hasMany(orders::class, 'order_id');
+        return $this->hasMany(orders::class, 'order_id', 'order_id');
     }
 
 }

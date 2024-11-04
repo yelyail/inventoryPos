@@ -80,8 +80,8 @@
                 <h5>{{$date}}</h5>
             </div>
             <div class="company-info">
-                <h2>Double-K Computers</h2>
-                <p>#20 Pag-Asa Street, S.I.R.<br> Matina, Phase 2, Barangay Bucana<br>Davao City, Philippines 8000</p>
+                <h2>DavCom Consumer Goods Trading</h2>
+                <p>Door 22, E.C. Business Center, <br> C.M. Recto Street, Brgy. 34-D, Poblacion District, <br> Davao City, Davao Del Sur Philippines 8000</p>
             </div>
         </div>
         <hr>

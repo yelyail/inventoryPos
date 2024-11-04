@@ -127,6 +127,7 @@
             <div class="left">
                 <p><strong>Client:</strong>{{ ucwords(strtolower($customer_name))}}</p>
                 <p><strong>Address: </strong>{{ucwords(strtolower($address))}}</p>
+                <p><strong>order: </strong>{{ucwords(strtolower($order_id))}}</p>
             </div>
             <div class="right">
                 <p><strong>Transact Ref.:</strong>{{$reference}}</p>
@@ -147,7 +148,7 @@
             <tbody>
                 @foreach($orderItems as $item)
                     <tr>
-                        <td>{{ $item['serial_num'] }}</td>
+                        <td>{{ $item['serial_number'] }}</td>
                         <td>{{ $item['product_name'] }}</td>
                         <td>{{ $item['quantity'] }}</td>
                         <td>Php {{ number_format($item['total_price'], 2) }}</td>

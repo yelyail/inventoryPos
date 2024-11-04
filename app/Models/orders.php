@@ -23,4 +23,8 @@ class orders extends Model
     {
         return $this->belongsTo(product::class, 'product_id', 'product_id');
     }
+    public function repair() 
+    {
+        return $this->hasMany(repair::class, 'order_id', 'order_id'); 
+    }
 }

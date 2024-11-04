@@ -214,6 +214,7 @@ class supervisorController extends Controller
         return view('Inventory/usermanagement', compact('users'));
     }
     
+
     public function report() {
         $products = DB::table('product')
             ->select(
@@ -270,43 +271,50 @@ class supervisorController extends Controller
         return view('Inventory/Report', compact('products'));
     }
     public function salesReport() {
-        $VAT_RATE = 0.12; // Define the VAT rate
+    $VAT_RATE = 0.12;
+
+    $orderDetails = DB::table('orderreceipts')
+        ->select(
+            'c.customer_name',
+            'p.product_name',
+            'c.customer_address',
+            'p.unitPrice',
+            'pm.paymentType',
+            'pm.reference_num',
+            'pm.amount_paid',
+            'pm.discount',
+            'o.qtyOrder',
+            'o.total_amount',
+            'orderreceipts.order_date',
+            'o.order_id',
+            'orderreceipts.status',
+            DB::raw('(SELECT MAX(r.return_date) FROM repair r WHERE r.order_id = o.order_id) as repair_date') // Corrected subquery
+        )
+        ->leftJoin('orders as o', 'o.order_id', '=', 'orderreceipts.orderreceipts_id')
+        ->leftJoin('product as p', 'p.product_id', '=', 'o.product_id')
+        ->leftJoin('customer as c', 'c.customer_id', '=', 'orderreceipts.customer_id')
+        ->leftJoin('paymentmethod as pm', 'pm.payment_id', '=', 'orderreceipts.payment_id')
+        ->get();
+
+    $orderDetails = $orderDetails->map(function ($order) use ($VAT_RATE) {
+        $orderDate = Carbon::parse($order->order_date);
+        $warrantyExpired = $orderDate->copy()->addYear();
+
+        $order->warranty_expired = $warrantyExpired->isPast() ? 'Expired' : 'Valid';
+        $order->warranty_expiration_date = $warrantyExpired->format('Y-m-d');
+
+        // Calculate VAT
+        $order->VAT = $order->discount > 0 ? 0 : ($order->total_amount * $VAT_RATE); 
+
+        $order->totalPrice = $order->qtyOrder * $order->unitPrice;
+
+        return $order;
+    });
+
+    return view('Inventory/salesReport', compact('orderDetails'));
+}
+
     
-        $orderDetails = DB::table('orderreceipts')
-            ->select(
-                'c.customer_name',
-                'p.product_name',
-                's.serial_number',
-                'c.customer_address',
-                'p.unitPrice',
-                'pm.paymentType',
-                'pm.reference_num',
-                'pm.amount_paid',
-                'pm.discount',
-                'o.qtyOrder',
-                'o.total_amount',
-                'orderreceipts.order_date',
-                'orderreceipts.status'
-            )
-            ->leftJoin('orders as o', 'o.order_id', '=', 'orderreceipts.orderreceipts_id')
-            ->leftJoin('product as p', 'p.product_id', '=', 'o.product_id')
-            ->leftJoin('serial as s', 's.product_id', '=', 'p.product_id')
-            ->leftJoin('customer as c', 'c.customer_id', '=', 'orderreceipts.customer_id')
-            ->leftJoin('paymentmethod as pm', 'pm.payment_id', '=', 'orderreceipts.payment_id')
-            ->get();
-    
-        $orderDetails = $orderDetails->map(function ($order) use ($VAT_RATE) {
-            $orderDate = Carbon::parse($order->order_date);
-            $warrantyExpired = $orderDate->addYear();
-            
-            $order->warranty_expired = $warrantyExpired->isPast() ? 'Expired' : 'Valid';
-            $order->warranty_expiration_date = $warrantyExpired->format('Y-m-d');
-            $order->VAT = $order->total_amount * $VAT_RATE;
-            return $order;
-        });
-    
-        return view('Inventory/salesReport', compact('orderDetails'));
-    }
     
     public function pending() {  
         $products = DB::table('product')
@@ -555,7 +563,7 @@ class supervisorController extends Controller
             ->toArray();
     }
 
-    $suppliers = Supplier::all();
+    $suppliers = supplier::all();
     return view('OfficeStaff/staffpending', compact('products', 'suppliers'));
     }
     public function staffStorePending(Request $request){
@@ -636,14 +644,12 @@ class supervisorController extends Controller
                 'total' => 'required|numeric|min:0',
             ]);
     
-            // Create Customer
-            $customer = Customer::create([
+            $customer = customer::create([
                 'customer_name' => $validatedData['paymentName'],
                 'customer_address' => $validatedData['paymentAddress'],
             ]);
     
-            // Create Payment
-            $payment = PaymentMethod::create([
+            $payment = paymentMethod::create([
                 'paymentType' => $validatedData['paymentMethod'],
                 'reference_num' => $validatedData['referenceNum'] ?? '',
                 'amount_paid' => $validatedData['payment'],
@@ -652,7 +658,6 @@ class supervisorController extends Controller
     
             $order = null;
             foreach ($validatedData['products'] as $productData) {
-                // Create Order Item
                 $order = orders::create([
                     'product_id' => $productData['productId'],
                     'productName' => $productData['productName'],
@@ -666,8 +671,6 @@ class supervisorController extends Controller
                         ->update(['status' => 'sold']);
                 }
             }
-    
-            // Create Order Receipt
             $orderReceipt = orderReceipts::create([
                 'customer_id' => $customer->customer_id,
                 'payment_id' => $payment->payment_id,
@@ -692,28 +695,29 @@ class supervisorController extends Controller
     {
         try {
             $request->validate([
-                'order_id' => 'required|integer|exists:repair,order_id', 
+                'order_id' => 'required|integer|exists:orders,order_id', 
                 'reason' => 'required|string|max:255'
             ]);
+    
             $replaceReason = $request->input('reason');
             $currentDate = now(); 
-            $newReplace = repair::create([
+            
+            $newRepair = Repair::create([
                 'order_id' => $request->input('order_id'),
                 'return_date' => $currentDate,
                 'return_reason' => $replaceReason,
-                'return_status' => 'complete',
             ]);
-
-            if ($newReplace) {
-                return response()->json(['success' => 'Replace request has been successfully submitted.'], 200);
-            } else {
-                return response()->json(['error' => 'Failed to submit replace request.'], 500);
-            }
-
+    
+            return response()->json(['success' => 'Repair request has been successfully submitted.'], 200);
+    
         } catch (\Exception $e) {
-            return response()->json(['error' => 'An internal error occurred. Please try again later.'], 500);
+            Log::error('Repair request error: '.$e->getMessage()); 
+            
+            return response()->json(['error' => $e->getMessage()], 500); // Return the actual error message for debugging
         }
     }
+    
+
     public function requestReplace(Request $request)
     {
         try {
@@ -898,8 +902,7 @@ class supervisorController extends Controller
                 'product.unitPrice',
                 'product.added_date',
                 'product.typeOfUnit'
-            )
-            ->get();
+            )->get();
 
             foreach ($products as $product) {
                 $product->serial_numbers = DB::table('serial')

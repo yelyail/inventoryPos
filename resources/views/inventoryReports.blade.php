@@ -67,51 +67,52 @@
         <div class="header">
             <div class="title-selection">
                 <h1>{{ $title }}</h1>
-                <h4><b>Reporting Period:</b> From: {{ $fromDate ? $fromDate : 'N/A' }} To: {{ $toDate ? $toDate : 'N/A' }}</h4>
-                <h5>{{ $date }}</h5>
+                <p>Report Date: {{ $date }}</p>
+                <p>Date Range: {{ $fromDate }} to {{ $toDate }}</p>
             </div>
             <div class="company-info">
-                <h2>Double-K Computers</h2>
-                <p>#20 Pag-Asa Street, S.I.R.<br> Matina, Phase 2, Barangay Bucana<br>Davao City, Philippines 8000</p>
+                <h2>DavCom Consumer Goods Trading</h2>
+                <p>Door 22, E.C. Business Center, <br> C.M. Recto Street, Brgy. 34-D, Poblacion District, <br> Davao City, Davao Del Sur Philippines 8000</p>
             </div>
         </div>
         <hr>
         <table>
             <thead>
                 <tr>
-                    <th>Product Name</th>
-                    <th>Category Name</th>
-                    <th>Supplier Name</th>
-                    <th>Current Stocks</th>
-                    <th>Price</th>
-                    <th>Warranty</th>
-                    <th>Description</th>
-                    <th>Date Added</th>
-                    <th>Updated Stocks</th>
-                    <th>Restock Date</th>
+                    <th class="w-40">Category Name</th>
+                    <th class="w-40">Serial Number</th>
+                    <th class="w-40">Brand Name</th>
+                    <th class="w-40">Model Name</th>
+                    <th class="w-40">Supplier Name</th>
+                    <th class="w-40">Description</th>
+                    <th class="w-40">Current Stocks</th>
+                    <th class="w-40">Price</th>
+                    <th class="w-40">Date Added</th>
+                    <th class="w-40">Warranty Expired</th>
+                    <th class="w-40">Unit</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($products as $product)
-                    <tr>
-                        <td>{{ $product['product_name'] }}</td>
-                        <td>{{ $product['categoryName'] }}</td>
-                        <td>{{ $product['supplierName'] }}</td>
-                        <td style="text-align:center">{{ $product['stock_qty'] }}</td>
-                        <td>{{ number_format($product['unit_price'], 2) }}</td>
-                        <td style="text-align:center">{{ $product['warranty'] }} days</td>
-                        <td>{{ $product['product_desc'] }}</td>
-                        <td>{{ $product['prod_add'] }}</td>
-                        <td>{{ $product['updatedQty'] }}</td>
-                        <td>{{ $product['nextRestockDate'] }}</td>
-                    </tr>
+                @foreach ($products as $product)
+                <tr>
+                    <td>{{ $product->categoryName }}</td>
+                    <td>{{ $product->serialNum }}</td>
+                    <td>{{ $product->brandName }}</td> 
+                    <td>{{ $product->modelName }}</td>
+                    <td>{{ $product->supplierName }}</td>
+                    <td>{{ $product->product_desc }}</td>
+                    <td>{{ $product->stock_qty }}</td>
+                    <td>{{ $product->unit_price }}</td>
+                    <td>{{ $product->prod_add }}</td>
+                    <td>{{ $product->warranty }}</td>
+                    <td>{{ $product->unit }}</td> 
+                </tr>
                 @endforeach
             </tbody>
         </table>
 
         <div class="footer" style="display: flex; justify-content: space-between; align-items: center;">
-            <p style="margin-top: 10px;"><b>Prepared by:</b> <u>{{ $representative }}</u></p>
-            <p style="margin: 0; text-align: right;"><b>Validated by:</b> <u>{{ $adminName }}</u></p> 
+            <p style="margin: 0; text-align: right;"><b>Validated by:</b> <u>{{ $representative }}</u></p> 
         </div>
     </div>
 </body>

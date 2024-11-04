@@ -10,7 +10,6 @@
             <!-- header -->
             <div class="w-full p-3">
                 <div class="bg-gray border border-black-950">
-                    <!-- Header Section with Search Box and Add Button -->
                     <div class="flex justify-between items-center uppercase text-gray-800 rounded-tl-lg rounded-tr-lg p-2">
                         <h1 class="prod_title text-2xl font-bold">Point of Sale</h1>
                     </div>

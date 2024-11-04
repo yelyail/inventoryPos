@@ -19,9 +19,10 @@ class serial extends Model
     public $timestamps = true;
     public function product()
     {
-        return $this->belongsTo(product::class, 'product_id');
+        return $this->belongsTo(Product::class, 'product_id', 'product_ID');
     }
+
     public function replace() {
-        return $this->hasMany(replace::class, 'inventory_id', 'inventory_id');
+        return $this->hasMany(Replace::class, 'inventory_id', 'inventory_id'); // Ensure Replace is defined
     }
 }

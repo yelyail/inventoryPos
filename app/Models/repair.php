@@ -15,11 +15,9 @@ class repair extends Model
         'order_id',
         'return_date',
         'return_reason',
-        'return_status',
     ];
-
     public function order()
     {
-        return $this->belongsTo(orders::class, 'order_id', 'order_id');
+        return $this->belongsTo(orders::class, 'order_id', 'order_id'); 
     }
 }

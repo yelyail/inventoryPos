@@ -26,10 +26,6 @@ Route::get('/', function () {
 })->name('Login');
 
 Route::post('/', [LoginController::class, 'login'])->name('login.post');
-Route::get('/register', [LoginController::class, 'register'])->name('register');
-Route::post('/registerSave', [LoginController::class, 'registerSave'])->name('registerSave');
-
-
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 //Routes for header navigations------------------------------------------------------------------------------------------------------
@@ -74,11 +70,9 @@ Route::controller(supervisorController::class)->group(function() {
     Route::post('staff/staffStorePending', 'staffStorePending')->name('staffStorePending');
     Route::patch('staff/approve/{id}', 'staffApprove')->name('staffApprove');
 });
-Route::controller(printController::class)->group(function(){
-    Route::get('/inventoryReportPrint', 'inventoryReportPrint')->name('inventoryReportPrint');
-    Route::get('/orderReceipt/{orderreceipts_id}', 'orderReceiptPrint')->name('orderReceiptPrint');
-
-});
+Route::get('/inventoryReportPrint', [printController::class, 'inventoryReportPrint'])->name('inventoryReportPrint');
+Route::get('/orderReceipt/{orderreceipts_id}', [printController::class, 'orderReceiptPrint'])->name('orderReceiptPrint');
+Route::get('/salesReportPrint',[printController::class, 'salesReportPrint'])->name('salesReportPrint');
 
 // require __DIR__.'/auth.php';
 // //-------------------------------------------------------------------------------------------------------
