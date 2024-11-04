@@ -70,8 +70,9 @@ Route::controller(supervisorController::class)->group(function() {
     Route::post('staff/staffStorePending', 'staffStorePending')->name('staffStorePending');
     Route::patch('staff/approve/{id}', 'staffApprove')->name('staffApprove');
 });
-Route::get('/inventoryReportPrint', [printController::class, 'inventoryReportPrint'])->name('inventoryReportPrint');
 Route::get('/orderReceipt/{orderreceipts_id}', [printController::class, 'orderReceiptPrint'])->name('orderReceiptPrint');
+
+Route::get('/inventoryReportPrint', [printController::class, 'inventoryReportPrint'])->name('inventoryReportPrint');
 Route::get('/salesReportPrint',[printController::class, 'salesReportPrint'])->name('salesReportPrint');
 
 // require __DIR__.'/auth.php';

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{$title}}</title>
+    <title>{{ $title }}</title>
     <style>
         @page {
             size: A4 portrait;
@@ -44,18 +44,18 @@
         th, td {
             border: 1px solid darkgray;
         }
-        td{
+        td {
             font-size: 12px;
         }
         thead {
             text-align: center;
             background-color: #f2f2f2;
         }
-        h5{
+        h5 {
             margin: 0;
             font-weight: normal;
         }
-        p{
+        p {
             margin: 0;
             font-weight: normal;
         }
@@ -80,12 +80,11 @@
             <thead>
                 <tr>
                     <th class="w-40">Category Name</th>
-                    <th class="w-40">Serial Number</th>
                     <th class="w-40">Brand Name</th>
                     <th class="w-40">Model Name</th>
                     <th class="w-40">Supplier Name</th>
                     <th class="w-40">Description</th>
-                    <th class="w-40">Current Stocks</th>
+                    <th class="w-40">Stocks</th>
                     <th class="w-40">Price</th>
                     <th class="w-40">Date Added</th>
                     <th class="w-40">Warranty Expired</th>
@@ -96,14 +95,13 @@
                 @foreach ($products as $product)
                 <tr>
                     <td>{{ $product->categoryName }}</td>
-                    <td>{{ $product->serialNum }}</td>
                     <td>{{ $product->brandName }}</td> 
-                    <td>{{ $product->modelName }}</td>
+                    <td>{{ $product->model_name }}</td>
                     <td>{{ $product->supplierName }}</td>
-                    <td>{{ $product->product_desc }}</td>
+                    <td>{{ $product->product_description }}</td>
                     <td>{{ $product->stock_qty }}</td>
-                    <td>{{ $product->unit_price }}</td>
-                    <td>{{ $product->prod_add }}</td>
+                    <td>{{ number_format($product->unit_price, 2) }}</td>
+                    <td>{{ $product->date_added }}</td>
                     <td>{{ $product->warranty }}</td>
                     <td>{{ $product->unit }}</td> 
                 </tr>

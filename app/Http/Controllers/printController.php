@@ -20,7 +20,8 @@ class printController extends Controller
 {
     public function inventoryReportPrint(Request $request) {
         $representative = Session::get('fullname'); 
-
+    
+        // Validate the date range input
         $request->validate([
             'from_date' => 'required|date',
             'to_date' => 'required|date|after_or_equal:from_date'
@@ -29,61 +30,61 @@ class printController extends Controller
             'to_date.required' => 'Please provide an ending date.',
             'to_date.after_or_equal' => 'The ending date must be the same or later than the starting date.'
         ]);
-
+    
         $fromDate = \Carbon\Carbon::parse($request->input('from_date'))->startOfDay();
         $toDate = \Carbon\Carbon::parse($request->input('to_date'))->endOfDay();
-
+    
         $products = DB::table('product')
-            ->select(
-                'product.product_id',
-                'inventory.inventory_id',
-                'product.product_image',
-                'category.category_name',
-                'serial.serial_number',
-                'category.brand_name',
-                'product.product_name as model_name',
-                'supplier.supplier_name',
-                'product.unitPrice',
-                'product.added_date as date_added',
-                DB::raw('MAX(inventory.warranty_supplier) as warranty_expired'),
-                'product.typeOfUnit as unit',
-                DB::raw('COUNT(serial.serial_number) as serial_count'),
-                DB::raw('(SELECT MAX(replace.replace_date) FROM replace WHERE serial.serial_Id = replace.serial_id) as replace_date')
-            )
-            ->join('inventory', 'product.product_id', '=', 'inventory.product_id')
-            ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
-            ->join('category', 'product.category_Id', '=', 'category.category_id')
-            ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
-            ->where('inventory.status', '=', 'approve')
-            ->whereBetween('product.added_date', [$fromDate, $toDate]) 
-            ->groupBy(
-                'product.product_id',
-                'inventory.inventory_id',
-                'product.product_image',
-                'serial.serial_number',
-                'category.category_name',
-                'category.brand_name',
-                'product.product_name',
-                'supplier.supplier_name',
-                'product.unitPrice',
-                'product.added_date',
-                'product.typeOfUnit'
-            )
-            ->orderBy('product.added_date', 'desc')
-            ->get();
+        ->select(
+            'product.product_id',
+            'inventory.inventory_id',
+            'product.product_image',
+            'category.category_name as categoryName',
+            DB::raw('COUNT(serial.serial_number) as stock_qty'), // Count of serial numbers
+            'category.brand_name as brandName', 
+            'product.product_name as model_name', 
+            'supplier.supplier_name as supplierName',
+            'product.product_description', 
+            'product.unitPrice as unit_price',
+            'product.added_date as date_added', 
+            DB::raw('MAX(inventory.warranty_supplier) as warranty'), 
+            'product.typeOfUnit as unit' 
+        )
+        ->join('inventory', 'product.product_id', '=', 'inventory.product_id')
+        ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
+        ->join('category', 'product.category_Id', '=', 'category.category_id')
+        ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
+        ->where('inventory.status', '=', 'approve')
+        ->whereBetween('product.added_date', [$fromDate, $toDate]) 
+        ->groupBy(
+            'product.product_id',
+            'inventory.inventory_id',
+            'product.product_image',
+            'category.category_name',
+            'category.brand_name',
+            'product.product_name',
+            'supplier.supplier_name',
+            'product.product_description',
+            'product.unitPrice',
+            'product.added_date',
+            'product.typeOfUnit'
+        )
+        ->orderBy('product.added_date', 'desc')
+        ->get();
 
         foreach ($products as $product) {
-            $product->serial_numbers = DB::table('serial')
-                ->where('product_id', $product->product_id)
-                ->orderBy('serial_number')
-                ->pluck('serial_number')
-                ->toArray();
+        $product->serial_numbers = DB::table('serial')
+            ->where('product_id', $product->product_id)
+            ->pluck('serial_number')
+            ->toArray();
         }
-
+            
+        // Check if products are empty
         if ($products->isEmpty()) {
             return response()->json(['message' => 'No products found for the selected date range.'], 404);
         }
-
+    
+        // Prepare data for PDF generation
         $data = [
             'title' => 'Inventory Report',
             'date' => now()->format('m/d/Y H:i:s'),
@@ -92,16 +93,15 @@ class printController extends Controller
             'fromDate' => $fromDate->format('Y-m-d'),
             'toDate' => $toDate->format('Y-m-d'),
         ];
-
+    
         // PDF generation
         $dompdf = new Dompdf();
         $dompdf->loadHtml(view('inventoryReports', $data)->render());
         $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
-
+    
         return $dompdf->stream('inventoryReport.pdf', ['Attachment' => true]);
     }
-
     public function salesReportPrint(Request $request) {
         // Validate the request input for date range
         $request->validate([
@@ -131,31 +131,50 @@ class printController extends Controller
                 'o.qtyOrder',
                 'o.total_amount',
                 'orderreceipts.order_date',
-                'orderreceipts.status'
+                'orderreceipts.status',
+                DB::raw('SUM(o.total_amount) as total_sales')
             )
             ->leftJoin('orders as o', 'o.order_id', '=', 'orderreceipts.orderreceipts_id')
             ->leftJoin('product as p', 'p.product_id', '=', 'o.product_id')
             ->leftJoin('customer as c', 'c.customer_id', '=', 'orderreceipts.customer_id')
             ->leftJoin('paymentmethod as pm', 'pm.payment_id', '=', 'orderreceipts.payment_id')
-            ->whereBetween('orderreceipts.order_date', [$fromDate, $toDate]) // Filter by date range
+            ->whereBetween('orderreceipts.order_date', [$fromDate, $toDate])
+            ->groupBy(
+                'c.customer_name',
+                'p.product_name',
+                'c.customer_address',
+                'p.unitPrice',
+                'pm.paymentType',
+                'pm.reference_num',
+                'pm.amount_paid',
+                'pm.discount',
+                'o.qtyOrder',
+                'o.total_amount',
+                'orderreceipts.order_date',
+                'orderreceipts.status'
+            )
             ->get();
+        $representative = Session::get('fullname') ?? 'Unknown Representative';
     
         $orderDetails = $orderDetails->map(function ($order) use ($VAT_RATE) {
             $orderDate = Carbon::parse($order->order_date);
-            $warrantyExpired = $orderDate->copy()->addYear(); 
+            $warrantyExpired = $orderDate->copy()->addYear();
     
             $order->warranty_expired = $warrantyExpired->isPast() ? 'Expired' : 'Valid';
             $order->warranty_expiration_date = $warrantyExpired->format('Y-m-d');
     
-            if (!empty($order->discount) && $order->discount > 0) {
-                $order->VAT = 0; 
-            } else {
-            }
-            
             $order->totalPrice = $order->qtyOrder * $order->unitPrice;
+    
+            if (empty($order->discount) || $order->discount <= 0) {
+                $order->VAT = $order->totalPrice * $VAT_RATE;
+            } else {
+                $order->VAT = 0; 
+            }
     
             return $order;
         });
+        $total_sales = $orderDetails->sum('totalPrice');
+        $total_VAT = $orderDetails->sum('VAT');
     
         // Prepare data for PDF generation
         $data = [
@@ -164,7 +183,10 @@ class printController extends Controller
             'date' => now()->format('m/d/Y H:i:s'),
             'fromDate' => $fromDate->format('m/d/Y'),
             'toDate' => $toDate->format('m/d/Y'),
-            'orderDetails' => $orderDetails 
+            'total_sales' => number_format($total_sales, 2), // Format for display
+            'total_VAT' => number_format($total_VAT, 2), // Add total VAT to data array
+            'orderDetails' => $orderDetails,
+            'representative' => $representative
         ];
     
         // Generate PDF
@@ -175,6 +197,8 @@ class printController extends Controller
     
         return $dompdf->stream('salesReport.pdf');
     }
+    
+    
     
     public function orderReceiptPrint($orderreceipts_id) {
         $orderReceipt = orderReceipts::with('orders.product.serial')->findOrFail($orderreceipts_id);

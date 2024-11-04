@@ -9,7 +9,7 @@
             <div class="bg-gray">
                 <div class="flex justify-between items-center uppercase text-gray-800 rounded-tl-lg rounded-tr-lg p-2">
                     <h1 class="prod_title text-2xl font-bold">Sales Reports</h1>
-                    <button type="button" class="btn custom-btn flex items-center p-2 text-white rounded bg-blue-500 hover:bg-blue-600" id="sales-button">
+                    <button type="button" class="btn custom-btn flex items-center p-2 text-white rounded bg-blue-500 hover:bg-blue-600" id="sales-button" onclick="generateSalesReport()">
                         <i class="fas fa-print mr-2"></i>
                         Generate Sales Report
                     </button>
@@ -102,4 +102,57 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('searchInput').addEventListener('keyup', filterTable);
+        document.getElementById('filter-button').addEventListener('click', filterTable); // Add event listener to filter button
+
+        function filterTable() {
+            let table = document.querySelector('.cstm-table');
+            let searchInput = document.getElementById('searchInput').value.toLowerCase();
+            let fromDate = document.getElementById('from_date').value ? new Date(document.getElementById('from_date').value) : null;
+            let toDate = document.getElementById('to_date').value ? new Date(document.getElementById('to_date').value) : null;
+
+            let tr = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < tr.length; i++) {
+                let td = tr[i].getElementsByTagName('td');
+                let showRow = true;
+
+                // Search filtering
+                if ((td[1] && td[1].textContent.toLowerCase().indexOf(searchInput) === -1) && 
+                    (td[2] && td[2].textContent.toLowerCase().indexOf(searchInput) === -1)) {
+                    showRow = false;
+                }
+
+                // Date filtering
+                let tdDate = td[10];  
+                if (tdDate) {
+                    let rowDate = new Date(tdDate.textContent.trim());
+                    if ((fromDate && rowDate < fromDate) || (toDate && rowDate > toDate)) {
+                        showRow = false;
+                    }
+                }
+
+                tr[i].style.display = showRow ? '' : 'none';
+            }
+        }
+
+        function generateSalesReport() {
+            let fromDate = document.getElementById('from_date').value;
+            let toDate = document.getElementById('to_date').value;
+
+            if (fromDate && toDate) {
+                let params = new URLSearchParams({
+                    from_date: fromDate,
+                    to_date: toDate
+                });
+                window.location.href = "{{ route('salesReportPrint') }}?" + params.toString();
+            } else {
+                alert("Please select a valid date range before generating the report.");
+            }
+        }
+        document.getElementById('sales-button').addEventListener('click', generateSalesReport);
+    });
+</script>
 @endsection

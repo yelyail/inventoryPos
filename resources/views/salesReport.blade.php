@@ -44,7 +44,7 @@
         th, td {
             border: 1px solid darkgray;
         }
-        td{
+        td {
             font-size: 12px;
         }
         thead {
@@ -58,11 +58,11 @@
             text-align: center;
             font-size: 20px;
         }
-        h5{
+        h5 {
             margin: 0;
             font-weight: normal;
         }
-        p{
+        p {
             margin: 0;
             font-weight: normal;
         }
@@ -74,10 +74,9 @@
         <div class="header">
             <div class="title-section">
                 <h1>{{$title}}</h1>
-                <h4><b>Reporting Period:</b> From: {{ $fromDate ? $fromDate : 'N/A' }} To: {{ $toDate ? $toDate : 'N/A' }}</h4>
-                <h4><b>Total Sales:</b> Php {{$total_sales}}</h4>
-                <h5>{{$order_id}}</h5>
-                <h5>{{$date}}</h5>
+                <h4><b>Date Range:</b> From: {{ $fromDate ? $fromDate : 'N/A' }} To: {{ $toDate ? $toDate : 'N/A' }}</h4>
+                <h4><b>Total Sales:</b> Php {{$total_sales}}</h4> <!-- Display total sales -->
+                <h5>Report Date: {{$date}}</h5>
             </div>
             <div class="company-info">
                 <h2>DavCom Consumer Goods Trading</h2>
@@ -93,6 +92,8 @@
                     <th>Quantity</th>
                     <th>Unit Price</th>
                     <th>Total Price</th>
+                    <th>VAT</th> <!-- Add VAT column -->
+                    <th>Discount</th>
                     <th>Amount Paid</th>
                     <th>Payment Method</th>
                     <th>Reference Number</th>
@@ -100,17 +101,19 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($orderItems as $orderItem)
+                @foreach ($orderDetails as $orderItem)
                     <tr>
-                        <td>{{ ucwords(strtolower($orderItem['customer_name'])) }}</td>
-                        <td>{{ $orderItem['particulars'] }}</td>
-                        <td style="text-align:center">{{ $orderItem['quantity_ordered'] }}</td>
-                        <td>Php {{ $orderItem['unit_price'] }}</td>
-                        <td>Php {{ $orderItem['payment'] }}</td>
-                        <td>Php {{ $orderItem['amount'] }}</td>
-                        <td>{{ $orderItem['payment_type'] }}</td>
-                        <td>{{ $orderItem['reference_num'] }}</td>
-                        <td>{{ $orderItem['order_date'] }}</td>
+                        <td>{{ ucwords(strtolower($orderItem->customer_name)) }}</td>
+                        <td>{{ $orderItem->product_name }}</td>
+                        <td style="text-align:center">{{ $orderItem->qtyOrder }}</td>
+                        <td>Php {{ number_format($orderItem->unitPrice, 2) }}</td>
+                        <td>Php {{ number_format($orderItem->totalPrice, 2) }}</td> 
+                        <td>Php {{ number_format($orderItem->VAT, 2) }}</td> 
+                        <td>Php {{ number_format($orderItem->discount, 2) }}</td>
+                        <td>Php {{ number_format($orderItem->amount_paid, 2) }}</td> 
+                        <td>{{ ucwords(strtolower($orderItem->paymentType)) }}</td>
+                        <td>{{ $orderItem->reference_num ?? 'N/A' }}</td>
+                        <td>{{ $orderItem->order_date }}</td>
                     </tr>
                 @endforeach
             </tbody>

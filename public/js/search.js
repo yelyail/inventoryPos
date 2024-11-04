@@ -1,11 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const salesReportPrintUrl = "{{ route('salesReportPrint') }}"; // Ensure the URL is set
-
     document.getElementById('searchInput').addEventListener('keyup', filterTable);
     document.getElementById('filter-button').addEventListener('click', filterTable);
-    
-    // Add event listener for report generation button
-    document.getElementById('sales-button').addEventListener('click', generateSalesReport);
 
     function filterTable() {
         let table = document.querySelector('.cstm-table');
@@ -53,68 +48,4 @@ document.addEventListener('DOMContentLoaded', function() {
             tr[i].style.display = showRow ? '' : 'none';
         }
     }
-    function generateSalesReport() {
-        let fromDate = document.getElementById('from_date').value;
-        let toDate = document.getElementById('to_date').value;
-
-        if (fromDate && toDate) {
-            let params = new URLSearchParams({
-                from_date: fromDate,
-                to_date: toDate,
-                download: true 
-            });
-
-            fetch("{{ route('salesReportPrint') }}?" + params.toString())
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            if (data.error) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'No Records Found',
-                                    text: data.error,
-                                    confirmButtonText: 'Okay'
-                                });
-                            }
-                        });
-                    } else {
-                        window.location.href = "{{ route('salesReportPrint') }}?" + params.toString();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'An error occurred while generating the report. Please try again later.',
-                        confirmButtonText: 'Okay'
-                    });
-                });
-        } else {
-            // Show SweetAlert for invalid date range
-            Swal.fire({
-                icon: 'warning',
-                title: 'Invalid Date Range',
-                text: 'Please select a valid date range before generating the report.',
-                confirmButtonText: 'Okay'
-            });
-        }
-    }
 });
-
-
-function generateInventoryReport() {
-    let fromDate = document.getElementById('from_date').value;
-    let toDate = document.getElementById('to_date').value;
-
-    if (fromDate && toDate) {
-        let params = new URLSearchParams({
-            from_date: fromDate,
-            to_date: toDate
-        });
-        let reportUrl = "{{ route('inventoryReportPrint') }}?" + params.toString();
-        window.location.href = reportUrl;
-    } else {
-        alert("Please select a valid date range before generating the report.");
-    }
-}
