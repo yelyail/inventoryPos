@@ -118,7 +118,7 @@
                             </div>
                             <div id="cashAmountDiv" class="mt-4 hidden">
                                 <label for="cashAmount" class="block text-gray-700">Enter Cash Amount</label>
-                                <input type="number" id="cashAmount" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full"/>
+                                <input type="number" id="cashAmount" class="mt-1 border border-gray-300 rounded-md px-4 py-2 w-full" min="0"/>
                             </div>
                             <!-- GCash Payment Inputs -->
                             <div id="gcashNameDiv" class="mt-4 hidden">

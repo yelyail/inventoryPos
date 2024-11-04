@@ -127,7 +127,6 @@
             <div class="left">
                 <p><strong>Client:</strong>{{ ucwords(strtolower($customer_name))}}</p>
                 <p><strong>Address: </strong>{{ucwords(strtolower($address))}}</p>
-                <p><strong>order: </strong>{{ucwords(strtolower($order_id))}}</p>
             </div>
             <div class="right">
                 <p><strong>Transact Ref.:</strong>{{$reference}}</p>
