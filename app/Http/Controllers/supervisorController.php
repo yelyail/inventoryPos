@@ -894,6 +894,7 @@ class supervisorController extends Controller
             ->where('inventory.status', '=', 'approve')
             ->groupBy(
                 'product.product_id',
+                'category.category_id',
                 'product.product_image',
                 'category.category_name',
                 'category.brand_name',

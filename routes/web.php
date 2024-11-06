@@ -26,6 +26,7 @@ Route::get('/', function () {
 })->name('Login');
 
 Route::post('/', [LoginController::class, 'login'])->name('login.post');
+Route::post('/registerSave', [LoginController::class, 'registerSave'])->name('registerSave');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 //Routes for header navigations------------------------------------------------------------------------------------------------------
