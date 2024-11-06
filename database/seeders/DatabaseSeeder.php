@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
     {
        User::create([
             'fullname' => 'admin',
-            'username' => 'admin12',
-            'job_title' => 'officeStaff',
+            'username' => 'admin111',
+            'job_title' => 'supervisor',
             'phone_number' => '9128349129',
             'password' => Hash::make('admin1234'),
             'archived'=>0

@@ -637,7 +637,7 @@ class supervisorController extends Controller
                 'products.*.serialArray' => 'array',
                 'products.*.price' => 'required|numeric|min:0',
                 'paymentName' => 'nullable|string',
-                'payment' => 'nullable|integer|min:0',  
+                'payment' => 'nullable|numeric|min:0',  
                 'paymentAddress' => 'nullable|string',
                 'referenceNum' => 'nullable|string',
                 'discountAmount' => 'nullable|numeric|min:0',

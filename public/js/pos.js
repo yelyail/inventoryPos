@@ -243,12 +243,11 @@ document.querySelectorAll('input[name="paymentMethod"]').forEach((input) => {
             document.getElementById('gcashAddressDiv').style.display = 'none';
             document.getElementById('gcashReferenceDiv').style.display = 'none';
 
-            // Show relevant fields based on the selected payment method
-            if (this.value === 'cash') {  // Updated to match 'Cash' case
+            if (this.value === 'cash') {  
                 document.getElementById('cashNameDiv').style.display = 'block';
                 document.getElementById('cashAddressDiv').style.display = 'block';
                 document.getElementById('cashAmountDiv').style.display = 'block';
-            } else if (this.value === 'gcash') {  // Updated to match 'GCash' case
+            } else if (this.value === 'gcash') {  x
                 document.getElementById('gcashNameDiv').style.display = 'block';
                 document.getElementById('gcashAddressDiv').style.display = 'block';
                 document.getElementById('gcashReferenceDiv').style.display = 'block';
@@ -267,18 +266,16 @@ document.querySelectorAll('input[name="paymentMethod"]').forEach((input) => {
             paymentName = document.getElementById('cashName')?.value.trim() || null;
             paymentAddress = document.getElementById('cashAddress')?.value.trim() || null;
             payment = parseFloat(document.getElementById('cashAmount')?.value.replace(/[^0-9.-]+/g, "")) || 0;
+
+            if (payment < total) {
+                alert("Cash Amount not enough.");
+                return; 
+            }
         } else if (paymentMethod === 'GCash') {
             paymentName = document.getElementById('gcashName')?.value.trim() || null;
             paymentAddress = document.getElementById('gcashAddress')?.value.trim() || null;
             payment = parseFloat(document.getElementById('totalDisplay')?.textContent.replace(/[^0-9.-]+/g, "")) || 0; // Assuming total is displayed on the page
         }
-
-        console.log('Payment Details:', {
-            paymentMethod,
-            paymentName,
-            paymentAddress,
-            payment
-        });
     }
 
     function sendToDatabase() {
@@ -294,6 +291,11 @@ document.querySelectorAll('input[name="paymentMethod"]').forEach((input) => {
             paymentName = document.getElementById('cashName')?.value.trim() || null; 
             paymentAddress = document.getElementById('cashAddress')?.value.trim() || null; 
             payment = parseFloat(document.getElementById('cashAmount')?.value.replace(/[^0-9.-]+/g, "")) || 0;
+                    
+            if (payment < total) {
+                alert("Cassdsdugh.");
+                return; 
+            }
         } else if (paymentMethod === 'gcash') {
             paymentName = document.getElementById('gcashName')?.value.trim() || null; 
             paymentAddress = document.getElementById('gcashAddress')?.value.trim() || null; 
@@ -316,7 +318,6 @@ document.querySelectorAll('input[name="paymentMethod"]').forEach((input) => {
             discountAmount,
             total,
         };
-        console.log("Data sent to database:", data); // Debugging output
 
         $.ajax({
             url: '/storeOrder',
