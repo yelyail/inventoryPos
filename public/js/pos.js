@@ -247,7 +247,7 @@ document.querySelectorAll('input[name="paymentMethod"]').forEach((input) => {
                 document.getElementById('cashNameDiv').style.display = 'block';
                 document.getElementById('cashAddressDiv').style.display = 'block';
                 document.getElementById('cashAmountDiv').style.display = 'block';
-            } else if (this.value === 'gcash') {  x
+            } else if (this.value === 'gcash') {
                 document.getElementById('gcashNameDiv').style.display = 'block';
                 document.getElementById('gcashAddressDiv').style.display = 'block';
                 document.getElementById('gcashReferenceDiv').style.display = 'block';
