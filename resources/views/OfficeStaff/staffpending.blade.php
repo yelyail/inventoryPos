@@ -48,8 +48,9 @@
                     <tr class="cursor-pointer hover:opacity-80" 
                         data-product-id="{{ $product->product_id }}" 
                         data-product-name="{{ $product->model_name }}" 
-                        data-serial="{{ $product->serial_numbers ? implode(', ', array_column($product->serial_numbers, 'serial_number')) : '' }}" 
-                        data-created-at="{{ $product->serial_numbers ? implode(', ', array_column($product->serial_numbers, 'created_at')) : '' }}" 
+                        data-serial-id="{{ $product->serial_numbers ? implode(', ', $product->serial_numbers->pluck('serial_id')->toArray()) : '' }}"
+                        data-serial="{{ $product->serial_numbers ? implode(', ', $product->serial_numbers->pluck('serial_number')->toArray()) : '' }}" 
+                        data-updated-at="{{ $product->serial_numbers ? implode(', ', $product->serial_numbers->pluck('updated_at')->toArray()) : '' }}" 
                         onclick="openSerialModal(this)">
                         <td>
                             <img src="{{ asset("storage/{$product->product_image}") }}" 
@@ -277,6 +278,7 @@
         </div>
     </div>
 </div>
+
 <!-- Modal for Serial Numbers -->
 <div id="serialModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden" role="dialog" aria-labelledby="serialModalLabel">
     <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
@@ -292,6 +294,7 @@
                     <tr>
                         <th class="border border-gray-300 p-2 text-left">Serial #</th>
                         <th class="border border-gray-300 p-2 text-left">Date Added</th>
+                        <th class="border border-gray-300 p-2 text-left">Action</th>
                     </tr>
                 </thead>
                 <tbody id="serialCreatedAtList" class="divide-y divide-gray-200">
@@ -316,6 +319,8 @@
         <form id="addSerialForm" onsubmit="addNewSerial(event)">
             <div class="p-4">
                 <input type="hidden" name="product_id" id="addSerialProductId">
+                <input type="hidden" name="serial_id" id="addSerialId">
+
                 <div class="mb-4">
                     <label for="serial_number" class="block text-sm font-medium text-gray-700">Serial Number</label>
                     <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" id="serial_number" name="serial_number" placeholder="Enter Serial Number" required>
@@ -327,5 +332,27 @@
         </form>
     </div>
 </div>
-
+<!-- Modal for Editing Serial Number -->
+<div id="editSerialModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
+        <div class="flex justify-between items-center p-4 border-b">
+            <h1 class="text-lg font-semibold">Edit Serial Number</h1>
+            <button type="button" class="text-gray-500 hover:text-gray-700" onclick="closeEditSerialModal()">&times;</button>
+        </div>
+        <form id="editSerialForm" onsubmit="editSerial(event)">
+            <div class="p-4">
+                <input type="hidden" id="editSerialProductId">
+                <input type="hidden" name="editSerialId" id="editSerialId">
+                <div class="mb-4">
+                    <label for="edit_serial_number" class="block text-sm font-medium text-gray-700">Serial Number</label>
+                    <input type="text" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                           id="edit_serial_number" placeholder="Enter Serial Number" required>
+                </div>
+                <div class="flex justify-end mt-4">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700">Save Changes</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection

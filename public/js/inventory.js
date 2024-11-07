@@ -1,39 +1,61 @@
 function openSerialModal(element) {
     const productName = element.getAttribute('data-product-name');
     const productId = element.getAttribute('data-product-id');
-    const serialData = element.getAttribute('data-serial');
-    const createdAtData = element.getAttribute('data-created-at');
+    const addSerialId = element.getAttribute('data-serial-id'); // This will be a comma-separated list of serial IDs
+    const serialData = element.getAttribute('data-serial'); // Comma-separated list of serial numbers
+    const createdAtData = element.getAttribute('data-updated-at'); // Comma-separated list of creation dates
 
-    document.getElementById('addSerialProductId').value = productId; // Set the hidden input value
+    // Set the product ID for adding new serials
+    document.getElementById('addSerialProductId').value = productId;
 
+    // Convert serial numbers, creation dates, and serial IDs to arrays
     const serialNumbers = serialData ? serialData.split(', ') : [];
     const createdAtDates = createdAtData ? createdAtData.split(', ') : [];
+    const serialIds = addSerialId ? addSerialId.split(', ') : [];  // Split the serial IDs into an array
 
     document.getElementById('addSerialProductName').textContent = productName;
+
     const serialCreatedAtList = document.getElementById('serialCreatedAtList');
-    serialCreatedAtList.innerHTML = ''; 
+    serialCreatedAtList.innerHTML = ''; // Clear previous rows
 
     serialNumbers.forEach((serial, index) => {
         const createdAt = createdAtDates[index] || 'N/A';
+        const serialId = serialIds[index] || ''; // Get the serial ID for the current index
+
         const row = document.createElement('tr');
-    
+
         const serialCell = document.createElement('td');
         serialCell.classList.add('border', 'border-gray-200', 'p-2');
         serialCell.textContent = serial;
-    
+
         const createdAtCell = document.createElement('td');
         createdAtCell.classList.add('border', 'border-gray-300', 'p-2');
         createdAtCell.textContent = createdAt;
-    
+
+        const editCell = document.createElement('td');
+        editCell.classList.add('border', 'border-gray-200', 'p-2');
+
+        const editIcon = document.createElement('i');
+        editIcon.classList.add('fa-regular', 'fa-pen-to-square', 'cursor-pointer');
+
+        // Pass the correct serialId and serial number to the modal when clicked
+        editIcon.onclick = () => {
+            openEditSerialModal(productId, serialId, serial); 
+        };
+        
+        editCell.appendChild(editIcon);
+
         row.appendChild(serialCell);
         row.appendChild(createdAtCell);
-    
+        row.appendChild(editCell);
+
+        // Append the row to the table
         serialCreatedAtList.appendChild(row);
     });
-    
 
-    document.getElementById('serialModal').classList.remove('hidden');
+    document.getElementById('serialModal').classList.remove('hidden'); // Show the serial modal
 }
+
 function closeSerialModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
@@ -63,7 +85,6 @@ const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute
 
 function addNewSerial(event) {
     event.preventDefault(); // Prevent the default form submission
-
     const newSerial = document.getElementById('serial_number').value.trim(); 
     const productId = document.getElementById('addSerialProductId').value.trim(); 
     const serialNumberList = document.getElementById('serialCreatedAtList'); 
@@ -110,6 +131,67 @@ function addNewSerial(event) {
         alert('Please enter a valid serial number and select a product.');
     }
 }
+// for editing the serial
+function openEditSerialModal(productId, serialId, serialNumber) {
+    const productIdInput = document.getElementById('editSerialProductId');
+    const serialIdInput = document.getElementById('editSerialId');
+    const serialNumberInput = document.getElementById('edit_serial_number');
+    const editModal = document.getElementById('editSerialModal');
+
+    if (productIdInput && serialIdInput && serialNumberInput && editModal) {
+        productIdInput.value = productId; 
+        serialIdInput.value = serialId;
+        serialNumberInput.value = serialNumber; 
+        editModal.classList.remove('hidden');  
+        console.log("Opening modal for serial ID:", serialId);
+    } else {
+        console.error("One or more modal elements not found. Check HTML for correct IDs.");
+    }
+}
+
+function closeEditSerialModal() {
+    document.getElementById('editSerialModal').classList.add('hidden');
+}
+
+function editSerial(event) {
+    event.preventDefault();
+
+    const productId = document.getElementById('editSerialProductId').value;
+    const serialId = document.getElementById('editSerialId').value;
+    const newSerialNumber = document.getElementById('edit_serial_number').value;
+
+    if (!serialId) {
+        console.error('Serial ID is missing!');
+        return;
+    }
+
+    fetch(`/serials/${serialId}/update`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            serial_number: newSerialNumber,
+            product_id: productId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Serial number updated successfully.');
+            closeEditSerialModal(); 
+            location.reload();
+        } else {
+            console.error(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating serial number:', error);
+    });
+}
+
+
 // Product Modal Functions
 function openAddProductModal() {
     document.getElementById('staticBackdrop').classList.remove('hidden');

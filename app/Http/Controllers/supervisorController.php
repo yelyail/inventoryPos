@@ -70,20 +70,21 @@ class supervisorController extends Controller
                 'inventory.status'
             )
             ->get();
+
     
         foreach ($products as $product) {
             $product->serial_numbers = DB::table('serial')
-                ->select('serial_number', 'created_at')
+                ->select('serial_id', 'serial_number', 'updated_at')
                 ->where('product_id', $product->product_id)
                 ->where('status', 'available')
                 ->get()
                 ->map(function ($serial) {
                     return [
+                        'serial_id' => $serial->serial_id,
                         'serial_number' => $serial->serial_number,
-                        'created_at' => $serial->created_at,
+                        'updated_at' => $serial->updated_at,
                     ];
-                })
-                ->toArray();
+                });
         }
     
         $suppliers = Supplier::all();
@@ -156,8 +157,6 @@ class supervisorController extends Controller
                 'serial_number' => 'required|string|max:255',
                 'product_id' => 'required|exists:product,product_id',
             ]);
-
-            // Check if the serial number already exists for this product
             $existingSerial = serial::where('serial_number', $request->serial_number)
                 ->where('product_id', $request->product_id)
                 ->first();
@@ -176,6 +175,32 @@ class supervisorController extends Controller
         } catch (\Exception $e) {
             Log::error('Error storing serial: ' . $e->getMessage());
             return response()->json(['error' => 'An error occurred while saving the serial number.'], 500);
+        }
+    }
+    public function updateSerial(Request $request, $serialId)
+    {
+        try {
+            $request->validate([
+                'serial_number' => 'required|string|max:255',
+                'product_id' => 'required|exists:product,product_id',
+            ]);
+
+            $serial = serial::findOrFail($serialId); 
+            $existingSerial = serial::where('serial_number', $request->serial_number)
+                ->where('product_id', $request->product_id)
+                ->first();
+
+            if ($existingSerial) {
+                return response()->json(['error' => 'This serial number already exists for the selected product.'], 409);
+            }
+            $serial->serial_number = $request->serial_number;
+            $serial->product_id = $request->product_id;
+            $serial->save();
+
+            return response()->json(['success' => 'Serial number updated successfully.']);
+        } catch (\Exception $e) {
+            Log::error('Error updating serial: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while updating the serial number.'], 500);
         }
     }
 
@@ -356,17 +381,17 @@ class supervisorController extends Controller
     
         foreach ($products as $product) {
             $product->serial_numbers = DB::table('serial')
-                ->select('serial_number', 'created_at')
+                ->select('serial_id', 'serial_number', 'updated_at')
                 ->where('product_id', $product->product_id)
                 ->where('status', 'available')
                 ->get()
                 ->map(function ($serial) {
                     return [
+                        'serial_id' => $serial->serial_id,
                         'serial_number' => $serial->serial_number,
-                        'created_at' => $serial->created_at,
+                        'updated_at' => $serial->updated_at,
                     ];
-                })
-                ->toArray();
+                });
         }
     
         $suppliers = Supplier::all();
@@ -532,7 +557,7 @@ class supervisorController extends Controller
         ->join('supplier', 'product.supplier_id', '=', 'supplier.supplier_id')
         ->join('category', 'product.category_Id', '=', 'category.category_id')
         ->leftJoin('serial', 'product.product_id', '=', 'serial.product_id')
-        ->where('inventory.status', '=', 'approve')
+        ->where('inventory.status', '=', 'pending')
         ->groupBy(
             'product.product_id',
             'product.product_image',
@@ -550,17 +575,17 @@ class supervisorController extends Controller
 
     foreach ($products as $product) {
         $product->serial_numbers = DB::table('serial')
-            ->select('serial_number', 'created_at')
+            ->select('serial_id', 'serial_number', 'updated_at')
             ->where('product_id', $product->product_id)
             ->where('status', 'available')
             ->get()
             ->map(function ($serial) {
                 return [
+                    'serial_id' => $serial->serial_id,
                     'serial_number' => $serial->serial_number,
-                    'created_at' => $serial->created_at,
+                    'updated_at' => $serial->updated_at,
                 ];
-            })
-            ->toArray();
+            });
     }
 
     $suppliers = supplier::all();

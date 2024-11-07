@@ -58,6 +58,7 @@ Route::controller(supervisorController::class)->group(function() {
 });
 
 Route::post('/storeSerial', [supervisorController::class, 'storeSerial'])->name('storeSerial');
+Route::put('/serials/{serialId}/update', [supervisorController::class, 'updateSerial'])->name('updateSerial');
 Route::post('/storeOrder', [supervisorController::class, 'storeOrder'])->name('storeOrder');
 // for the user
 Route::controller(supervisorController::class)->group(function() {
