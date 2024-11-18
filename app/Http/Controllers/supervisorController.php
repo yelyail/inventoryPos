@@ -272,6 +272,7 @@ class supervisorController extends Controller
                 'serial.serial_number',
                 'category.category_name',
                 'category.brand_name',
+                'replace.replace_date',
                 'product.product_name',
                 'supplier.supplier_name',
                 'product.unitPrice',
