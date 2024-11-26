@@ -96,15 +96,18 @@ function filterPosTable() {
 function openPosSerialModal(button) {
     const productName = button.getAttribute('data-product-name');
     const productId = button.getAttribute('data-product-id');
-    const serialNumbers = button.getAttribute('data-serial').split(', '); // Convert to array
-    const productImage = button.getAttribute('data-product-image'); // Get product image
-    const productPrice = button.getAttribute('data-product-price'); // Get product price
+    let serialNumbers = button.getAttribute('data-serial').split(', '); // Convert to array
+    const productImage = button.getAttribute('data-product-image'); 
+    const productPrice = button.getAttribute('data-product-price'); 
 
+    // Update Modal Fields
     document.getElementById('addSerialProductName').textContent = productName;
     document.getElementById('addSerialProductId').value = productId;
 
     const serialList = document.getElementById('serialCreatedAtList');
     serialList.innerHTML = ''; // Clear existing entries
+
+    // Populate Serial List
     serialNumbers.forEach((serial) => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -122,8 +125,16 @@ function openPosSerialModal(button) {
         if (selectedSerials.length > 0) {
             selectedSerials.forEach(selectedSerial => {
                 const serialValue = selectedSerial.value;
+
+                serialNumbers = serialNumbers.filter(serial => serial !== serialValue);
                 addToOrderSummary(productName, serialValue, productId, productImage, productPrice);
             });
+            button.setAttribute('data-serial', serialNumbers.join(', '));
+
+            if (serialNumbers.length === 0) {
+                button.closest('.item').remove(); 
+            }
+
             closeSerialModal('serialModal');
         } else {
             alert('Please select at least one serial number.');
@@ -132,6 +143,7 @@ function openPosSerialModal(button) {
 
     document.getElementById('serialModal').classList.remove('hidden');
 }
+
 function closeSerialModal(modalId) {
     document.getElementById(modalId).classList.add('hidden');
 }
